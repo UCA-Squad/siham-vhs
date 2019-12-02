@@ -1,5 +1,12 @@
 # PoC &amp; Unit Tests for SIHAM WebServices
 
+## Requirements:
+- composer
+- php-soap
+
+------------
+
+## Noob's guide
 - git clone https://github.com/UCA-Squad/siham-vhs.git
 - composer update
 - Modifier le vhost
