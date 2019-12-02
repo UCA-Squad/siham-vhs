@@ -4,7 +4,6 @@
 - composer
 - php-soap
 
-------------
 
 ## Noob's guide :
 - git clone https://github.com/UCA-Squad/siham-vhs.git
@@ -30,5 +29,3 @@
 > duplique le .env, modifier le fichier .env.local.php généré avec vos paramètres de connexion
 - php bin/phpunit 
 > à executer dans le répertoire de déploiement pour tester les services
-
-
