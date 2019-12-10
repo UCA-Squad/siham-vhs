@@ -21,7 +21,7 @@ class SoapClients {
                     'password' => $_ENV['SIHAM_WS_PASSWORD'],
                     'trace' => true,
                 ]);
-            } catch (SoapFault $fault) {
+            } catch (\SoapFault $fault) {
                 return false;
             }
         }

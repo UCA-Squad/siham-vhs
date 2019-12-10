@@ -9,6 +9,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Util\ListeAgentsWebService;
+use App\Util\DossierAgentWebService;
 use App\Entity\Agent;
 
 
@@ -58,7 +59,7 @@ class SyncCommand extends Command
             $progressBar->start();
             foreach($listAgents->return as $listAgent) {
     
-                // ... do some work
+                // retrieve agent
                 $agent = $this->em->getRepository(Agent::class)->findOneByMatricule($listAgent->matricule);
                 // dump($agent);
                 if (!$agent) {
@@ -67,6 +68,16 @@ class SyncCommand extends Command
                 $agent->addListAgentFields($listAgent);
 
 
+                $dossierAgentWS = new DossierAgentWebService();
+
+                $personalData = $dossierAgentWS->getPersonalData($listAgent->matricule);
+                if (isset($personalData->return))
+                    $agent->addPersonalData($personalData->return);
+
+
+                $administrativeData = $dossierAgentWS->getAdministrativeData($listAgent->matricule);
+                if (isset($administrativeData->return))
+                    $agent->addAdministrativeData($administrativeData->return);
 
                 $this->em->persist($agent);
     

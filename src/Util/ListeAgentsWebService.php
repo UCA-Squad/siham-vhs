@@ -4,20 +4,29 @@ namespace App\Util;
 
 use App\Util\SoapClients;
 
-const WSDL = '/ListeAgentsWebService/ListeAgentsWebService?wsdl';
 
 class ListeAgentsWebService
 {
-
+    private $WSDL = '/ListeAgentsWebService/ListeAgentsWebService?wsdl';
+    
     public function getListAgentsByName($name) {
 
-        $soapClientListeAgent = SoapClients::getInstance(WSDL);
+        $soapClientListAgent = SoapClients::getInstance($this->WSDL);
         
-        return $soapClientListeAgent->recupListeAgents([
-			'ParamRecupListeAgents' => [
-				'nomPatronymique' => $name
-			]
-		]);
+        $listAgents = new \StdClass(); // Response expected
+        if ($soapClientListAgent) {
+            try {
+                $listAgents = $soapClientListAgent->recupListeAgents([
+                    'ParamRecupListeAgents' => [
+                        'nomPatronymique' => $name
+                    ]
+                ]);
+            } catch (\SoapFault $fault) {
+                // ... log it ?
+            }
+        }
+
+        return $listAgents;
     }
 
 }

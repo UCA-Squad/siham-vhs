@@ -59,6 +59,13 @@ class Agent {
     private $dateNaissance;
 
     /**
+     * @var bool|null
+     *
+     * @ORM\Column(name="codeCivilite", type="boolean", nullable=true)
+     */
+    private $codeCivilite;
+
+    /**
      * @var string|null
      *
      * @ORM\Column(name="codeEmploiAffectationHierarchique", type="string", length=10, nullable=true)
@@ -103,23 +110,23 @@ class Agent {
     /**
      * @var \DateTime|null
      *
-     * @ORM\Column(name="dateDebutAffectationHierarchique", type="date", nullable=true)
+     * @ORM\Column(name="dateDebutAffectHierarchique", type="date", nullable=true)
      */
-    private $dateDebutAffectationHierarchique;
+    private $dateDebutAffectHierarchique;
 
     /**
      * @var \DateTime|null
      *
-     * @ORM\Column(name="dateFinAffectationHierarchique", type="date", nullable=true)
+     * @ORM\Column(name="dateFinAffectHierarchique", type="date", nullable=true)
      */
-    private $dateFinAffectationHierarchique;
+    private $dateFinAffectHierarchique;
 
     /**
      * @var int|null
      *
-     * @ORM\Column(name="quotiteAffectationHierarchique", type="smallint", nullable=true)
+     * @ORM\Column(name="quotiteAffectHierarchique", type="smallint", nullable=true)
      */
-    private $quotiteAffectationHierarchique;
+    private $quotiteAffectHierarchique;
 
     /**
      * @var string|null
@@ -138,9 +145,23 @@ class Agent {
     /**
      * @var string|null
      *
+     * @ORM\Column(name="portablePerso", type="string", length=20, nullable=true)
+     */
+    private $portablePerso;
+
+    /**
+     * @var string|null
+     *
      * @ORM\Column(name="mailPro", type="string", length=100, nullable=true)
      */
     private $mailPro;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="mailPerso", type="string", length=100, nullable=true)
+     */
+    private $mailPerso;
 
     /**
      * @var string|null
@@ -166,51 +187,9 @@ class Agent {
     /**
      * @var string|null
      *
-     * @ORM\Column(name="libLongPIP", type="string", length=45, nullable=true)
+     * @ORM\Column(name="codeQualiteStatutaire", type="string", length=1, nullable=true)
      */
-    private $libLongPIP;
-
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="codeCorps", type="string", length=4, nullable=true)
-     */
-    private $codeCorps;
-
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="libCourtCorps", type="string", length=18, nullable=true)
-     */
-    private $libCourtCorps;
-
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="libLongCorps", type="string", length=45, nullable=true)
-     */
-    private $libLongCorps;
-
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="codeGrade", type="string", length=4, nullable=true)
-     */
-    private $codeGrade;
-
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="libLongGrade", type="string", length=45, nullable=true)
-     */
-    private $libLongGrade;
-
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="codeEchelon", type="string", length=2, nullable=true)
-     */
-    private $codeEchelon;
+    private $codeQualiteStatutaire;
 
     /**
      * @var string|null
@@ -222,72 +201,16 @@ class Agent {
     /**
      * @var string|null
      *
-     * @ORM\Column(name="libLongGroupeHierarchique", type="string", length=45, nullable=true)
+     * @ORM\Column(name="codeCategory", type="string", length=18, nullable=true)
      */
-    private $libLongGroupeHierarchique;
+    private $codeCategory;
 
     /**
      * @var string|null
      *
-     * @ORM\Column(name="temEnseignantChercheur", type="string", length=1, nullable=true)
+     * @ORM\Column(name="codeEchelon", type="string", length=2, nullable=true)
      */
-    private $temEnseignantChercheur;
-
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="mailPerso", type="string", length=100, nullable=true)
-     */
-    private $mailPerso;
-
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="temEtat", type="string", length=1, nullable=true)
-     */
-    private $temEtat;
-
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="affectationHierarchique", type="text", length=65535, nullable=true)
-     */
-    private $affectationHierarchique;
-
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="affectationsFonctionnelles", type="text", length=65535, nullable=true)
-     */
-    private $affectationsFonctionnelles;
-
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="affectationsAdresses", type="text", length=65535, nullable=true)
-     */
-    private $affectationsAdresses;
-
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="codeEmploiAffectation", type="string", length=10, nullable=true)
-     */
-    private $codeEmploiAffectation;
-
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="categorieEmploiPoste", type="string", length=4, nullable=true)
-     */
-    private $categorieEmploiPoste;
-
-    /**
-     * @var bool|null
-     *
-     * @ORM\Column(name="civilite", type="boolean", nullable=true)
-     */
-    private $civilite;
+    private $codeEchelon;
 
     /**
      * @var int|null
@@ -299,16 +222,128 @@ class Agent {
     /**
      * @var string|null
      *
-     * @ORM\Column(name="codeQualiteStatutaire", type="string", length=1, nullable=true)
+     * @ORM\Column(name="codeCorps", type="string", length=4, nullable=true)
      */
-    private $codeQualiteStatutaire;
+    private $codeCorps;
 
     /**
      * @var string|null
      *
-     * @ORM\Column(name="libLongQualiteStatutaire", type="string", length=45, nullable=true)
+     * @ORM\Column(name="codeGrade", type="string", length=4, nullable=true)
      */
-    private $libLongQualiteStatutaire;
+    private $codeGrade;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="temEnseignantChercheur", type="string", length=1, nullable=true)
+     */
+    private $temEnseignantChercheur;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="temEtat", type="string", length=1, nullable=true)
+     */
+    private $temEtat;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="categorieEmploiPoste", type="string", length=4, nullable=true)
+     */
+    private $categorieEmploiPoste;
+
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="codeUOAffectationsADR", type="string", nullable=true)
+     */
+    private $codeUOAffectationsADR;
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="nameUOAffectationsADR", type="text", nullable=true)
+     */
+    private $nameUOAffectationsADR;
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="quotUOAffectationsADR", type="string", nullable=true)
+     */
+    private $quotUOAffectationsADR;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="codeUOAffectationsFUN", type="string", nullable=true)
+     */
+    private $codeUOAffectationsFUN;
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="nameUOAffectationsFUN", type="text", nullable=true)
+     */
+    private $nameUOAffectationsFUN;
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="quotUOAffectationsFUN", type="string", nullable=true)
+     */
+    private $quotUOAffectationsFUN;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="codeUOAffectationsHIE", type="string", nullable=true)
+     */
+    private $codeUOAffectationsHIE;
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="nameUOAffectationsHIE", type="text", nullable=true)
+     */
+    private $nameUOAffectationsHIE;
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="quotUOAffectationsHIE", type="string", nullable=true)
+     */
+    private $quotUOAffectationsHIE;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="codeFunctions", type="string", nullable=true)
+     */
+    private $codeFunctions;
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="nameFunctions", type="text", nullable=true)
+     */
+    private $nameFunctions;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="codePositionsAdministrative", type="string", nullable=true)
+     */
+    private $codePositionsAdministrative;
+    
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="codeAbsences", type="string", nullable=true)
+     */
+    private $codeAbsences;
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="nameAbsences", type="text", nullable=true)
+     */
+    private $nameAbsences;
 
     #endregion
 
@@ -355,6 +390,15 @@ class Agent {
     }
     public function setDateNaissance(?\DateTimeInterface $dateNaissance): self {
         $this->dateNaissance = $dateNaissance;
+
+        return $this;
+    }
+
+    public function getCodeCivilite(): ?bool {
+        return $this->codeCivilite;
+    }
+    public function setCodeCivilite(?bool $codeCivilite): self {
+        $this->codeCivilite = $codeCivilite;
 
         return $this;
     }
@@ -413,29 +457,29 @@ class Agent {
         return $this;
     }
 
-    public function getDateDebutAffectationHierarchique(): ?\DateTimeInterface {
-        return $this->dateDebutAffectationHierarchique;
+    public function getDateDebutAffectHierarchique(): ?\DateTimeInterface {
+        return $this->dateDebutAffectHierarchique;
     }
-    public function setDateDebutAffectationHierarchique(?\DateTimeInterface $dateDebutAffectationHierarchique): self {
-        $this->dateDebutAffectationHierarchique = $dateDebutAffectationHierarchique;
+    public function setDateDebutAffectHierarchique(?\DateTimeInterface $dateDebutAffectHierarchique): self {
+        $this->dateDebutAffectHierarchique = $dateDebutAffectHierarchique;
 
         return $this;
     }
 
-    public function getDateFinAffectationHierarchique(): ?\DateTimeInterface {
-        return $this->dateFinAffectationHierarchique;
+    public function getDateFinAffectHierarchique(): ?\DateTimeInterface {
+        return $this->dateFinAffectHierarchique;
     }
-    public function setDateFinAffectationHierarchique(?\DateTimeInterface $dateFinAffectationHierarchique): self {
-        $this->dateFinAffectationHierarchique = $dateFinAffectationHierarchique;
+    public function setDateFinAffectHierarchique(?\DateTimeInterface $dateFinAffectHierarchique): self {
+        $this->dateFinAffectHierarchique = $dateFinAffectHierarchique;
 
         return $this;
     }
 
-    public function getQuotiteAffectationHierarchique(): ?int {
-        return $this->quotiteAffectationHierarchique;
+    public function getQuotiteAffectHierarchique(): ?int {
+        return $this->quotiteAffectHierarchique;
     }
-    public function setQuotiteAffectationHierarchique(?int $quotiteAffectationHierarchique): self {
-        $this->quotiteAffectationHierarchique = $quotiteAffectationHierarchique;
+    public function setQuotiteAffectHierarchique(?int $quotiteAffectHierarchique): self {
+        $this->quotiteAffectHierarchique = $quotiteAffectHierarchique;
 
         return $this;
     }
@@ -458,11 +502,29 @@ class Agent {
         return $this;
     }
 
+    public function getPortablePerso(): ?string {
+        return $this->portablePerso;
+    }
+    public function setPortablePerso(?string $portablePerso): self {
+        $this->portablePerso = $portablePerso;
+
+        return $this;
+    }
+
     public function getMailPro(): ?string {
         return $this->mailPro;
     }
     public function setMailPro(?string $mailPro): self {
         $this->mailPro = $mailPro;
+
+        return $this;
+    }
+
+    public function getMailPerso(): ?string {
+        return $this->mailPerso;
+    }
+    public function setMailPerso(?string $mailPerso): self {
+        $this->mailPerso = $mailPerso;
 
         return $this;
     }
@@ -494,69 +556,14 @@ class Agent {
         return $this;
     }
 
-    public function getLibLongPIP(): ?string {
-        return $this->libLongPIP;
+    public function getCodeQualiteStatutaire(): ?string {
+        return $this->codeQualiteStatutaire;
     }
-    public function setLibLongPIP(?string $libLongPIP): self {
-        $this->libLongPIP = $libLongPIP;
+    public function setCodeQualiteStatutaire(?string $codeQualiteStatutaire): self {
+        $this->codeQualiteStatutaire = $codeQualiteStatutaire;
 
         return $this;
     }
-
-    public function getCodeCorps(): ?string {
-        return $this->codeCorps;
-    }
-    public function setCodeCorps(?string $codeCorps): self {
-        $this->codeCorps = $codeCorps;
-
-        return $this;
-    }
-
-    public function getLibCourtCorps(): ?string {
-        return $this->libCourtCorps;
-    }
-    public function setLibCourtCorps(?string $libCourtCorps): self {
-        $this->libCourtCorps = $libCourtCorps;
-
-        return $this;
-    }
-
-    public function getLibLongCorps(): ?string {
-        return $this->libLongCorps;
-    }
-    public function setLibLongCorps(?string $libLongCorps): self {
-        $this->libLongCorps = $libLongCorps;
-
-        return $this;
-    }
-
-    public function getCodeGrade(): ?string {
-        return $this->codeGrade;
-    }
-    public function setCodeGrade(?string $codeGrade): self {
-        $this->codeGrade = $codeGrade;
-
-        return $this;
-    }
-
-    public function getLibLongGrade(): ?string {
-        return $this->libLongGrade;
-    }
-    public function setLibLongGrade(?string $libLongGrade): self {
-        $this->libLongGrade = $libLongGrade;
-
-        return $this;
-    }
-
-    public function getCodeEchelon(): ?string {
-        return $this->codeEchelon;
-    }
-    public function setCodeEchelon(?string $codeEchelon): self {
-        $this->codeEchelon = $codeEchelon;
-
-        return $this;
-    }
-
     public function getCodeGroupeHierarchique(): ?string {
         return $this->codeGroupeHierarchique;
     }
@@ -565,12 +572,43 @@ class Agent {
 
         return $this;
     }
-
-    public function getLibLongGroupeHierarchique(): ?string {
-        return $this->libLongGroupeHierarchique;
+    public function getCodeCategory(): ?string {
+        return $this->codeCategory;
     }
-    public function setLibLongGroupeHierarchique(?string $libLongGroupeHierarchique): self {
-        $this->libLongGroupeHierarchique = $libLongGroupeHierarchique;
+    public function setCodeCategory(?string $codeCategory): self {
+        $this->codeCategory = $codeCategory;
+
+        return $this;
+    }
+    public function getCodeEchelon(): ?string {
+        return $this->codeEchelon;
+    }
+    public function setCodeEchelon(?string $codeEchelon): self {
+        $this->codeEchelon = $codeEchelon;
+
+        return $this;
+    }
+    public function getIndiceMajore(): ?int {
+        return $this->indiceMajore;
+    }
+    public function setIndiceMajore(?int $indiceMajore): self {
+        $this->indiceMajore = $indiceMajore;
+
+        return $this;
+    }
+    public function getCodeCorps(): ?string {
+        return $this->codeCorps;
+    }
+    public function setCodeCorps(?string $codeCorps): self {
+        $this->codeCorps = $codeCorps;
+
+        return $this;
+    }
+    public function getCodeGrade(): ?string {
+        return $this->codeGrade;
+    }
+    public function setCodeGrade(?string $codeGrade): self {
+        $this->codeGrade = $codeGrade;
 
         return $this;
     }
@@ -584,56 +622,11 @@ class Agent {
         return $this;
     }
 
-    public function getMailPerso(): ?string {
-        return $this->mailPerso;
-    }
-    public function setMailPerso(?string $mailPerso): self {
-        $this->mailPerso = $mailPerso;
-
-        return $this;
-    }
-
     public function getTemEtat(): ?string {
         return $this->temEtat;
     }
     public function setTemEtat(?string $temEtat): self {
         $this->temEtat = $temEtat;
-
-        return $this;
-    }
-
-    public function getAffectationHierarchique(): ?string {
-        return $this->affectationHierarchique;
-    }
-    public function setAffectationHierarchique(?string $affectationHierarchique): self {
-        $this->affectationHierarchique = $affectationHierarchique;
-
-        return $this;
-    }
-
-    public function getAffectationsFonctionnelles(): ?string {
-        return $this->affectationsFonctionnelles;
-    }
-    public function setAffectationsFonctionnelles(?string $affectationsFonctionnelles): self {
-        $this->affectationsFonctionnelles = $affectationsFonctionnelles;
-
-        return $this;
-    }
-
-    public function getAffectationsAdresses(): ?string {
-        return $this->affectationsAdresses;
-    }
-    public function setAffectationsAdresses(?string $affectationsAdresses): self {
-        $this->affectationsAdresses = $affectationsAdresses;
-
-        return $this;
-    }
-
-    public function getCodeEmploiAffectation(): ?string {
-        return $this->codeEmploiAffectation;
-    }
-    public function setCodeEmploiAffectation(?string $codeEmploiAffectation): self {
-        $this->codeEmploiAffectation = $codeEmploiAffectation;
 
         return $this;
     }
@@ -647,38 +640,120 @@ class Agent {
         return $this;
     }
 
-    public function getCivilite(): ?bool {
-        return $this->civilite;
+    public function getCodeUOAffectationsADR(): ?string {
+        return $this->codeUOAffectationsADR;
     }
-    public function setCivilite(?bool $civilite): self {
-        $this->civilite = $civilite;
+    public function setCodeUOAffectationsADR(?string $codeUOAffectationsADR): self {
+        $this->codeUOAffectationsADR = $codeUOAffectationsADR;
+
+        return $this;
+    }
+    public function getNameUOAffectationsADR(): ?string {
+        return $this->nameUOAffectationsADR;
+    }
+    public function setNameUOAffectationsADR(?string $nameUOAffectationsADR): self {
+        $this->nameUOAffectationsADR = $nameUOAffectationsADR;
+
+        return $this;
+    }
+    public function getQuotUOAffectationsADR(): ?int {
+        return $this->quotUOAffectationsADR;
+    }
+    public function setQuotUOAffectationsADR(?int $quotUOAffectationsADR): self {
+        $this->quotUOAffectationsADR = $quotUOAffectationsADR;
 
         return $this;
     }
 
-    public function getIndiceMajore(): ?int {
-        return $this->indiceMajore;
+    public function getCodeUOAffectationsFUN(): ?string {
+        return $this->codeUOAffectationsFUN;
     }
-    public function setIndiceMajore(?int $indiceMajore): self {
-        $this->indiceMajore = $indiceMajore;
+    public function setCodeUOAffectationsFUN(?string $codeUOAffectationsFUN): self {
+        $this->codeUOAffectationsFUN = $codeUOAffectationsFUN;
+
+        return $this;
+    }
+    public function getNameUOAffectationsFUN(): ?string {
+        return $this->nameUOAffectationsFUN;
+    }
+    public function setNameUOAffectationsFUN(?string $nameUOAffectationsFUN): self {
+        $this->nameUOAffectationsFUN = $nameUOAffectationsFUN;
+
+        return $this;
+    }
+    public function getQuotUOAffectationsFUN(): ?int {
+        return $this->quotUOAffectationsFUN;
+    }
+    public function setQuotUOAffectationsFUN(?int $quotUOAffectationsFUN): self {
+        $this->quotUOAffectationsFUN = $quotUOAffectationsFUN;
 
         return $this;
     }
 
-    public function getCodeQualiteStatutaire(): ?string {
-        return $this->codeQualiteStatutaire;
+    public function getCodeUOAffectationsHIE(): ?string {
+        return $this->codeUOAffectationsHIE;
     }
-    public function setCodeQualiteStatutaire(?string $codeQualiteStatutaire): self {
-        $this->codeQualiteStatutaire = $codeQualiteStatutaire;
+    public function setCodeUOAffectationsHIE(?string $codeUOAffectationsHIE): self {
+        $this->codeUOAffectationsHIE = $codeUOAffectationsHIE;
+
+        return $this;
+    }
+    public function getNameUOAffectationsHIE(): ?string {
+        return $this->nameUOAffectationsHIE;
+    }
+    public function setNameUOAffectationsHIE(?string $nameUOAffectationsHIE): self {
+        $this->nameUOAffectationsHIE = $nameUOAffectationsHIE;
+
+        return $this;
+    }
+    public function getQuotUOAffectationsHIE(): ?int {
+        return $this->quotUOAffectationsHIE;
+    }
+    public function setQuotUOAffectationsHIE(?int $quotUOAffectationsHIE): self {
+        $this->quotUOAffectationsHIE = $quotUOAffectationsHIE;
 
         return $this;
     }
 
-    public function getLibLongQualiteStatutaire(): ?string {
-        return $this->libLongQualiteStatutaire;
+    public function getCodeFunctions(): ?string {
+        return $this->codeFunctions;
     }
-    public function setLibLongQualiteStatutaire(?string $libLongQualiteStatutaire): self {
-        $this->libLongQualiteStatutaire = $libLongQualiteStatutaire;
+    public function setCodeFunctions(?string $codeFunctions): self {
+        $this->codeFunctions = $codeFunctions;
+
+        return $this;
+    }
+    public function getNameFunctions(): ?string {
+        return $this->nameFunctions;
+    }
+    public function setNameFunctions(?string $nameFunctions): self {
+        $this->nameFunctions = $nameFunctions;
+
+        return $this;
+    }
+
+    public function getCodePositionsAdministrative(): ?string {
+        return $this->codePositionsAdministrative;
+    }
+    public function setCodePositionsAdministrative(?string $codePositionsAdministrative): self {
+        $this->codePositionsAdministrative = $codePositionsAdministrative;
+
+        return $this;
+    }
+
+    public function getCodeAbsences(): ?string {
+        return $this->codeAbsences;
+    }
+    public function setCodeAbsences(?string $codeAbsences): self {
+        $this->codeAbsences = $codeAbsences;
+
+        return $this;
+    }
+    public function getNameAbsences(): ?string {
+        return $this->nameAbsences;
+    }
+    public function setNameAbsences(?string $nameAbsences): self {
+        $this->nameAbsences = $nameAbsences;
 
         return $this;
     }
@@ -698,6 +773,127 @@ class Agent {
                 } else {
                     $this->$attribute = $value;
                 }
+            }
+        }
+    }
+
+    /**
+     * Set attributes from response of webservice dossierAgent
+     * @param personalData object response of webservice 
+     */
+    public function addPersonalData($personalData) {
+        
+        if (isset($personalData->listeNumerosMails)) {
+            $listeNumerosMails = \is_object($personalData->listeNumerosMails) ? [$personalData->listeNumerosMails] : $personalData->listeNumerosMails;
+            foreach($listeNumerosMails as $numeroMail) {
+                if ($numeroMail->codeTypologieNumeroMail == 'MPE')
+                    $this->mailPerso = $numeroMail->numeroMail;
+                else if ($numeroMail->codeTypologieNumeroMail == 'PPE')
+                	$this->portablePerso = $numeroMail->numeroMail;
+            }
+        }
+
+        $codeFunctions = [];
+        $nameFunctions = [];
+        if (isset($personalData->listeFonctions)) {
+            $listeFonctions = \is_object($personalData->listeFonctions) ? [$personalData->listeFonctions] : $personalData->listeFonctions;
+            foreach($listeFonctions as $listeFonction) {
+                $codeFunctions[] = $listeFonction->codeFonction;
+                $nameFunctions[] = $listeFonction->libLongFonction;
+            }
+        }
+        $this->codeFunctions = \implode('|', $codeFunctions);
+        $this->nameFunctions = \implode('|', $nameFunctions);
+    }
+
+    /**
+     * Set attributes from response of webservice dossierAgent
+     * @param administrativeData object response of webservice 
+     */
+    public function addAdministrativeData($administrativeData) {
+        
+        $codeUOAffectationsADR = []; $nameUOAffectationsADR = []; $quotUOAffectationsADR = [];
+        $codeUOAffectationsFUN = []; $nameUOAffectationsFUN = []; $quotUOAffectationsFUN = [];
+        $codeUOAffectationsHIE = []; $nameUOAffectationsHIE = []; $quotUOAffectationsHIE = [];
+        $categorieEmploiPoste = NULL;
+        if (isset($administrativeData->listeAffectations)) {
+            $listeAffectations = \is_object($administrativeData->listeAffectations) ? [$administrativeData->listeAffectations] : $administrativeData->listeAffectations;
+            foreach($listeAffectations as $listeAffectation) {
+                if ($listeAffectation->codeTypeRattachement == 'ADR') {
+                    if (isset($listeAffectation->codeUOAffectation))        $codeUOAffectationsADR[] = $listeAffectation->codeUOAffectation;
+                    if (isset($listeAffectation->libLongCodeUOAffectation)) $nameUOAffectationsADR[] = $listeAffectation->libLongCodeUOAffectation;
+                    if (isset($listeAffectation->quotiteAffectation))       $quotUOAffectationsADR[] = $listeAffectation->quotiteAffectation;
+                } else if ($listeAffectation->codeTypeRattachement == 'FUN') {
+                    if (isset($listeAffectation->codeUOAffectation))        $codeUOAffectationsFUN[] = $listeAffectation->codeUOAffectation;
+                    if (isset($listeAffectation->libLongCodeUOAffectation)) $nameUOAffectationsFUN[] = $listeAffectation->libLongCodeUOAffectation;
+                    if (isset($listeAffectation->quotiteAffectation))       $quotUOAffectationsFUN[] = $listeAffectation->quotiteAffectation;
+                } else if ($listeAffectation->codeTypeRattachement == 'HIE') {
+                    if (isset($listeAffectation->codeUOAffectation))        $codeUOAffectationsHIE[] = $listeAffectation->codeUOAffectation;
+                    if (isset($listeAffectation->libLongCodeUOAffectation)) $nameUOAffectationsHIE[] = $listeAffectation->libLongCodeUOAffectation;
+                    if (isset($listeAffectation->quotiteAffectation))       $quotUOAffectationsHIE[] = $listeAffectation->quotiteAffectation;
+                    if (isset($listeAffectation->categorieEmploiPoste))     $categorieEmploiPoste = $listeAffectation->categorieEmploiPoste;
+                }
+            }
+        }
+        $this->codeUOAffectationsADR = \implode('|', $codeUOAffectationsADR); $this->nameUOAffectationsADR = \implode('|', $nameUOAffectationsADR); $this->quotUOAffectationsADR = \implode('|', $quotUOAffectationsADR);
+        $this->codeUOAffectationsFUN = \implode('|', $codeUOAffectationsFUN); $this->nameUOAffectationsFUN = \implode('|', $nameUOAffectationsFUN); $this->quotUOAffectationsFUN = \implode('|', $quotUOAffectationsFUN);
+        $this->codeUOAffectationsHIE = \implode('|', $codeUOAffectationsHIE); $this->nameUOAffectationsHIE = \implode('|', $nameUOAffectationsHIE); $this->quotUOAffectationsHIE = \implode('|', $quotUOAffectationsHIE);
+        $this->categorieEmploiPoste = $categorieEmploiPoste;
+
+
+        $codeQualiteStatutaire = NULL;
+        $codeGroupeHierarchique = NULL;
+        $codeCategory = NULL;
+        $codeEchelon = NULL;
+        $indiceMajore = NULL;
+        $codeCorps = NULL;
+        $codeGrade = NULL;
+        $temEnseignantChercheur = NULL;
+        if (isset($administrativeData->listeCarrieres)) {
+            $listeCarrieres = \is_object($administrativeData->listeCarrieres) ? [$administrativeData->listeCarrieres] : $administrativeData->listeCarrieres;
+            foreach($listeCarrieres as $listeCarriere) {
+                if (isset($listeCarriere->codeQualiteStatutaire)) $codeQualiteStatutaire = $listeCarriere->codeQualiteStatutaire;
+                if (isset($listeCarriere->codeGroupeHierarchique)) $codeGroupeHierarchique = $listeCarriere->codeGroupeHierarchique;
+                if (isset($listeCarriere->libCourtCategorieFP)) // and $listeCarriere->numeroCarriere ?
+                    $codeCategory = $listeCarriere->libCourtCategorieFP;// concatenate ?
+                if (isset($listeCarriere->codeEchelon)) $codeEchelon = $listeCarriere->codeEchelon;
+                if (isset($listeCarriere->indiceMajore)) $indiceMajore = $listeCarriere->indiceMajore;
+                if (isset($listeCarriere->codeCorps)) $codeCorps = $listeCarriere->codeCorps;
+                if (isset($listeCarriere->codeGrade)) $codeGrade = $listeCarriere->codeGrade;
+                if (isset($listeCarriere->temEnseignantChercheur)) $temEnseignantChercheur = $listeCarriere->temEnseignantChercheur;
+            }
+        }
+        $this->codeQualiteStatutaire = $codeQualiteStatutaire;
+        $this->codeGroupeHierarchique = $codeGroupeHierarchique;
+        $this->codeCategory = $codeCategory;
+        $this->codeEchelon = $codeEchelon;
+        $this->indiceMajore = $indiceMajore;
+        $this->codeCorps = $codeCorps;
+        $this->codeGrade = $codeGrade;
+        $this->temEnseignantChercheur = $temEnseignantChercheur;
+
+        if (isset($administrativeData->listePIP)) {
+            $listePIPs = \is_object($administrativeData->listePIP) ? [$administrativeData->listePIP] : $administrativeData->listePIP;
+            foreach($listePIPs as $listePIP) {
+                if (isset($listePIP->codePIP)) $this->codePIP = $listePIP->codePIP;// concatenate ?
+            }
+        }
+
+        if (isset($administrativeData->listePositionsAdministratives)) {
+            $listePositionsAdministratives = \is_object($administrativeData->listePositionsAdministratives) ? [$administrativeData->listePositionsAdministratives] : $administrativeData->listePositionsAdministratives;
+            foreach($listePositionsAdministratives as $listePositionAdministrative) {
+                if (isset($listePositionAdministrative->codePositionAdmin))
+                    $this->codePositionAdmin = $listePositionAdministrative->codePositionAdmin;// concatenate ?
+            }
+        }
+
+        if (isset($administrativeData->listeAbsencesConges)) {
+            $listeAbsencesConges = \is_object($administrativeData->listeAbsencesConges) ? [$administrativeData->listeAbsencesConges] : $administrativeData->listeAbsencesConges;
+            foreach($listeAbsencesConges as $listeAbsenceConges) {
+                if (isset($listeAbsenceConges->codeMotifAbsenceConge))
+                    $this->codeAbsence = $listeAbsenceConges->codeMotifAbsenceConge;// concatenate ?
+                if (isset($listeAbsenceConges->libLongMotifAbsenceConge))
+                    $this->nameAbsence = $listeAbsenceConges->libLongMotifAbsenceConge;// concatenate ?
             }
         }
     }
