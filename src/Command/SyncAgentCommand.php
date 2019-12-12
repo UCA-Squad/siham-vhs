@@ -13,10 +13,10 @@ use App\Util\DossierAgentWebService;
 use App\Entity\Agent;
 
 
-class SyncCommand extends Command
+class SyncAgentCommand extends Command
 {
     // the name of the command (the part after "bin/console")
-    protected static $defaultName = 'sync:all';
+    protected static $defaultName = 'sync:agent';
     private $em;
 
     public function __construct(EntityManagerInterface $em)
@@ -29,7 +29,7 @@ class SyncCommand extends Command
     {
         $this
         // the short description shown while running "php bin/console list"
-        ->setDescription('Sync all user from SIHAM...')
+        ->setDescription('Sync all users from SIHAM...')
 
         // the full command description shown when running the command with
         // the "--help" option

@@ -17,3 +17,11 @@
 .phpunit.result.cache
 /phpunit.xml
 ###< symfony/phpunit-bridge ###
+
+###> result test from PHPUnits ###
+### php bin/phpunit  --testdox-html templates/tests/test.all.html
+### php bin/phpunit test/path/specificTest.php --testdox-html templates/tests/test.specific.html
+
+/templates/tests/test.*.html
+
+###< result test from PHPUnits ###

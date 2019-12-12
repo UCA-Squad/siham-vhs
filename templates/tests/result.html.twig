@@ -1,0 +1,20 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Test Result{% endblock %}
+
+{% block body %}
+
+<style>
+.title {
+    font-size: 2em;
+    font-family: Arial;
+    color: #555753;
+    margin-top: 1em;
+}
+</style>
+
+<div class="title">{{ title }}</div>
+
+{% include "tests/test.all.html" ignore missing %}
+
+{% endblock %}
