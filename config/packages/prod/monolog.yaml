@@ -1,5 +1,15 @@
 monolog:
+    # Add new channel to log the synch commands
+    channels: ['sync']
+    
     handlers:
+        #  Define handler to log in a different file
+        sync:
+            type: stream
+            path: "%kernel.logs_dir%/%kernel.environment%.sync.log"
+            level: debug
+            max_files: 10
+            channels: ['sync', 'doctrine']
         main:
             type: fingers_crossed
             action_level: error
