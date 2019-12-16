@@ -6,7 +6,9 @@ monolog:
         # Define handler to log in a different file
         sync:
             type: stream
-            path: "%kernel.logs_dir%/%kernel.environment%.sync.log"
+            # default path means templates directory
+            # in order to read log into twig render
+            path: "%twig.default_path%/sync/%kernel.environment%.sync.log"
             level: debug
             max_files: 10
             channels: ["sync", "doctrine"]

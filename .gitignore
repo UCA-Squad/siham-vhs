@@ -18,10 +18,13 @@
 /phpunit.xml
 ###< symfony/phpunit-bridge ###
 
-###> result test from PHPUnits ###
+###> test result from PHPUnits ###
 ### php bin/phpunit  --testdox-html templates/tests/test.all.html
 ### php bin/phpunit test/path/specificTest.php --testdox-html templates/tests/test.specific.html
-
 /templates/tests/test.*.html
+###< test result from PHPUnits ###
 
-###< result test from PHPUnits ###
+###> sync result from Command sync:agent ###
+### php bin/console sync:agent logger
+/templates/sync/*.log
+###< sync result from Command sync:agent ###

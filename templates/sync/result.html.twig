@@ -1,6 +1,6 @@
 {% extends "base.html.twig" %}
 
-{% block title %}Tests Result{% endblock %}
+{% block title %}Sync Result{% endblock %}
 
 {% block body %}
 
@@ -15,6 +15,8 @@
 
 <div class="title">{{ title }}</div>
 
-{% include "tests/test.all.html" ignore missing %}
+<pre>
+    {% include "sync/" ~ environment ~ ".sync.log" ignore missing %}
+</pre>
 
 {% endblock %}
