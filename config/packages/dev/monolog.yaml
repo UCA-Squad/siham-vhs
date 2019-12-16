@@ -1,0 +1,29 @@
+monolog:
+    # Add new channel to log the synch commands
+    channels: ['sync']
+    
+    handlers:
+        # Define handler to log in a different file
+        sync:
+            type: stream
+            path: "%kernel.logs_dir%/%kernel.environment%.sync.log"
+            level: debug
+            max_files: 10
+            channels: ["sync", "doctrine"]
+        main:
+            type: stream
+            path: "%kernel.logs_dir%/%kernel.environment%.log"
+            level: debug
+            channels: ["!event", '!sync']
+        # uncomment to get logging in your browser
+        # you may have to allow bigger header sizes in your Web server configuration
+        #firephp:
+        #    type: firephp
+        #    level: info
+        #chromephp:
+        #    type: chromephp
+        #    level: info
+        console:
+            type: console
+            process_psr_3_messages: false
+            channels: ["!event", "!doctrine", "!console"]
