@@ -33,6 +33,20 @@ class Agent {
     /**
      * @var string|null
      *
+     * @ORM\Column(name="username", type="string", length=12)
+     */
+    private $username;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="badge", type="string", length=45)
+     */
+    private $badge;
+
+    /**
+     * @var string|null
+     *
      * @ORM\Column(name="nomPatronymique", type="string", length=40, nullable=true)
      */
     private $nomPatronymique;
@@ -354,6 +368,24 @@ class Agent {
     }
     public function setMatricule(?string $matricule): self {
         $this->matricule = $matricule;
+
+        return $this;
+    }
+
+    public function getUsername(): ?string {
+        return $this->username;
+    }
+    public function setUsername(?string $username): self {
+        $this->username = $username;
+
+        return $this;
+    }
+
+    public function getBadge(): ?string {
+        return $this->badge;
+    }
+    public function setBadge(?string $badge): self {
+        $this->badge = $badge;
 
         return $this;
     }
