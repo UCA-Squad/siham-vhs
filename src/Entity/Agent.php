@@ -75,7 +75,7 @@ class Agent {
     /**
      * @var bool|null
      *
-     * @ORM\Column(name="codeCivilite", type="boolean", nullable=true)
+     * @ORM\Column(name="codeCivilite", type="string", length=1, nullable=true)
      */
     private $codeCivilite;
 
@@ -180,7 +180,7 @@ class Agent {
     /**
      * @var string|null
      *
-     * @ORM\Column(name="numDossierHarpege", type="string", length=12, nullable=true)
+     * @ORM\Column(name="numDossierHarpege", type="integer", nullable=true)
      */
     private $numDossierHarpege;
 
@@ -426,10 +426,10 @@ class Agent {
         return $this;
     }
 
-    public function getCodeCivilite(): ?bool {
+    public function getCodeCivilite(): ?string {
         return $this->codeCivilite;
     }
-    public function setCodeCivilite(?bool $codeCivilite): self {
+    public function setCodeCivilite(?string $codeCivilite): self {
         $this->codeCivilite = $codeCivilite;
 
         return $this;
@@ -561,10 +561,10 @@ class Agent {
         return $this;
     }
 
-    public function getNumDossierHarpege(): ?string {
+    public function getNumDossierHarpege(): ?integer {
         return $this->numDossierHarpege;
     }
-    public function setNumDossierHarpege(?string $numDossierHarpege): self {
+    public function setNumDossierHarpege(?integer $numDossierHarpege): self {
         $this->numDossierHarpege = $numDossierHarpege;
 
         return $this;
