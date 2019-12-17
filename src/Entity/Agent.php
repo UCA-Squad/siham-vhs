@@ -561,10 +561,10 @@ class Agent {
         return $this;
     }
 
-    public function getNumDossierHarpege(): ?integer {
+    public function getNumDossierHarpege(): ?int {
         return $this->numDossierHarpege;
     }
-    public function setNumDossierHarpege(?integer $numDossierHarpege): self {
+    public function setNumDossierHarpege(?int $numDossierHarpege): self {
         $this->numDossierHarpege = $numDossierHarpege;
 
         return $this;
