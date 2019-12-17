@@ -29,4 +29,8 @@ services:
     # add sync logger as a service for command
     App\Command\SyncAgentCommand:
         arguments:
-            $logger: '@monolog.logger.sync'
+            $logger: '@monolog.logger.sync_agent'
+    App\Command\SyncLdapCommand:
+        arguments:
+            $logger: '@monolog.logger.sync_ldap'
+            $project_dir: '%kernel.project_dir%'

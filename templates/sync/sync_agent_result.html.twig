@@ -1,0 +1,22 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Sync Agent Result{% endblock %}
+
+{% block body %}
+
+<style>
+.title {
+    font-size: 2em;
+    font-family: Arial;
+    color: #555753;
+    margin-top: 1em;
+}
+</style>
+
+<div class="title">{{ title }}</div>
+
+<pre>
+    {% include "sync/" ~ environment ~ ".sync.agent.log" ignore missing %}
+</pre>
+
+{% endblock %}

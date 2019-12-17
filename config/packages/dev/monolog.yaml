@@ -1,22 +1,30 @@
 monolog:
     # Add new channel to log the synch commands
-    channels: ['sync']
+    channels: ['sync_agent', 'sync_ldap']
     
     handlers:
         # Define handler to log in a different file
-        sync:
+        sync_agent:
             type: stream
             # default path means templates directory
             # in order to read log into twig render
-            path: "%twig.default_path%/sync/%kernel.environment%.sync.log"
+            path: "%twig.default_path%/sync/%kernel.environment%.sync.agent.log"
             level: debug
             max_files: 10
-            channels: ["sync", "doctrine"]
+            channels: ["sync_agent"]
+        sync_ldap:
+            type: stream
+            # default path means templates directory
+            # in order to read log into twig render
+            path: "%twig.default_path%/sync/%kernel.environment%.sync.ldap.log"
+            level: debug
+            max_files: 10
+            channels: ["sync_ldap"]
         main:
             type: stream
             path: "%kernel.logs_dir%/%kernel.environment%.log"
             level: debug
-            channels: ["!event", '!sync']
+            channels: ["!event", '!sync_agent', '!sync_ldap']
         # uncomment to get logging in your browser
         # you may have to allow bigger header sizes in your Web server configuration
         #firephp:

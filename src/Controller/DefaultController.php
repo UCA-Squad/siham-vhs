@@ -26,26 +26,36 @@ class DefaultController extends AbstractController
     }
 
     /**
-     * @Route("/sync", name="sync_result")
+     * @Route("/sync/agent", name="sync_agent_result")
      */
-    public function syncResult()
+    public function syncAgentResult()
     {
-        $title = 'No sync result yet';
+        $title = 'No sync agent result yet';
 
-        $syncResultFile = dirname(__DIR__) . '/../templates/sync/' . $_ENV['APP_ENV'] . '.sync.log';
+        $syncResultFile = dirname(__DIR__) . '/../templates/sync/' . $_ENV['APP_ENV'] . '.sync.agent.log';
         if (file_exists($syncResultFile)) {
-            $title =  'Sync result at ' . date ('D jS Y H:i:s', filemtime($syncResultFile));
+            $title =  'Sync agent result at ' . date ('D jS Y H:i:s', filemtime($syncResultFile));
         }
 
-        return $this->render('sync/result.html.twig', [
+        return $this->render('sync/sync_agent_result.html.twig', [
             'title' => $title
         ]);
     }
 
     /**
-     * @Route("/ldap", name="ldap")
+     * @Route("/sync/ldap", name="sync_ldap_result")
      */
-    public function ldap() {
-        return new Response("LOL",Response::HTTP_OK);
+    public function syncLdapResult()
+    {
+        $title = 'No sync ldap result yet';
+
+        $syncResultFile = dirname(__DIR__) . '/../templates/sync/' . $_ENV['APP_ENV'] . '.sync.ldap.log';
+        if (file_exists($syncResultFile)) {
+            $title =  'Sync ldap result at ' . date ('D jS Y H:i:s', filemtime($syncResultFile));
+        }
+
+        return $this->render('sync/sync_ldap_result.html.twig', [
+            'title' => $title
+        ]);
     }
 }
