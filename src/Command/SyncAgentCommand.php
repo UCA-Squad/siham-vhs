@@ -72,6 +72,7 @@ class SyncAgentCommand extends Command
                 $progressBar->start();
             }
             
+            $counterTempo = 1;
             foreach($listAgents->return as $listAgent) {
     
                 // retrieve agent
@@ -109,6 +110,9 @@ class SyncAgentCommand extends Command
                     // advances the progress bar 1 unit
                     $progressBar->advance();
                 }
+
+                // take a break for webservice :-( 
+                if ($counterTempo++ % 1000 == 0) \sleep(30);
             }
 
             if ($loggerMode === 'logger') {
