@@ -33,7 +33,7 @@ class Agent {
     /**
      * @var string|null
      *
-     * @ORM\Column(name="username", type="string", length=12)
+     * @ORM\Column(name="username", type="string", length=12, nullable=true)
      */
     private $username;
 
