@@ -40,7 +40,7 @@ class Agent {
     /**
      * @var string|null
      *
-     * @ORM\Column(name="badge", type="string", length=45)
+     * @ORM\Column(name="badge", type="string", length=45, nullable=true)
      */
     private $badge;
 
