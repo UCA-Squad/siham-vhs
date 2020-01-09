@@ -5,6 +5,9 @@
     "php": {
         "version": "7.3"
     },
+    "symfony/asset": {
+        "version": "v5.0.1"
+    },
     "symfony/debug-bundle": {
         "version": "4.1",
         "recipe": {

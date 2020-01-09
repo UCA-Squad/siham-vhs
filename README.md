@@ -29,5 +29,7 @@
 > duplique le .env, modifier le fichier .env.local.php généré avec vos paramètres de connexion
 - php bin/phpunit 
 > à executer dans le répertoire de déploiement pour tester les services
-- php /var/www/siham-vhs/bin/phpunit --testdox-html /var/www/siham-vhs/templates/tests/test.all.html > /dev/null
-> à mettre en cron et rendu disponible à la racine de l'application
+- php bin/phpunit --testdox-html templates/tests/test.all.html > /dev/null
+> à mettre en cron et rendre disponible à la racine de l'application
+- sass --no-source-map --style=compressed assets/scss/main.css public/css/main.min.css
+> if you need to update main style
