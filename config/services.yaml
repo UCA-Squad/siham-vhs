@@ -30,6 +30,9 @@ services:
     App\Command\SyncAgentCommand:
         arguments:
             $logger: '@monolog.logger.sync_agent'
+    App\Command\SyncStructureCommand:
+        arguments:
+            $logger: '@monolog.logger.sync_structure'
     App\Command\SyncLdapCommand:
         arguments:
             $logger: '@monolog.logger.sync_ldap'

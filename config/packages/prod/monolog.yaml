@@ -1,6 +1,6 @@
 monolog:
     # Add new channel to log the synch commands
-    channels: ['sync_agent', 'sync_ldap']
+    channels: ['sync_agent', 'sync_structure', 'sync_ldap']
     
     handlers:
         # Define handler to log in a different file
@@ -12,6 +12,14 @@ monolog:
             level: debug
             max_files: 10
             channels: ["sync_agent"]
+        sync_structure:
+            type: stream
+            # default path means templates directory
+            # in order to read log into twig render
+            path: "%twig.default_path%/sync/%kernel.environment%.sync.structure.log"
+            level: debug
+            max_files: 10
+            channels: ["sync_structure"]
         sync_ldap:
             type: stream
             # default path means templates directory

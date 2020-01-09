@@ -181,4 +181,30 @@ class Structure {
 
     #endregion
 
+    /**
+     * Set attributes from response of webservice dossierParametrage
+     * @param structureReturn object response of webservice 
+     */
+    public function addStructureReturnFields($structureReturn) {
+        
+        foreach($structureReturn as $attribute => $value) {
+            if (\property_exists($this, $attribute)) {
+                if (strpos($attribute, 'date') !== false) {
+                    $this->$attribute = new \DateTime(substr($value,0,10));
+                } else if (strpos($attribute, 'listeAdressesUO') !== false) {
+                    $addresses = isset($structureReturn->listeAdressesUO) ? $structureReturn->listeAdressesUO : [];
+                    if (!is_array($addresses)) {
+                        $addresses = [$addresses];
+                    }
+                    $addressesFormatted = [];
+                    foreach($addresses as $address) {
+                        $addressesFormatted[] = (!empty($address->noVoieAdresseUO) || !empty($address->nomVoieAdresse) ? $address->noVoieAdresseUO . ' ' . $address->nomVoieAdresse . ', ' : '') . $address->codePostalAdresseUO . ' ' . $address->communeAdresseUO;
+                    }
+                    $this->$attribute = implode('|', $addressesFormatted);
+                } else {
+                    $this->$attribute = $value;
+                }
+            }
+        }
+    }
 }
