@@ -21,11 +21,21 @@ class SoapClientsTest extends TestCase {
     /**
      * Instance of DossierAgentWebService exist or connection success
      */
-    public function testConnectionDossierAgents() {
+    public function testConnectionDossierAgent() {
 
         $connectionDossierAgent = SoapClients::getInstance('/DossierAgentWebService/DossierAgentWebService?wsdl');
 
         $this->assertEquals(false, is_bool($connectionDossierAgent));
+    }
+
+    /**
+     * Instance of DossierParametrageWebService exist or connection success
+     */
+    public function testConnectionDossierParametrage() {
+
+        $connectionDossierParametrage = SoapClients::getInstance('/DossierParametrageWebService/DossierParametrageWebService?wsdl');
+
+        $this->assertEquals(false, is_bool($connectionDossierParametrage));
     }
 
 }

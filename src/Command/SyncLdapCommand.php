@@ -90,7 +90,7 @@ class SyncLdapCommand extends Command
                 if (!$agent) {
                     continue;
                 }
-                $detailAgent['matricule'] = $agent->getMatricule();// because call bu numDOssierHarpege
+                $detailAgent['matricule'] = $agent->getMatricule();// because call bu numDossierHarpege
                 // For each attribute set if different and call webservice to write
                 if ($agent->getBadge() != $detailAgent['badge']) $agent->setBadge($detailAgent['badge']);
                 

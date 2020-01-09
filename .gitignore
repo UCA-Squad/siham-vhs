@@ -9,9 +9,10 @@
 /vendor/
 ###< symfony/framework-bundle ###
 
-###> IntelliJ’s idea ###
+###> VSCode / IntelliJ’s idea ###
 .idea
-###< IntelliJ’s idea ###
+.vscode
+###< VSCode/ IntelliJ’s idea ###
 
 ###> symfony/phpunit-bridge ###
 .phpunit

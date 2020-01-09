@@ -11,7 +11,7 @@ class ListeAgentsWebServiceTest extends TestCase
     public function testGetListAgentsByName(){
 
         $listAgentsWebService = new ListeAgentsWebService();
-        $responseListAgents = $listAgentsWebService->getListAgentsByName('MARTIN');
+        $responseListAgents = $listAgentsWebService->getListAgentsByName($_ENV['SIHAM_WS_NOMUSUEL_TEST']);
 
         // There is more than one return
         $this->assertObjectHasAttribute('return', $responseListAgents);

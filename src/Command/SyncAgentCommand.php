@@ -65,8 +65,8 @@ class SyncAgentCommand extends Command
             if ($loggerMode === 'logger') {
                 $this->logger->info($numberOfUsers . ' agents found');
             } else {
-                $io->writeln(\sprintf('<info>%s</info> users found', $numberOfUsers));
-                // creates a new progress bar (50 units)
+                $io->writeln(\sprintf('<info>%s</info> agents found', $numberOfUsers));
+                // creates a new progress bar
                 $progressBar = new ProgressBar($io, $numberOfUsers);
                 // starts and displays the progress bar
                 $progressBar->start();
