@@ -76,7 +76,7 @@ class SyncLdapCommand extends Command
 
             $dossierAgentWS = new DossierAgentWebService();
 
-            $fields = ['matricule', 'telephonePro', 'uselessPhone', 'uselessFax', 'mailPro', 'username', 'status', 'badge', 'mailPerso', 'uselessEndLine'];
+            $fields = ['matricule', 'telephonePro', 'uselessPhone', 'mailPro', 'username', 'status', 'badge', 'mailPerso', 'uselessEndLine'];
             // while (($row = fgetcsv($fi, 0, ';')) !== false) {
             foreach($rows as $row) {
                 $detailAgent = array_combine($fields, explode(';', $row));
@@ -90,10 +90,10 @@ class SyncLdapCommand extends Command
                 if (!$agent) {
                     continue;
                 }
-                $detailAgent['matricule'] = $agent->getMatricule();// because call bu numDossierHarpege
+                $detailAgent['matricule'] = $agent->getMatricule();// because called by numDossierHarpege
                 // For each attribute set if different and call webservice to write
-                if ($agent->getBadge() != $detailAgent['badge']) $agent->setBadge($detailAgent['badge']);
-                
+                if ($agent->getBadge() != $detailAgent['badge'])
+                    $agent->setBadge($detailAgent['badge']);
                 if ($agent->getUsername() != $detailAgent['username']) {
                     $agent->setUsername($detailAgent['username']);
 
