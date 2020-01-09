@@ -257,9 +257,10 @@ class Agent {
     /**
      * @var string|null
      *
-     * @ORM\Column(name="temEtat", type="string", length=1, nullable=true)
+     * @ORM\Column(name="organismePrincipal", type="string", length=20, nullable=true)
      */
-    private $temEtat;
+    private $organismePrincipal;
+
 
     /**
      * @var string|null
@@ -342,9 +343,9 @@ class Agent {
     /**
      * @var string|null
      *
-     * @ORM\Column(name="codePositionsAdministrative", type="string", nullable=true)
+     * @ORM\Column(name="codePositionStatutaire", type="string", nullable=true)
      */
-    private $codePositionsAdministrative;
+    private $codePositionStatutaire;
     
     /**
      * @var string|null
@@ -654,11 +655,11 @@ class Agent {
         return $this;
     }
 
-    public function getTemEtat(): ?string {
-        return $this->temEtat;
+    public function getOrganismePrincipal(): ?string {
+        return $this->organismePrincipal;
     }
-    public function setTemEtat(?string $temEtat): self {
-        $this->temEtat = $temEtat;
+    public function setOrganismePrincipal(?string $organismePrincipal): self {
+        $this->organismePrincipal = $organismePrincipal;
 
         return $this;
     }
@@ -764,11 +765,11 @@ class Agent {
         return $this;
     }
 
-    public function getCodePositionsAdministrative(): ?string {
-        return $this->codePositionsAdministrative;
+    public function getCodePositionStatutaire(): ?string {
+        return $this->codePositionStatutaire;
     }
-    public function setCodePositionsAdministrative(?string $codePositionsAdministrative): self {
-        $this->codePositionsAdministrative = $codePositionsAdministrative;
+    public function setCodePositionStatutaire(?string $codePositionStatutaire): self {
+        $this->codePositionStatutaire = $codePositionStatutaire;
 
         return $this;
     }
@@ -893,6 +894,7 @@ class Agent {
                 if (isset($listeCarriere->codeCorps)) $codeCorps = $listeCarriere->codeCorps;
                 if (isset($listeCarriere->codeGrade)) $codeGrade = $listeCarriere->codeGrade;
                 if (isset($listeCarriere->temEnseignantChercheur)) $temEnseignantChercheur = $listeCarriere->temEnseignantChercheur;
+                if (isset($listeCarriere->organismePrincipal)) $organismePrincipal = $listeCarriere->organismePrincipal;
             }
         }
         $this->codeQualiteStatutaire = $codeQualiteStatutaire;
@@ -903,6 +905,7 @@ class Agent {
         $this->codeCorps = $codeCorps;
         $this->codeGrade = $codeGrade;
         $this->temEnseignantChercheur = $temEnseignantChercheur;
+        $this->organismePrincipal = $organismePrincipal;
 
         if (isset($administrativeData->listePIP)) {
             $listePIPs = \is_object($administrativeData->listePIP) ? [$administrativeData->listePIP] : $administrativeData->listePIP;
@@ -914,8 +917,8 @@ class Agent {
         if (isset($administrativeData->listePositionsAdministratives)) {
             $listePositionsAdministratives = \is_object($administrativeData->listePositionsAdministratives) ? [$administrativeData->listePositionsAdministratives] : $administrativeData->listePositionsAdministratives;
             foreach($listePositionsAdministratives as $listePositionAdministrative) {
-                if (isset($listePositionAdministrative->codePositionAdmin))
-                    $this->codePositionAdmin = $listePositionAdministrative->codePositionAdmin;// concatenate ?
+                if (isset($listePositionAdministrative->codePositionStatutaire))
+                    $this->codePositionStatutaire = $listePositionAdministrative->codePositionStatutaire;// concatenate ?
             }
         }
 
