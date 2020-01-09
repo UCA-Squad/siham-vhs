@@ -17,10 +17,27 @@ class DefaultController extends AbstractController
 
         $testsResultFile = dirname(__DIR__) . '/../templates/tests/test.all.html';
         if (file_exists($testsResultFile)) {
-            $title =  'Tests result at ' . date ('D jS Y H:i:s', filemtime($testsResultFile));
+            $title =  'Tests result at ' . date ('D jS M Y H:i:s', filemtime($testsResultFile));
         }
 
         return $this->render('tests/result.html.twig', [
+            'title' => $title
+        ]);
+    }
+
+    /**
+     * @Route("/sync/structure", name="sync_structure_result")
+     */
+    public function syncStructureResult()
+    {
+        $title = 'No sync structure result yet';
+
+        $syncResultFile = dirname(__DIR__) . '/../templates/sync/' . $_ENV['APP_ENV'] . '.sync.structure.log';
+        if (file_exists($syncResultFile)) {
+            $title =  'Sync structure result at ' . date ('D jS M Y H:i:s', filemtime($syncResultFile));
+        }
+
+        return $this->render('sync/sync_structure_result.html.twig', [
             'title' => $title
         ]);
     }
@@ -34,7 +51,7 @@ class DefaultController extends AbstractController
 
         $syncResultFile = dirname(__DIR__) . '/../templates/sync/' . $_ENV['APP_ENV'] . '.sync.agent.log';
         if (file_exists($syncResultFile)) {
-            $title =  'Sync agent result at ' . date ('D jS Y H:i:s', filemtime($syncResultFile));
+            $title =  'Sync agent result at ' . date ('D jS M Y H:i:s', filemtime($syncResultFile));
         }
 
         return $this->render('sync/sync_agent_result.html.twig', [
@@ -51,7 +68,7 @@ class DefaultController extends AbstractController
 
         $syncResultFile = dirname(__DIR__) . '/../templates/sync/' . $_ENV['APP_ENV'] . '.sync.ldap.log';
         if (file_exists($syncResultFile)) {
-            $title =  'Sync ldap result at ' . date ('D jS Y H:i:s', filemtime($syncResultFile));
+            $title =  'Sync ldap result at ' . date ('D jS M Y H:i:s', filemtime($syncResultFile));
         }
 
         return $this->render('sync/sync_ldap_result.html.twig', [
