@@ -257,7 +257,7 @@ class Agent {
     /**
      * @var string|null
      *
-     * @ORM\Column(name="organismePrincipal", type="string", length=20, nullable=true)
+     * @ORM\Column(name="organismePrincipal", type="string", length=45, nullable=true)
      */
     private $organismePrincipal;
 
@@ -882,6 +882,7 @@ class Agent {
         $codeCorps = NULL;
         $codeGrade = NULL;
         $temEnseignantChercheur = NULL;
+        $organismePrincipal = NULL;
         if (isset($administrativeData->listeCarrieres)) {
             $listeCarrieres = \is_object($administrativeData->listeCarrieres) ? [$administrativeData->listeCarrieres] : $administrativeData->listeCarrieres;
             foreach($listeCarrieres as $listeCarriere) {

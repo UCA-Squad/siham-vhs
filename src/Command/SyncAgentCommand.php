@@ -112,7 +112,7 @@ class SyncAgentCommand extends Command
                 }
 
                 // take a break for webservice :-( 
-                if ($counterTempo++ % 1000 == 0) \sleep(30);
+                if ($counterTempo++ % 500 == 0) \sleep(30);
             }
 
             if ($loggerMode === 'logger') {
@@ -121,7 +121,7 @@ class SyncAgentCommand extends Command
                 // ensures that the progress bar is at 100%
                 $progressBar->finish();
                 
-                $io->success('Sync the users from SIHAM was successfully done.');
+                $io->success('Sync the users from SIHAM was successfully done in ' . (time() - $start) . 's');
             }
 
         } else {
