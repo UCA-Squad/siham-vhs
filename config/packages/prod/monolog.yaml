@@ -5,7 +5,7 @@ monolog:
     handlers:
         # Define handler to log in a different file
         sync_agent:
-            type: stream
+            type: rotating_file
             # default path means templates directory
             # in order to read log into twig render
             path: "%twig.default_path%/sync/%kernel.environment%.sync.agent.log"
@@ -13,7 +13,7 @@ monolog:
             max_files: 10
             channels: ["sync_agent"]
         sync_structure:
-            type: stream
+            type: rotating_file
             # default path means templates directory
             # in order to read log into twig render
             path: "%twig.default_path%/sync/%kernel.environment%.sync.structure.log"
@@ -21,7 +21,7 @@ monolog:
             max_files: 10
             channels: ["sync_structure"]
         sync_ldap:
-            type: stream
+            type: rotating_file
             # default path means templates directory
             # in order to read log into twig render
             path: "%twig.default_path%/sync/%kernel.environment%.sync.ldap.log"
