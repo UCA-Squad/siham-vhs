@@ -33,3 +33,9 @@
 > à mettre en cron et rendre disponible à la racine de l'application
 - sass --no-source-map --style=compressed assets/scss/main.css public/css/main.min.css
 > if you need to update main style
+
+- php bin/console sync:structure logger
+- php bin/console sync:agent logger
+- php bin/console sync:ldap logger
+
+
