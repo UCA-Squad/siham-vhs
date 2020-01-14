@@ -112,7 +112,8 @@ class SyncAgentCommand extends Command
                 }
 
                 // take a break for webservice :-( 
-                if ($counterTempo++ % 500 == 0) \sleep(30);
+                if ($counterTempo++ % 250 == 0) \sleep(15);
+                if ($counterTempo++ % 1000 == 0) \sleep(30);
             }
 
             if ($loggerMode === 'logger') {
