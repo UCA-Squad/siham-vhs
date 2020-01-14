@@ -5,6 +5,7 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Finder\Finder;
 
 class DefaultController extends AbstractController
 {
@@ -26,53 +27,38 @@ class DefaultController extends AbstractController
     }
 
     /**
-     * @Route("/sync/structure", name="sync_structure_result")
+     * @Route("/sync/{fileName}", name="sync_result")
      */
-    public function syncStructureResult()
+    public function syncResult($fileName = null)
     {
-        $title = 'No sync structure result yet';
+        $title = 'No sync result yet';
 
-        $syncResultFile = dirname(__DIR__) . '/../templates/sync/' . $_ENV['APP_ENV'] . '.sync.structure.log';
-        if (file_exists($syncResultFile)) {
-            $title =  'Sync structure result at ' . date ('D jS M Y H:i:s', filemtime($syncResultFile));
+        $files = [];
+        $fileToDisplay = null;
+        $finder = new Finder();
+        $finder->files()->in(dirname(__DIR__) . '/../templates/sync/')
+                        ->name($_ENV['APP_ENV'] . '.sync.*.log')
+                        ->sortByName()->reverseSorting();
+        if ($finder->hasResults()) {
+            foreach ($finder as $file) {
+                // Set file from finder, we cannot simply use finder to twig 
+                preg_match('/' . $_ENV['APP_ENV'] . '.sync.(.*?)\-/s', $file->getPathname(), $matches);
+                if (!isset($logType) || $matches[1] != $logType)
+                    $logType = $matches[1];
+                $files[$matches[1]][] = $file;
+                // Distinct the file to display by the selected or default
+                if (empty($fileToDisplay) && (is_null($fileName) || $fileName == $file->getRelativePathname())) {
+                    $fileToDisplay = $file;
+                    $title =  'Sync ' . $logType . ' result at ' . date ('D jS M Y H:i:s', $fileToDisplay->getMTime());
+                }
+            }
         }
 
-        return $this->render('sync/sync_structure_result.html.twig', [
-            'title' => $title
+        return $this->render('sync/sync_result.html.twig', [
+            'title' => $title,
+            'fileToDisplay' => $fileToDisplay,
+            'files' => $files
         ]);
     }
 
-    /**
-     * @Route("/sync/agent", name="sync_agent_result")
-     */
-    public function syncAgentResult()
-    {
-        $title = 'No sync agent result yet';
-
-        $syncResultFile = dirname(__DIR__) . '/../templates/sync/' . $_ENV['APP_ENV'] . '.sync.agent.log';
-        if (file_exists($syncResultFile)) {
-            $title =  'Sync agent result at ' . date ('D jS M Y H:i:s', filemtime($syncResultFile));
-        }
-
-        return $this->render('sync/sync_agent_result.html.twig', [
-            'title' => $title
-        ]);
-    }
-
-    /**
-     * @Route("/sync/ldap", name="sync_ldap_result")
-     */
-    public function syncLdapResult()
-    {
-        $title = 'No sync ldap result yet';
-
-        $syncResultFile = dirname(__DIR__) . '/../templates/sync/' . $_ENV['APP_ENV'] . '.sync.ldap.log';
-        if (file_exists($syncResultFile)) {
-            $title =  'Sync ldap result at ' . date ('D jS M Y H:i:s', filemtime($syncResultFile));
-        }
-
-        return $this->render('sync/sync_ldap_result.html.twig', [
-            'title' => $title
-        ]);
-    }
 }

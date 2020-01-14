@@ -1,0 +1,27 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Sync Result{% endblock %}
+
+{% block body %}
+
+<div class="log-title">{{ title }}</div>
+
+<div class="log-columns">
+
+    <div class="log-column log-list">
+        {% set logType = '' %}
+        {% for logType, logTypeFiles in files %}
+            <div class="log-type">{{ logType }}</div>
+            {% for logTypeFile in logTypeFiles %}
+                
+        <a href="{{ path('sync_result', {'fileName': logTypeFile.filename}) }}">{{ logTypeFile.filename }}</a>
+            {% endfor %}
+        {% endfor %}
+    </div>
+    
+    <div class="log-column log-content">
+        {% include "sync/" ~ fileToDisplay.filename ignore missing %}
+    </div>
+</div>
+
+{% endblock %}

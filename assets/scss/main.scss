@@ -22,3 +22,40 @@ body {
         }
     }
 }
+
+.log-title {
+    font-size: 2em;
+    font-family: Arial;
+    color: #555753;
+    margin-top: 1em;
+}
+.log-type {
+    font-weight: bold;
+    text-transform: capitalize;
+    font-size: 1.5em;
+    padding: 5px 10px;
+    margin: 20px 0 5px;
+    border-radius: 5px;
+    &:first-of-type {
+        margin: 0px 0 5px;
+    }
+    color: #5E5C5C;
+    background-color: #F4ECE5;
+}
+.log-columns {
+    display: flex;
+}
+.log-column {
+    padding: 15px;
+    &.log-list {
+        min-width: 250px;
+        & > a {
+            display: block;
+            line-height: 1.5em;
+        }
+    }
+    &.log-content {
+        font-family: monospace;
+        white-space: pre-line;
+    }
+}
