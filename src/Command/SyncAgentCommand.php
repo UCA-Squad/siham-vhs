@@ -112,8 +112,9 @@ class SyncAgentCommand extends Command
                 }
 
                 // take a break for webservice :-( 
-                if ($counterTempo++ % 250 == 0) \sleep(15);
-                if ($counterTempo++ % 1000 == 0) \sleep(30);
+                // Temporally disable since VM up memory to 6Go
+                // if ($counterTempo++ % 250 == 0) \sleep(15);
+                // if ($counterTempo++ % 1000 == 0) \sleep(30);
             }
 
             if ($loggerMode === 'logger') {
