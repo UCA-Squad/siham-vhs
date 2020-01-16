@@ -57,7 +57,8 @@ body {
     &.log-content {
         font-family: monospace;
         white-space: pre-line;
-        height: 800px;
-        overflow-y: auto;
+        height: 750px;
+        width: 100%;
+        overflow: auto;
     }
 }
