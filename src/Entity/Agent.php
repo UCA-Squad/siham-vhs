@@ -346,6 +346,20 @@ class Agent {
      * @ORM\Column(name="codePositionStatutaire", type="string", nullable=true)
      */
     private $codePositionStatutaire;
+
+        /**
+     * @var \DateTime|null
+     *
+     * @ORM\Column(name="dateDebutPositionAdministrative", type="date", nullable=true)
+     */
+    private $dateDebutPositionAdministrative;
+
+    /**
+     * @var \DateTime|null
+     *
+     * @ORM\Column(name="dateFinPositionAdministrative", type="date", nullable=true)
+     */
+    private $dateFinPositionAdministrative;
     
     /**
      * @var string|null
@@ -597,6 +611,24 @@ class Agent {
 
         return $this;
     }
+    public function getDateDebutPositionAdministrative(): ?\DateTimeInterface {
+        return $this->dateDebutPositionAdministrative;
+    }
+    public function setDateDebutPositionAdministrative(?\DateTimeInterface $dateDebutPositionAdministrative): self {
+        $this->dateDebutPositionAdministrative = $dateDebutPositionAdministrative;
+
+        return $this;
+    }
+
+    public function getDateFinPositionAdministrative(): ?\DateTimeInterface {
+        return $this->dateFinPositionAdministrative;
+    }
+    public function setDateFinPositionAdministrative(?\DateTimeInterface $dateFinPositionAdministrative): self {
+        $this->dateFinPositionAdministrative = $dateFinPositionAdministrative;
+
+        return $this;
+    }
+
     public function getCodeGroupeHierarchique(): ?string {
         return $this->codeGroupeHierarchique;
     }
@@ -920,6 +952,10 @@ class Agent {
             foreach($listePositionsAdministratives as $listePositionAdministrative) {
                 if (isset($listePositionAdministrative->codePositionStatutaire))
                     $this->codePositionStatutaire = $listePositionAdministrative->codePositionStatutaire;// concatenate ?
+                if (isset($listePositionAdministrative->dateDebutPositionAdmin))
+                    $this->dateDebutPositionAdministrative = $listePositionAdministrative->dateDebutPositionAdmin;
+                if (isset($listePositionAdministrative->dateFinReellePositionAdmin))
+                    $this->dateFinPositionAdministrative = $listePositionAdministrative->dateFinReellePositionAdmin;
             }
         }
 
