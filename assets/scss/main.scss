@@ -4,7 +4,7 @@ body {
 }
 .menu {
     text-align: center;
-    padding: 10px;
+    padding: 5px 10px;
     font-size: 1.5em;
     display: flex;
     justify-content: center;
@@ -27,7 +27,7 @@ body {
     font-size: 2em;
     font-family: Arial;
     color: #555753;
-    margin-top: 1em;
+    margin-top: 0.5em;
 }
 .log-type {
     font-weight: bold;
@@ -57,7 +57,7 @@ body {
     &.log-content {
         font-family: monospace;
         white-space: pre-line;
-        height: 750px;
+        height: 780px;
         width: 100%;
         overflow: auto;
     }
