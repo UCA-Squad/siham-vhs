@@ -330,6 +330,25 @@ class Agent {
     /**
      * @var string|null
      *
+     * @ORM\Column(name="codeUOAffectationsAGR", type="string", nullable=true)
+     */
+    private $codeUOAffectationsAGR;
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="dateDebutUOAffectationsAGR", type="date", nullable=true)
+     */
+    private $dateDebutUOAffectationsAGR;
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="dateFinUOAffectationsAGR", type="date", nullable=true)
+     */
+    private $dateFinUOAffectationsAGR;
+
+    /**
+     * @var string|null
+     *
      * @ORM\Column(name="codeFunctions", type="string", nullable=true)
      */
     private $codeFunctions;
@@ -347,7 +366,14 @@ class Agent {
      */
     private $codePositionStatutaire;
 
-        /**
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="codePositionAdministrative", type="string", nullable=true)
+     */
+    private $codePositionAdministrative;
+
+    /**
      * @var \DateTime|null
      *
      * @ORM\Column(name="dateDebutPositionAdministrative", type="date", nullable=true)
@@ -780,6 +806,31 @@ class Agent {
         return $this;
     }
 
+    public function getCodeUOAffectationsAGR(): ?string {
+        return $this->codeUOAffectationsAGR;
+    }
+    public function setCodeUOAffectationsAGR(?string $codeUOAffectationsAGR): self {
+        $this->codeUOAffectationsAGR = $codeUOAffectationsAGR;
+
+        return $this;
+    }
+    public function getDateDebutUOAffectationsAGR(): ?date {
+        return $this->dateDebutUOAffectationsAGR;
+    }
+    public function setDateDebutUOAffectationsAGR(?date $dateDebutUOAffectationsAGR): self {
+        $this->dateDebutUOAffectationsAGR = $dateDebutUOAffectationsAGR;
+
+        return $this;
+    }
+    public function getDateFinUOAffectationsAGR(): ?date {
+        return $this->dateFinUOAffectationsAGR;
+    }
+    public function setDateFinUOAffectationsAGR(?date $dateFinUOAffectationsAGR): self {
+        $this->dateFinUOAffectationsAGR = $dateFinUOAffectationsAGR;
+
+        return $this;
+    }
+
     public function getCodeFunctions(): ?string {
         return $this->codeFunctions;
     }
@@ -802,6 +853,15 @@ class Agent {
     }
     public function setCodePositionStatutaire(?string $codePositionStatutaire): self {
         $this->codePositionStatutaire = $codePositionStatutaire;
+
+        return $this;
+    }
+
+    public function getCodePositionAdministrative(): ?string {
+        return $this->codePositionAdministrative;
+    }
+    public function setCodePositionAdministrative(?string $codePositionAdministrative): self {
+        $this->codePositionAdministrative = $codePositionAdministrative;
 
         return $this;
     }
@@ -952,6 +1012,8 @@ class Agent {
             foreach($listePositionsAdministratives as $listePositionAdministrative) {
                 if (isset($listePositionAdministrative->codePositionStatutaire))
                     $this->codePositionStatutaire = $listePositionAdministrative->codePositionStatutaire;// concatenate ?
+                if (isset($listePositionAdministrative->codePositionAdministrative))
+                    $this->codePositionAdministrative = $listePositionAdministrative->codePositionAdministrative;
                 if (isset($listePositionAdministrative->dateDebutPositionAdmin))
                     $this->dateDebutPositionAdministrative = $listePositionAdministrative->dateDebutPositionAdmin;
                 if (isset($listePositionAdministrative->dateFinReellePositionAdmin))
