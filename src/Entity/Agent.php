@@ -1015,9 +1015,9 @@ class Agent {
                 if (isset($listePositionAdministrative->codePositionAdministrative))
                     $this->codePositionAdministrative = $listePositionAdministrative->codePositionAdministrative;
                 if (isset($listePositionAdministrative->dateDebutPositionAdmin))
-                    $this->dateDebutPositionAdministrative = $listePositionAdministrative->dateDebutPositionAdmin;
+                    $this->dateDebutPositionAdministrative = new \DateTime(substr($listePositionAdministrative->dateDebutPositionAdmin,0,10));
                 if (isset($listePositionAdministrative->dateFinReellePositionAdmin))
-                    $this->dateFinPositionAdministrative = $listePositionAdministrative->dateFinReellePositionAdmin;
+                    $this->dateFinPositionAdministrative = new \DateTime(substr($listePositionAdministrative->dateFinReellePositionAdmin,0,10));
             }
         }
 
