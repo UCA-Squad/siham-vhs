@@ -390,15 +390,15 @@ class Agent {
     /**
      * @var string|null
      *
-     * @ORM\Column(name="codeAbsences", type="string", nullable=true)
+     * @ORM\Column(name="codeAbsence", type="string", nullable=true)
      */
-    private $codeAbsences;
+    private $codeAbsence;
     /**
      * @var string|null
      *
-     * @ORM\Column(name="nameAbsences", type="text", nullable=true)
+     * @ORM\Column(name="nameAbsence", type="text", nullable=true)
      */
-    private $nameAbsences;
+    private $nameAbsence;
 
     #endregion
 
@@ -866,19 +866,19 @@ class Agent {
         return $this;
     }
 
-    public function getCodeAbsences(): ?string {
-        return $this->codeAbsences;
+    public function getCodeAbsence(): ?string {
+        return $this->codeAbsence;
     }
-    public function setCodeAbsences(?string $codeAbsences): self {
-        $this->codeAbsences = $codeAbsences;
+    public function setCodeAbsence(?string $codeAbsence): self {
+        $this->codeAbsence = $codeAbsence;
 
         return $this;
     }
-    public function getNameAbsences(): ?string {
-        return $this->nameAbsences;
+    public function getNameAbsence(): ?string {
+        return $this->nameAbsence;
     }
-    public function setNameAbsences(?string $nameAbsences): self {
-        $this->nameAbsences = $nameAbsences;
+    public function setNameAbsence(?string $nameAbsence): self {
+        $this->nameAbsence = $nameAbsence;
 
         return $this;
     }
@@ -1000,36 +1000,51 @@ class Agent {
         $this->temEnseignantChercheur = $temEnseignantChercheur;
         $this->organismePrincipal = $organismePrincipal;
 
+        $codePIP = NULL;
         if (isset($administrativeData->listePIP)) {
             $listePIPs = \is_object($administrativeData->listePIP) ? [$administrativeData->listePIP] : $administrativeData->listePIP;
             foreach($listePIPs as $listePIP) {
-                if (isset($listePIP->codePIP)) $this->codePIP = $listePIP->codePIP;// concatenate ?
+                if (isset($listePIP->codePIP)) $codePIP = $listePIP->codePIP;// concatenate ?
             }
         }
+        $this->codePIP = $codePIP;
 
+        $codePositionStatutaire = NULL;
+        $codePositionAdministrative = NULL;
+        $dateDebutPositionAdministrative = NULL;
+        $dateFinPositionAdministrative = NULL;
         if (isset($administrativeData->listePositionsAdministratives)) {
             $listePositionsAdministratives = \is_object($administrativeData->listePositionsAdministratives) ? [$administrativeData->listePositionsAdministratives] : $administrativeData->listePositionsAdministratives;
             foreach($listePositionsAdministratives as $listePositionAdministrative) {
                 if (isset($listePositionAdministrative->codePositionStatutaire))
-                    $this->codePositionStatutaire = $listePositionAdministrative->codePositionStatutaire;// concatenate ?
-                if (isset($listePositionAdministrative->codePositionAdministrative))
-                    $this->codePositionAdministrative = $listePositionAdministrative->codePositionAdministrative;
+                    $codePositionStatutaire = $listePositionAdministrative->codePositionStatutaire;// concatenate ?
+                if (isset($listePositionAdministrative->codePositionAdmin))
+                    $codePositionAdministrative = $listePositionAdministrative->codePositionAdmin;
                 if (isset($listePositionAdministrative->dateDebutPositionAdmin))
-                    $this->dateDebutPositionAdministrative = new \DateTime(substr($listePositionAdministrative->dateDebutPositionAdmin,0,10));
+                    $dateDebutPositionAdministrative = new \DateTime(substr($listePositionAdministrative->dateDebutPositionAdmin,0,10));
                 if (isset($listePositionAdministrative->dateFinReellePositionAdmin))
-                    $this->dateFinPositionAdministrative = new \DateTime(substr($listePositionAdministrative->dateFinReellePositionAdmin,0,10));
+                    $dateFinPositionAdministrative = new \DateTime(substr($listePositionAdministrative->dateFinReellePositionAdmin,0,10));
             }
         }
+        $this->codePositionStatutaire = $codePositionStatutaire;
+        $this->codePositionAdministrative = $codePositionAdministrative;
+        $this->dateDebutPositionAdministrative = $codePositionAdministrative;
+        $this->dateFinPositionAdministrative = $codePositionAdministrative;
 
+        $codeAbsence = NULL;
+        $nameAbsence = NULL;
         if (isset($administrativeData->listeAbsencesConges)) {
             $listeAbsencesConges = \is_object($administrativeData->listeAbsencesConges) ? [$administrativeData->listeAbsencesConges] : $administrativeData->listeAbsencesConges;
             foreach($listeAbsencesConges as $listeAbsenceConges) {
                 if (isset($listeAbsenceConges->codeMotifAbsenceConge))
-                    $this->codeAbsence = $listeAbsenceConges->codeMotifAbsenceConge;// concatenate ?
+                    $codeAbsence = $listeAbsenceConges->codeMotifAbsenceConge;// concatenate ?
                 if (isset($listeAbsenceConges->libLongMotifAbsenceConge))
-                    $this->nameAbsence = $listeAbsenceConges->libLongMotifAbsenceConge;// concatenate ?
+                    $nameAbsence = $listeAbsenceConges->libLongMotifAbsenceConge;// concatenate ?
             }
         }
+        $this->codeAbsence = $codeAbsence;
+        $this->nameAbsence = $nameAbsence;
+
     }
 
 }
