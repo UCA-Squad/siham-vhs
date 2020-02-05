@@ -334,13 +334,13 @@ class Agent {
      */
     private $codeUOAffectationsAGR;
     /**
-     * @var string|null
+     * @var \DateTime|null
      *
      * @ORM\Column(name="dateDebutUOAffectationsAGR", type="date", nullable=true)
      */
     private $dateDebutUOAffectationsAGR;
     /**
-     * @var string|null
+     * @var \DateTime|null
      *
      * @ORM\Column(name="dateFinUOAffectationsAGR", type="date", nullable=true)
      */
@@ -439,7 +439,6 @@ class Agent {
 
         return $this;
     }
-
     public function getNomUsuel(): ?string {
         return $this->nomUsuel;
     }
@@ -448,7 +447,6 @@ class Agent {
 
         return $this;
     }
-
     public function getPrenom(): ?string {
         return $this->prenom;
     }
@@ -457,7 +455,6 @@ class Agent {
 
         return $this;
     }
-
     public function getDateNaissance(): ?\DateTimeInterface {
         return $this->dateNaissance;
     }
@@ -484,7 +481,6 @@ class Agent {
 
         return $this;
     }
-
     public function getLibLongEmploiAffectation(): ?string {
         return $this->libLongEmploiAffectation;
     }
@@ -502,7 +498,6 @@ class Agent {
 
         return $this;
     }
-
     public function getLibLongPosteAffectation(): ?string {
         return $this->libLongPosteAffectation;
     }
@@ -520,7 +515,6 @@ class Agent {
 
         return $this;
     }
-
     public function getLibLongUOAffectationHierarchique(): ?string {
         return $this->libLongUOAffectationHierarchique;
     }
@@ -529,7 +523,6 @@ class Agent {
 
         return $this;
     }
-
     public function getDateDebutAffectHierarchique(): ?\DateTimeInterface {
         return $this->dateDebutAffectHierarchique;
     }
@@ -538,7 +531,6 @@ class Agent {
 
         return $this;
     }
-
     public function getDateFinAffectHierarchique(): ?\DateTimeInterface {
         return $this->dateFinAffectHierarchique;
     }
@@ -547,7 +539,6 @@ class Agent {
 
         return $this;
     }
-
     public function getQuotiteAffectHierarchique(): ?int {
         return $this->quotiteAffectHierarchique;
     }
@@ -565,7 +556,6 @@ class Agent {
 
         return $this;
     }
-
     public function getPortablePro(): ?string {
         return $this->portablePro;
     }
@@ -574,7 +564,6 @@ class Agent {
 
         return $this;
     }
-
     public function getPortablePerso(): ?string {
         return $this->portablePerso;
     }
@@ -583,7 +572,6 @@ class Agent {
 
         return $this;
     }
-
     public function getMailPro(): ?string {
         return $this->mailPro;
     }
@@ -592,7 +580,6 @@ class Agent {
 
         return $this;
     }
-
     public function getMailPerso(): ?string {
         return $this->mailPerso;
     }
@@ -634,23 +621,6 @@ class Agent {
     }
     public function setCodeQualiteStatutaire(?string $codeQualiteStatutaire): self {
         $this->codeQualiteStatutaire = $codeQualiteStatutaire;
-
-        return $this;
-    }
-    public function getDateDebutPositionAdministrative(): ?\DateTimeInterface {
-        return $this->dateDebutPositionAdministrative;
-    }
-    public function setDateDebutPositionAdministrative(?\DateTimeInterface $dateDebutPositionAdministrative): self {
-        $this->dateDebutPositionAdministrative = $dateDebutPositionAdministrative;
-
-        return $this;
-    }
-
-    public function getDateFinPositionAdministrative(): ?\DateTimeInterface {
-        return $this->dateFinPositionAdministrative;
-    }
-    public function setDateFinPositionAdministrative(?\DateTimeInterface $dateFinPositionAdministrative): self {
-        $this->dateFinPositionAdministrative = $dateFinPositionAdministrative;
 
         return $this;
     }
@@ -814,18 +784,18 @@ class Agent {
 
         return $this;
     }
-    public function getDateDebutUOAffectationsAGR(): ?date {
+    public function getDateDebutUOAffectationsAGR(): ?\DateTimeInterface {
         return $this->dateDebutUOAffectationsAGR;
     }
-    public function setDateDebutUOAffectationsAGR(?date $dateDebutUOAffectationsAGR): self {
+    public function setDateDebutUOAffectationsAGR(?\DateTimeInterface $dateDebutUOAffectationsAGR): self {
         $this->dateDebutUOAffectationsAGR = $dateDebutUOAffectationsAGR;
 
         return $this;
     }
-    public function getDateFinUOAffectationsAGR(): ?date {
+    public function getDateFinUOAffectationsAGR(): ?\DateTimeInterface {
         return $this->dateFinUOAffectationsAGR;
     }
-    public function setDateFinUOAffectationsAGR(?date $dateFinUOAffectationsAGR): self {
+    public function setDateFinUOAffectationsAGR(?\DateTimeInterface $dateFinUOAffectationsAGR): self {
         $this->dateFinUOAffectationsAGR = $dateFinUOAffectationsAGR;
 
         return $this;
@@ -862,6 +832,22 @@ class Agent {
     }
     public function setCodePositionAdministrative(?string $codePositionAdministrative): self {
         $this->codePositionAdministrative = $codePositionAdministrative;
+
+        return $this;
+    }
+    public function getDateDebutPositionAdministrative(): ?\DateTimeInterface {
+        return $this->dateDebutPositionAdministrative;
+    }
+    public function setDateDebutPositionAdministrative(?\DateTimeInterface $dateDebutPositionAdministrative): self {
+        $this->dateDebutPositionAdministrative = $dateDebutPositionAdministrative;
+
+        return $this;
+    }
+    public function getDateFinPositionAdministrative(): ?\DateTimeInterface {
+        return $this->dateFinPositionAdministrative;
+    }
+    public function setDateFinPositionAdministrative(?\DateTimeInterface $dateFinPositionAdministrative): self {
+        $this->dateFinPositionAdministrative = $dateFinPositionAdministrative;
 
         return $this;
     }
@@ -1028,8 +1014,8 @@ class Agent {
         }
         $this->codePositionStatutaire = $codePositionStatutaire;
         $this->codePositionAdministrative = $codePositionAdministrative;
-        $this->dateDebutPositionAdministrative = $codePositionAdministrative;
-        $this->dateFinPositionAdministrative = $codePositionAdministrative;
+        $this->dateDebutPositionAdministrative = $dateDebutPositionAdministrative;
+        $this->dateFinPositionAdministrative = $dateFinPositionAdministrative;
 
         $codeAbsence = NULL;
         $nameAbsence = NULL;
