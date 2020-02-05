@@ -60,8 +60,8 @@ class SyncAgentCommand extends Command
         $listAgentsWS = new ListeAgentsWebService();
         $listAgents = $listAgentsWS->getListAgentsByName('%');
         if (isset($listAgents->return)) {
-
-            $numberOfUsers = count($listAgents->return);
+            $listAgents = is_array($listAgents->return) ? $listAgents->return : [$listAgents->return];
+            $numberOfUsers = count($listAgents);
             if ($loggerMode === 'logger') {
                 $this->logger->info($numberOfUsers . ' agents found');
             } else {
@@ -73,8 +73,7 @@ class SyncAgentCommand extends Command
             }
             
             $counterTempo = 1;
-            foreach($listAgents->return as $listAgent) {
-    
+            foreach($listAgents as $listAgent) {
                 // retrieve agent
                 if ($loggerMode === 'logger') {
                     $this->logger->info('Get agent ' . $listAgent->matricule . ' from database');
