@@ -334,15 +334,15 @@ class Agent {
      */
     private $codeUOAffectationsAGR;
     /**
-     * @var \DateTime|null
+     * @var string|null
      *
-     * @ORM\Column(name="dateDebutUOAffectationsAGR", type="date", nullable=true)
+     * @ORM\Column(name="dateDebutUOAffectationsAGR", type="string", nullable=true)
      */
     private $dateDebutUOAffectationsAGR;
     /**
-     * @var \DateTime|null
+     * @var string|null
      *
-     * @ORM\Column(name="dateFinUOAffectationsAGR", type="date", nullable=true)
+     * @ORM\Column(name="dateFinUOAffectationsAGR", type="string", nullable=true)
      */
     private $dateFinUOAffectationsAGR;
 
@@ -784,18 +784,18 @@ class Agent {
 
         return $this;
     }
-    public function getDateDebutUOAffectationsAGR(): ?\DateTimeInterface {
+    public function getDateDebutUOAffectationsAGR(): ?string {
         return $this->dateDebutUOAffectationsAGR;
     }
-    public function setDateDebutUOAffectationsAGR(?\DateTimeInterface $dateDebutUOAffectationsAGR): self {
+    public function setDateDebutUOAffectationsAGR(?string $dateDebutUOAffectationsAGR): self {
         $this->dateDebutUOAffectationsAGR = $dateDebutUOAffectationsAGR;
 
         return $this;
     }
-    public function getDateFinUOAffectationsAGR(): ?\DateTimeInterface {
+    public function getDateFinUOAffectationsAGR(): ?string {
         return $this->dateFinUOAffectationsAGR;
     }
-    public function setDateFinUOAffectationsAGR(?\DateTimeInterface $dateFinUOAffectationsAGR): self {
+    public function setDateFinUOAffectationsAGR(?string $dateFinUOAffectationsAGR): self {
         $this->dateFinUOAffectationsAGR = $dateFinUOAffectationsAGR;
 
         return $this;

@@ -1,24 +1,42 @@
 doctrine:
     dbal:
-        url: '%env(resolve:DATABASE_URL)%'
+        default_connection: siham_vhs
+        
+        connections:
 
-        # IMPORTANT: You MUST configure your db driver and server version,
-        # either here or in the DATABASE_URL env var (see .env file)
-        #driver: 'mysql'
-        #server_version: '5.7'
+            siham_vhs:
+                url: '%env(resolve:DATABASE_SIHAM_VHS_URL)%'
 
-        # Only needed for MySQL (ignored otherwise)
-        charset: utf8mb4
-        default_table_options:
-            collate: utf8mb4_unicode_ci
+                # IMPORTANT: You MUST configure your db driver and server version,
+                # either here or in the DATABASE_URL env var (see .env file)
+                #driver: 'mysql'
+                #server_version: '5.7'
+
+                # Only needed for MySQL (ignored otherwise)
+                charset: utf8mb4
+                default_table_options:
+                    collate: utf8mb4_unicode_ci
+            geisha:
+                url: '%env(resolve:DATABASE_GEISHA_URL)%'
+                driver: 'oci8'
     orm:
         auto_generate_proxy_classes: true
-        naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
-        auto_mapping: true
-        mappings:
-            App:
-                is_bundle: false
-                type: annotation
-                dir: '%kernel.project_dir%/src/Entity'
-                prefix: 'App\Entity'
-                alias: App
+       
+        default_entity_manager: siham_vhs 
+        
+        entity_managers:
+            
+            siham_vhs:
+                connection: siham_vhs 
+                naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+                auto_mapping: true
+                mappings:
+                    App:
+                        is_bundle: false
+                        type: annotation
+                        dir: '%kernel.project_dir%/src/Entity'
+                        prefix: 'App\Entity'
+                        alias: App
+
+            geisha:
+                connection: geisha

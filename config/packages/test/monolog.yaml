@@ -1,7 +1,54 @@
 monolog:
+    # Add new channel to log the synch commands
+    channels: ['sync_agent', 'sync_structure', 'sync_ldap']
+
     handlers:
+        # Define handler to log in a different file
+        sync_agent:
+            type: rotating_file
+            # default path means templates directory
+            # in order to read log into twig render
+            path: "%twig.default_path%/sync/%kernel.environment%.sync.agent.log"
+            level: debug
+            max_files: 10
+            channels: ["sync_agent"]
+        sync_structure:
+            type: rotating_file
+            # default path means templates directory
+            # in order to read log into twig render
+            path: "%twig.default_path%/sync/%kernel.environment%.sync.structure.log"
+            level: debug
+            max_files: 10
+            channels: ["sync_structure"]
+        sync_ldap:
+            type: rotating_file
+            # default path means templates directory
+            # in order to read log into twig render
+            path: "%twig.default_path%/sync/%kernel.environment%.sync.ldap.log"
+            level: debug
+            max_files: 10
+            channels: ["sync_ldap"]
         main:
             type: stream
             path: "%kernel.logs_dir%/%kernel.environment%.log"
             level: debug
-            channels: ["!event"]
+            channels: ["!event", '!sync_agent', '!sync_structure', '!sync_ldap']
+        # uncomment to get logging in your browser
+        # you may have to allow bigger header sizes in your Web server configuration
+        #firephp:
+        #    type: firephp
+        #    level: info
+        #chromephp:
+        #    type: chromephp
+        #    level: info
+        console:
+            type: console
+            process_psr_3_messages: false
+            channels: ["!event", "!doctrine", "!console"]
+
+    # handlers:
+    #     main:
+    #         type: stream
+    #         path: "%kernel.logs_dir%/%kernel.environment%.log"
+    #         level: debug
+    #         channels: ["!event"]
