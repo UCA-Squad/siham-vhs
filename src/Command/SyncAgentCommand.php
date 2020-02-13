@@ -62,7 +62,7 @@ class SyncAgentCommand extends Command
             $io->write('Call ListeAgentsWebService... ');
         }
         $listAgentsWS = new ListeAgentsWebService();
-        $listAgents = $listAgentsWS->getListAgentsByName('FONTANEL');
+        $listAgents = $listAgentsWS->getListAgentsByName('%');
         if (isset($listAgents->return)) {
             $listAgents = is_array($listAgents->return) ? $listAgents->return : [$listAgents->return];
             $numberOfUsers = count($listAgents);
