@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Structure
  *
  * @ORM\Table(name="structure")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\StructureRepository")
  */
 class Structure {
 

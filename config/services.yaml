@@ -30,6 +30,9 @@ services:
     App\Command\SyncAgentCommand:
         arguments:
             $logger: '@monolog.logger.sync_agent'
+    App\Command\SyncGeishaCommand:
+        arguments:
+            $logger: '@monolog.logger.sync_geisha'
     App\Command\SyncStructureCommand:
         arguments:
             $logger: '@monolog.logger.sync_structure'

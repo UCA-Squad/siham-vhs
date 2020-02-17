@@ -1,0 +1,154 @@
+<?php
+
+namespace App\Command;
+
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Console\Helper\ProgressBar;
+use Doctrine\Persistence\ManagerRegistry;
+use Psr\Log\LoggerInterface;
+use App\Util\ListeAgentsWebService;
+use App\Util\DossierAgentWebService;
+use App\Entity\Agent;
+use App\Entity\Structure;
+
+
+class SyncGeishaCommand extends Command
+{
+    // the name of the command (the part after "bin/console")
+    protected static $defaultName = 'sync:geisha';
+    private $em;
+    private $geishaEm;
+    private $logger;
+
+    public function __construct(ManagerRegistry $doctrine, LoggerInterface $logger)
+    {
+        parent::__construct();
+        $this->em = $doctrine->getManager();// siham_vhs by default
+        $this->geishaEm = $doctrine->getManager('geisha');
+        $this->logger = $logger;
+    }   
+
+    protected function configure()
+    {
+        $this
+         // configure options
+        ->addOption('logger', null, InputOption::VALUE_OPTIONAL, 'The logger mode: "console" (by default) or "file".', 'console')
+
+        // the short description shown while running "php bin/console list"
+        ->setDescription('Sync all users from GEISHA...')
+
+        // the full command description shown when running the command with
+        // the "--help" option
+        ->setHelp('This command allows you to retrieve agreements from GEISHA...')
+    ;
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $start = time();
+
+        $loggerMode = $input->getOption('logger');
+        
+        if ($loggerMode === 'file') {
+            $this->logger->info('Start sync agreements from GEISHA');
+        } else {
+            $io = new SymfonyStyle($input, $output);
+            $io->newLine();
+            $io->write('Start sync agreements from GEISHA... ');
+        }
+
+        $connGeisha = $this->geishaEm->getConnection();
+        $sqlGeishaAgreements = 'SELECT NO_INDIVIDU, C_STRUCTURE, TO_CHAR(D_DEB_VAL, \'YYYY-MM-DD\') AS D_DEB_VAL, TO_CHAR(D_FIN_VAL, \'YYYY-MM-DD\') AS D_FIN_VAL FROM AGREMENT WHERE ((D_DEB_VAL <= TO_DATE(:dateDebutObservation, \'YYYY-MM-DD\') AND D_FIN_VAL >= TO_DATE(:dateDebutObservation, \'YYYY-MM-DD\')) OR (D_DEB_VAL <= TO_DATE(:dateFinObservation, \'YYYY-MM-DD\') AND D_FIN_VAL >= TO_DATE(:dateFinObservation, \'YYYY-MM-DD\'))) ORDER BY NO_INDIVIDU, D_DEB_VAL';
+        $stmtGeisha = $connGeisha->prepare($sqlGeishaAgreements);
+        $dateObservation = new \DateTime();
+        $stmtGeisha->bindValue('dateDebutObservation', $dateObservation->format('Y-m-d'));
+        $stmtGeisha->bindValue('dateFinObservation', $dateObservation->modify('+60 days')->format('Y-m-d'));
+        $stmtGeisha->execute();
+        $agreements = $stmtGeisha->fetchAll();
+        if (!empty($agreements)) {
+            
+            // Agreements exist or GEISHA response
+            // REMOVE all AGR fields
+            $sqlRemoveAgreements = 'UPDATE `siham_vhs`.`agent` SET `codeUOAffectationsAGR` = NULL, `dateDebutUOAffectationsAGR` = NULL, `dateFinUOAffectationsAGR` = NULL';
+            $conn = $this->em->getConnection();
+            $stmt = $conn->prepare($sqlRemoveAgreements);
+            $stmt->execute();
+            $numberOfAgreementsUpdated = $stmt->rowCount();
+            
+            $numberOfAgreementsGeisha = count($agreements);
+            if ($loggerMode === 'file') {
+                $this->logger->info('(' . $numberOfAgreementsUpdated . ' agent agreements reset) ' . $numberOfAgreementsGeisha . ' agreements found');
+            } else {
+                $io->writeln(\sprintf('(<info>%s</info> agent agreements reset) <info>%s</info> agreements found', $numberOfAgreementsUpdated, $numberOfAgreementsGeisha));
+                // creates a new progress bar
+                $progressBar = new ProgressBar($io, $numberOfAgreementsGeisha);
+                // starts and displays the progress bar
+                $progressBar->start();
+            }
+
+
+            // Loop on each agreement to set it to the agent
+            foreach ($agreements as $agreement) {
+                $agent = $this->em->getRepository(Agent::class)->findOneByNumDossierHarpege($agreement['NO_INDIVIDU']);
+                if ($agent) {
+                    // Get previous UO and date of agreements to concatenate them
+                    $codeUOAffectationsAGR      = explode('|', $agent->getCodeUOAffectationsAGR());
+                    $dateDebutUOAffectationsAGR = explode('|', $agent->getDateDebutUOAffectationsAGR());
+                    $dateFinUOAffectationsAGR   = explode('|', $agent->getDateFinUOAffectationsAGR());
+                    
+                    $structure = $this->em->getRepository(Structure::class)->findOneInCodeHarpege($agreement['C_STRUCTURE']);
+                    $codeUOAffectationAGR = $agreement['C_STRUCTURE'];
+                    if ($structure) {
+                        $codeUOAffectationAGR = $structure->getCodeUO();
+                    }
+                    if ($loggerMode === 'file') {
+                        $this->logger->info('-- Set agreement ' . $agreement['C_STRUCTURE'] . ' -> ' . $codeUOAffectationAGR . '  for ' . $agent->getMatricule());
+                    }
+                    
+                    // Add next agreement
+                    $codeUOAffectationsAGR[]        = $codeUOAffectationAGR;
+                    $dateDebutUOAffectationsAGR[]   = $agreement['D_DEB_VAL'];
+                    $dateFinUOAffectationsAGR[]     = $agreement['D_FIN_VAL'];
+                    // Save them
+                    $agent->setCodeUOAffectationsAGR(\implode('|', \array_filter($codeUOAffectationsAGR)));
+                    $agent->setDateDebutUOAffectationsAGR(\implode('|', \array_filter($dateDebutUOAffectationsAGR)));
+                    $agent->setDateFinUOAffectationsAGR(\implode('|', \array_filter($dateFinUOAffectationsAGR)));
+                    $this->em->persist($agent);
+                    $this->em->flush();
+                    
+                }
+                
+                if ($loggerMode !== 'file') {
+                    // advances the progress bar 1 unit
+                    $progressBar->advance();
+                }
+            }
+        } else {
+            if ($loggerMode === 'file') {
+                $this->logger->error('No agreement');
+            } else {
+                $io->error('No agreement');
+            }
+        }
+    
+
+        
+
+
+        if ($loggerMode === 'file') {
+            $this->logger->info('Done in ' . (time() - $start) . 's');
+        } else {
+            // ensures that the progress bar is at 100%
+            $progressBar->finish();
+            
+            $io->success('Sync the agreements from GEISHA was successfully done in ' . (time() - $start) . 's');
+        }        
+        
+        return 0;
+    }
+}

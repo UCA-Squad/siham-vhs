@@ -1,6 +1,6 @@
 monolog:
     # Add new channel to log the synch commands
-    channels: ['sync_agent', 'sync_structure', 'sync_ldap']
+    channels: ['sync_agent', 'sync_geisha', 'sync_structure', 'sync_ldap']
     
     handlers:
         # Define handler to log in a different file
@@ -10,15 +10,23 @@ monolog:
             # in order to read log into twig render
             path: "%twig.default_path%/sync/%kernel.environment%.sync.agent.log"
             level: debug
-            max_files: 10
+            max_files: 6
             channels: ["sync_agent"]
+        sync_geisha:
+            type: rotating_file
+            # default path means templates directory
+            # in order to read log into twig render
+            path: "%twig.default_path%/sync/%kernel.environment%.sync.geisha.log"
+            level: debug
+            max_files: 6
+            channels: ["sync_geisha"]
         sync_structure:
             type: rotating_file
             # default path means templates directory
             # in order to read log into twig render
             path: "%twig.default_path%/sync/%kernel.environment%.sync.structure.log"
             level: debug
-            max_files: 10
+            max_files: 6
             channels: ["sync_structure"]
         sync_ldap:
             type: rotating_file
@@ -26,14 +34,14 @@ monolog:
             # in order to read log into twig render
             path: "%twig.default_path%/sync/%kernel.environment%.sync.ldap.log"
             level: debug
-            max_files: 10
+            max_files: 6
             channels: ["sync_ldap"]
         main:
             type: fingers_crossed
             action_level: error
             handler: nested
             excluded_http_codes: [404, 405]
-            channels: ['!sync_agent', '!sync_structure', '!sync_ldap']
+            channels: ['!sync_agent', '!sync_geisha', '!sync_structure', '!sync_ldap']
         nested:
             type: stream
             path: "%kernel.logs_dir%/%kernel.environment%.log"
