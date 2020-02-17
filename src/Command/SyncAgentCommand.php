@@ -5,10 +5,10 @@ namespace App\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Helper\ProgressBar;
-// use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 use App\Util\ListeAgentsWebService;
@@ -36,8 +36,10 @@ class SyncAgentCommand extends Command
     protected function configure()
     {
         $this
-         // configure an argument
-         ->addArgument('logger_mode', InputArgument::OPTIONAL, 'The logger mode: console or logger.')
+         // configure options
+        ->addOption('logger', null, InputOption::VALUE_OPTIONAL, 'The logger mode: "console" (by default) or "file".', 'console')
+        ->addOption('from-date', null, InputOption::VALUE_OPTIONAL, '"all" or date in "Y-m-d" format (date of the day by default)', date('Y-m-d'))
+
         // the short description shown while running "php bin/console list"
         ->setDescription('Sync all users from SIHAM...')
 
@@ -52,21 +54,29 @@ class SyncAgentCommand extends Command
         $start = time();
         ini_set('default_socket_timeout', 300);
 
-        $loggerMode = $input->getArgument('logger_mode');
-
-        if ($loggerMode === 'logger') {
+        $loggerMode = $input->getOption('logger');
+        $fromDate = $input->getOption('from-date');
+        
+        if ($loggerMode === 'file') {
             $this->logger->info('Start sync agents');
         } else {
             $io = new SymfonyStyle($input, $output);
             $io->newLine();
             $io->write('Call ListeAgentsWebService... ');
         }
+
         $listAgentsWS = new ListeAgentsWebService();
-        $listAgents = $listAgentsWS->getListAgentsByName('%');
+        $listAgents = NULL;
+        if ($fromDate === 'all') {
+            $listAgents = $listAgentsWS->getListAgentsByName('%');
+        } else {
+            $listAgents = $listAgentsWS->getListAgentsModifies($fromDate);
+        }
+
         if (isset($listAgents->return)) {
             $listAgents = is_array($listAgents->return) ? $listAgents->return : [$listAgents->return];
             $numberOfUsers = count($listAgents);
-            if ($loggerMode === 'logger') {
+            if ($loggerMode === 'file') {
                 $this->logger->info($numberOfUsers . ' agents found');
             } else {
                 $io->writeln(\sprintf('<info>%s</info> agents found', $numberOfUsers));
@@ -79,7 +89,7 @@ class SyncAgentCommand extends Command
             $counterTempo = 1;
             foreach($listAgents as $listAgent) {
                 // retrieve agent
-                if ($loggerMode === 'logger') {
+                if ($loggerMode === 'file') {
                     $this->logger->info('Get agent ' . $listAgent->matricule . ' from database');
                 }
                 $agent = $this->em->getRepository(Agent::class)->findOneByMatricule($listAgent->matricule);
@@ -91,7 +101,7 @@ class SyncAgentCommand extends Command
 
                 $dossierAgentWS = new DossierAgentWebService();
 
-                if ($loggerMode === 'logger') {
+                if ($loggerMode === 'file') {
                     $this->logger->info('-- Get personal data for ' . $listAgent->matricule);
                 }
                 $personalData = $dossierAgentWS->getPersonalData($listAgent->matricule);
@@ -99,7 +109,7 @@ class SyncAgentCommand extends Command
                     $agent->addPersonalData($personalData->return);
 
 
-                if ($loggerMode === 'logger') {
+                if ($loggerMode === 'file') {
                     $this->logger->info('-- Get administrative data for ' . $listAgent->matricule);
                 }
                 $administrativeData = $dossierAgentWS->getAdministrativeData($listAgent->matricule);
@@ -111,7 +121,7 @@ class SyncAgentCommand extends Command
                 $dateDebutUOAffectationsAGR = [];
                 $dateFinUOAffectationsAGR   = [];
                 if (\strstr($agent->getCodeUOAffectationsFUN(), 'U0B000000L') !== false || $agent->getTemEnseignantChercheur() == 'O') {
-                    if ($loggerMode === 'logger') {
+                    if ($loggerMode === 'file') {
                         $this->logger->info('-- Get geisha data for ' . $listAgent->matricule);
                     }
                     $conn = $this->geishaEm->getConnection();
@@ -138,7 +148,7 @@ class SyncAgentCommand extends Command
                 $this->em->persist($agent);
                 $this->em->flush();
     
-                if ($loggerMode !== 'logger') {
+                if ($loggerMode !== 'file') {
                     // advances the progress bar 1 unit
                     $progressBar->advance();
                 }
@@ -149,7 +159,7 @@ class SyncAgentCommand extends Command
                 // if ($counterTempo++ % 1000 == 0) \sleep(30);
             }
 
-            if ($loggerMode === 'logger') {
+            if ($loggerMode === 'file') {
                 $this->logger->info('Done in ' . (time() - $start) . 's');
             } else {
                 // ensures that the progress bar is at 100%
@@ -159,7 +169,7 @@ class SyncAgentCommand extends Command
             }
 
         } else {
-            if ($loggerMode === 'logger') {
+            if ($loggerMode === 'file') {
                 $this->logger->error('No response from WebService');
             } else {
                 $io->error('No response from WebService');

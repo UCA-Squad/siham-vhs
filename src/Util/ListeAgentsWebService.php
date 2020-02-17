@@ -29,4 +29,22 @@ class ListeAgentsWebService
         return $listAgents;
     }
 
+    public function getListAgentsModifies($dateObservation) {
+
+        $soapClientListAgent = SoapClients::getInstance($this->WSDL);
+        
+        $listAgents = new \StdClass(); // Response expected
+        if ($soapClientListAgent) {
+            try {
+                $listAgents = $soapClientListAgent->recupAgentsModifies([
+                    'DateHeureDebObservation' => $dateObservation
+                ]);
+            } catch (\SoapFault $fault) {
+                // ... log it ?
+            }
+        }
+
+        return $listAgents;
+    }
+
 }
