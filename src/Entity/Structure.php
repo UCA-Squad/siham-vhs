@@ -74,7 +74,7 @@ class Structure {
     /**
      * @var string|null
      *
-     * @ORM\Column(name="codeHarpege", type="string", length=5, nullable=true)
+     * @ORM\Column(name="codeHarpege", type="string", nullable=true)
      */
     private $codeHarpege;
 
