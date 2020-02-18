@@ -57,10 +57,10 @@ class ListeAgentsWebService
 
         /**
      * Get list of agents due term between two dates
-     * @param $dateStartObservation require datetime with the format Y-m-d
-     * @param $dateEndObservation require datetime with the format Y-m-d
+     * @param $startObservationDate require datetime with the format Y-m-d
+     * @param $endObservationDate require datetime with the format Y-m-d
      */
-    public function getListAgentsDueTerm($dateStartObservation, $dateEndObservation) {
+    public function getListAgentsDueTerm($startObservationDate, $endObservationDate) {
 
         $soapClientListAgent = SoapClients::getInstance($this->WSDL);
         
@@ -69,8 +69,8 @@ class ListeAgentsWebService
             try {
                 $listAgents = $soapClientListAgent->recupAgentsEcheance([
                     'ParamAgentEcheance' => [
-                        'dateDebutObservation' => $dateStartObservation,
-                        'dateFinObservation' => $dateEndObservation
+                        'dateDebutObservation' => $startObservationDate,
+                        'dateFinObservation' => $endObservationDate
                     ]
                 ]);
             } catch (\SoapFault $fault) {

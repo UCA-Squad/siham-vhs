@@ -9,7 +9,7 @@ class DossierAgentWebService
 {
     private $WSDL = '/DossierAgentWebService/DossierAgentWebService?wsdl';
 
-    public function getPersonalData($matricule) {
+    public function getPersonalData($matricule, $startObservationDate = null, $endObservationDate = null) {
 
         $soapClientDossierAgent = SoapClients::getInstance($this->WSDL);
         
@@ -18,7 +18,8 @@ class DossierAgentWebService
             try {
                 $personalData = $soapClientDossierAgent->recupDonneesPersonnelles([
                     'ParamListAgent' => [
-                        'dateObservation' => date('c'),
+                        'dateObservation' => $startObservationDate ?? date('Y-m-d'),
+                        'dateFinObservation' => $endObservationDate ?? '',
                         'listeMatricules' => [
                             'matricule' => $matricule
                         ]
@@ -31,6 +32,7 @@ class DossierAgentWebService
         return $personalData;
     }
 
+    //region set personal data
     public function setPersonalData($matricule, $typeNumero, $numero, $typeAction) {
 
         $soapClientDossierAgent = SoapClients::getInstance($this->WSDL);
@@ -52,7 +54,6 @@ class DossierAgentWebService
         }
         return isset($responsePersonalData->return) && isset($responsePersonalData->return->statutMAJ) ? $responsePersonalData->return->statutMAJ : false;
     }
-
     public function addPhonePro($matricule, $phoneNumber) {
         return $this->setPersonalData($matricule, 'TPR', $phoneNumber, 'A') == 1;
     }
@@ -92,8 +93,9 @@ class DossierAgentWebService
     public function removeEmailPerso($matricule) {
         return $this->setPersonalData($matricule, 'MPE', '', 'S') == 1;
     }
+    //endregion
 
-    public function getAdministrativeData($matricule) {
+    public function getAdministrativeData($matricule, $startObservationDate = null, $endObservationDate = null) {
 
         $soapClientDossierAgent = SoapClients::getInstance($this->WSDL);
         
@@ -102,7 +104,8 @@ class DossierAgentWebService
             try {
                 $administrativeData = $soapClientDossierAgent->recupDonneesAdministratives([
                     'ParamListAgent' => [
-                        'dateObservation' => date('c'),
+                        'dateObservation' => $startObservationDate ?? date('Y-m-d'),
+                        'dateFinObservation' => $endObservationDate ?? '',
                         'listeMatricules' => [
                             'matricule' => $matricule
                         ]
