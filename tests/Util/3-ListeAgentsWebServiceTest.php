@@ -17,9 +17,23 @@ class ListeAgentsWebServiceTest extends TestCase
         $this->assertObjectHasAttribute('return', $responseListAgents);
     }
 
-    /**
-     * @TODO
-     * - ? list of attributes to fill database
-     * 
-     */
+    public function testGetListAgentsUpdated(){
+
+        $listAgentsWebService = new ListeAgentsWebService();
+        $responseListAgents = $listAgentsWebService->getListAgentsUpdated(date('Y-m-d'));
+
+        // There is more than one return
+        $this->assertObjectHasAttribute('return', $responseListAgents);
+    }
+
+    public function testGetListAgentsDueTerm(){
+
+        $listAgentsWebService = new ListeAgentsWebService();
+        $responseListAgents = $listAgentsWebService->getListAgentsDueTerm(date('Y-m-d'), date('Y-m-d', \strtotime('+60 days')));
+
+        // There is more than one return
+        $this->assertObjectHasAttribute('return', $responseListAgents);
+    }
+
+    
 }
