@@ -4,7 +4,6 @@ namespace App\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -27,9 +26,8 @@ class SyncAgentCommand extends Command
     public function __construct(ManagerRegistry $doctrine, LoggerInterface $logger)
     {
         parent::__construct();
-        $this->em = $doctrine->getManager();// siham_vhs by default //$em;
+        $this->em = $doctrine->getManager();// siham_vhs by default;
         $this->geishaEm = $doctrine->getManager('geisha');
-        // $this->geishaEm = $this->getDoctrine()->getManager('geisha');
         $this->logger = $logger;
     }   
 
@@ -52,7 +50,7 @@ class SyncAgentCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $start = time();
-        ini_set('default_socket_timeout', 300);
+        ini_set('default_socket_timeout', 600);
 
         $loggerMode = $input->getOption('logger');
         $fromDate = $input->getOption('from-date');
@@ -89,14 +87,14 @@ class SyncAgentCommand extends Command
             $counterTempo = 1;
             foreach($listAgents as $listAgent) {
                 // retrieve agent
-                if ($loggerMode === 'file') {
-                    $this->logger->info('Get agent ' . $listAgent->matricule . ' from database');
-                }
                 $agent = $this->em->getRepository(Agent::class)->findOneByMatricule($listAgent->matricule);
+                if ($loggerMode === 'file') {
+                    $this->logger->info('Get agent ' . $listAgent->matricule . ' from database: ' . ($agent ? 'found' : 'not found'));
+                }
                 if (!$agent) {
                     $agent = new Agent();
+                    $agent->setMatricule($listAgent->matricule);
                 }
-                $agent->addListAgentFields($listAgent);
 
 
                 $dossierAgentWS = new DossierAgentWebService();
@@ -116,34 +114,6 @@ class SyncAgentCommand extends Command
                 if (isset($administrativeData->return))
                     $agent->addAdministrativeData($administrativeData->return);
 
-                // GEISHA
-                $codeUOAffectationsAGR      = [];
-                $dateDebutUOAffectationsAGR = [];
-                $dateFinUOAffectationsAGR   = [];
-                if (\strstr($agent->getCodeUOAffectationsFUN(), 'U0B000000L') !== false || $agent->getTemEnseignantChercheur() == 'O') {
-                    if ($loggerMode === 'file') {
-                        $this->logger->info('-- Get geisha data for ' . $listAgent->matricule);
-                    }
-                    $conn = $this->geishaEm->getConnection();
-                    $sql = 'SELECT C_STRUCTURE, TO_CHAR(D_DEB_VAL, \'YYYY-MM-DD\') AS D_DEB_VAL, TO_CHAR(D_FIN_VAL, \'YYYY-MM-DD\') AS D_FIN_VAL FROM AGREMENT WHERE NO_INDIVIDU = :numDossierHarpege AND ((D_DEB_VAL <= TO_DATE(:dateDebutObservation, \'YYYY-MM-DD\') AND D_FIN_VAL >= TO_DATE(:dateDebutObservation, \'YYYY-MM-DD\')) OR (D_DEB_VAL <= TO_DATE(:dateFinObservation, \'YYYY-MM-DD\') AND D_FIN_VAL >= TO_DATE(:dateFinObservation, \'YYYY-MM-DD\'))) ORDER BY D_DEB_VAL';
-                    $stmt = $conn->prepare($sql);
-                    $stmt->bindValue('numDossierHarpege', $agent->getNumDossierHarpege());
-                    $dateObservation = new \DateTime();
-                    $stmt->bindValue('dateDebutObservation', $dateObservation->format('Y-m-d'));
-                    $stmt->bindValue('dateFinObservation', $dateObservation->modify('+60 days')->format('Y-m-d'));
-                    $stmt->execute();
-                    $agreements = $stmt->fetchAll();
-                    if (!empty($agreements)) {
-                        foreach ($agreements as $agreement) {
-                            $codeUOAffectationsAGR[]        = $agreement['C_STRUCTURE'];
-                            $dateDebutUOAffectationsAGR[]   = $agreement['D_DEB_VAL'];
-                            $dateFinUOAffectationsAGR[]     = $agreement['D_FIN_VAL'];
-                        }
-                    }
-                }
-                $agent->setCodeUOAffectationsAGR(\implode('|', $codeUOAffectationsAGR));
-                $agent->setDateDebutUOAffectationsAGR(\implode('|', $dateDebutUOAffectationsAGR));
-                $agent->setDateFinUOAffectationsAGR(\implode('|', $dateFinUOAffectationsAGR));
 
                 $this->em->persist($agent);
                 $this->em->flush();
