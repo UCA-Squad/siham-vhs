@@ -11,17 +11,29 @@ class DossierAgentWebServiceTest extends TestCase
     public function testGetPersonalData(){
 
         $dossierAgentWebService = new DossierAgentWebService();
-        $responseDossierAgent = $dossierAgentWebService->getPersonalData($_ENV['SIHAM_WS_MATRICULE_TEST']);
-        // There is more than one return
-        $this->assertObjectHasAttribute('return', $responseDossierAgent);
+
+        $responseDossierAgentGetPD = $dossierAgentWebService->getPersonalData($_ENV['SIHAM_WS_MATRICULE_TEST']);
+        $this->assertObjectHasAttribute('return', $responseDossierAgentGetPD);
+
+        $responseDossierAgentGetPDBySD = $dossierAgentWebService->getPersonalData($_ENV['SIHAM_WS_MATRICULE_TEST'], date('Y-m-d'));
+        $this->assertObjectHasAttribute('return', $responseDossierAgentGetPDBySD);
+
+        $responseDossierAgentGetPDBySDAndED = $dossierAgentWebService->getPersonalData($_ENV['SIHAM_WS_MATRICULE_TEST'], date('Y-m-d'), date('Y-m-d', \strtotime('+30 days')));
+        $this->assertObjectHasAttribute('return', $responseDossierAgentGetPDBySDAndED);
     }
 
     public function testGetAdministrativeData(){
 
         $dossierAgentWebService = new DossierAgentWebService();
-        $responseDossierAgent = $dossierAgentWebService->getAdministrativeData($_ENV['SIHAM_WS_MATRICULE_TEST']);
-        // There is more than one return
-        $this->assertObjectHasAttribute('return', $responseDossierAgent);
+        
+        $responseDossierAgentGetAD = $dossierAgentWebService->getAdministrativeData($_ENV['SIHAM_WS_MATRICULE_TEST']);
+        $this->assertObjectHasAttribute('return', $responseDossierAgentGetAD);
+
+        $responseDossierAgentGetADBySD = $dossierAgentWebService->getAdministrativeData($_ENV['SIHAM_WS_MATRICULE_TEST'], date('Y-m-d'));
+        $this->assertObjectHasAttribute('return', $responseDossierAgentGetADBySD);
+
+        $responseDossierAgentGetADBySDAndED = $dossierAgentWebService->getAdministrativeData($_ENV['SIHAM_WS_MATRICULE_TEST'], date('Y-m-d'), date('Y-m-d', \strtotime('+30 days')));
+        $this->assertObjectHasAttribute('return', $responseDossierAgentGetADBySDAndED);
     }
 
     public function testSetPersonalData(){
