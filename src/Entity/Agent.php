@@ -75,72 +75,23 @@ class Agent {
     /**
      * @var bool|null
      *
-     * @ORM\Column(name="codeCivilite", type="string", length=1, nullable=true)
+     * @ORM\Column(name="civilite", type="string", length=1, nullable=true)
      */
-    private $codeCivilite;
+    private $civilite;
 
     /**
      * @var string|null
      *
-     * @ORM\Column(name="codeEmploiAffectationHierarchique", type="string", length=10, nullable=true)
+     * @ORM\Column(name="numDossierHarpege", type="integer", nullable=true)
      */
-    private $codeEmploiAffectationHierarchique;
-
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="libLongEmploiAffectation", type="string", length=60, nullable=true)
-     */
-    private $libLongEmploiAffectation;
-
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="codePosteAffectation", type="string", length=10, nullable=true)
-     */
-    private $codePosteAffectation;
-
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="libLongPosteAffectation", type="string", length=60, nullable=true)
-     */
-    private $libLongPosteAffectation;
-
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="codeUOAffectationHierarchique", type="string", length=10, nullable=true)
-     */
-    private $codeUOAffectationHierarchique;
-
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="libLongUOAffectationHierarchique", type="string", length=100, nullable=true)
-     */
-    private $libLongUOAffectationHierarchique;
+    private $numDossierHarpege;
 
     /**
      * @var \DateTime|null
      *
-     * @ORM\Column(name="dateDebutAffectHierarchique", type="date", nullable=true)
+     * @ORM\Column(name="lastUpdate", type="datetime", nullable=true)
      */
-    private $dateDebutAffectHierarchique;
-
-    /**
-     * @var \DateTime|null
-     *
-     * @ORM\Column(name="dateFinAffectHierarchique", type="date", nullable=true)
-     */
-    private $dateFinAffectHierarchique;
-
-    /**
-     * @var int|null
-     *
-     * @ORM\Column(name="quotiteAffectHierarchique", type="smallint", nullable=true)
-     */
-    private $quotiteAffectHierarchique;
+    private $lastUpdate;
 
     /**
      * @var string|null
@@ -176,20 +127,6 @@ class Agent {
      * @ORM\Column(name="mailPerso", type="string", length=100, nullable=true)
      */
     private $mailPerso;
-
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="numDossierHarpege", type="integer", nullable=true)
-     */
-    private $numDossierHarpege;
-
-    /**
-     * @var \DateTime|null
-     *
-     * @ORM\Column(name="lastUpdate", type="datetime", nullable=true)
-     */
-    private $lastUpdate;
 
     /**
      * @var string|null
@@ -261,6 +198,33 @@ class Agent {
      */
     private $organismePrincipal;
 
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="codeEmploiAffectation", type="string", length=10, nullable=true)
+     */
+    private $codeEmploiAffectation;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="libLongEmploiAffectation", type="string", length=60, nullable=true)
+     */
+    private $libLongEmploiAffectation;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="codePosteAffectation", type="string", length=10, nullable=true)
+     */
+    private $codePosteAffectation;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="libLongPosteAffectation", type="string", length=60, nullable=true)
+     */
+    private $libLongPosteAffectation;
 
     /**
      * @var string|null
@@ -268,45 +232,6 @@ class Agent {
      * @ORM\Column(name="categorieEmploiPoste", type="string", length=4, nullable=true)
      */
     private $categorieEmploiPoste;
-
-
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="codeUOAffectationsADR", type="string", nullable=true)
-     */
-    private $codeUOAffectationsADR;
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="nameUOAffectationsADR", type="text", nullable=true)
-     */
-    private $nameUOAffectationsADR;
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="quotUOAffectationsADR", type="string", nullable=true)
-     */
-    private $quotUOAffectationsADR;
-
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="codeUOAffectationsFUN", type="string", nullable=true)
-     */
-    private $codeUOAffectationsFUN;
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="nameUOAffectationsFUN", type="text", nullable=true)
-     */
-    private $nameUOAffectationsFUN;
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="quotUOAffectationsFUN", type="string", nullable=true)
-     */
-    private $quotUOAffectationsFUN;
 
     /**
      * @var string|null
@@ -323,9 +248,60 @@ class Agent {
     /**
      * @var string|null
      *
-     * @ORM\Column(name="quotUOAffectationsHIE", type="string", nullable=true)
+     * @ORM\Column(name="dateDebutAffectationsHIE", type="string", nullable=true)
      */
-    private $quotUOAffectationsHIE;
+    private $dateDebutAffectationsHIE;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="dateFinAffectationsHIE", type="string", nullable=true)
+     */
+    private $dateFinAffectationsHIE;
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="quotiteUOAffectationsHIE", type="string", nullable=true)
+     */
+    private $quotiteUOAffectationsHIE;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="codeUOAffectationsFUN", type="string", nullable=true)
+     */
+    private $codeUOAffectationsFUN;
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="nameUOAffectationsFUN", type="text", nullable=true)
+     */
+    private $nameUOAffectationsFUN;
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="quotiteUOAffectationsFUN", type="string", nullable=true)
+     */
+    private $quotiteUOAffectationsFUN;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="codeUOAffectationsADR", type="string", nullable=true)
+     */
+    private $codeUOAffectationsADR;
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="nameUOAffectationsADR", type="text", nullable=true)
+     */
+    private $nameUOAffectationsADR;
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="quotiteUOAffectationsADR", type="string", nullable=true)
+     */
+    private $quotiteUOAffectationsADR;
 
     /**
      * @var string|null
@@ -464,86 +440,29 @@ class Agent {
         return $this;
     }
 
-    public function getCodeCivilite(): ?string {
-        return $this->codeCivilite;
+    public function getCivilite(): ?string {
+        return $this->civilite;
     }
-    public function setCodeCivilite(?string $codeCivilite): self {
-        $this->codeCivilite = $codeCivilite;
+    public function setCivilite(?string $civilite): self {
+        $this->civilite = $civilite;
 
         return $this;
     }
 
-    public function getCodeEmploiAffectationHierarchique(): ?string {
-        return $this->codeEmploiAffectationHierarchique;
+    public function getNumDossierHarpege(): ?int {
+        return $this->numDossierHarpege;
     }
-    public function setCodeEmploiAffectationHierarchique(?string $codeEmploiAffectationHierarchique): self {
-        $this->codeEmploiAffectationHierarchique = $codeEmploiAffectationHierarchique;
-
-        return $this;
-    }
-    public function getLibLongEmploiAffectation(): ?string {
-        return $this->libLongEmploiAffectation;
-    }
-    public function setLibLongEmploiAffectation(?string $libLongEmploiAffectation): self {
-        $this->libLongEmploiAffectation = $libLongEmploiAffectation;
+    public function setNumDossierHarpege(?int $numDossierHarpege): self {
+        $this->numDossierHarpege = $numDossierHarpege;
 
         return $this;
     }
 
-    public function getCodePosteAffectation(): ?string {
-        return $this->codePosteAffectation;
+    public function getLastUpdate(): ?\DateTimeInterface {
+        return $this->lastUpdate;
     }
-    public function setCodePosteAffectation(?string $codePosteAffectation): self {
-        $this->codePosteAffectation = $codePosteAffectation;
-
-        return $this;
-    }
-    public function getLibLongPosteAffectation(): ?string {
-        return $this->libLongPosteAffectation;
-    }
-    public function setLibLongPosteAffectation(?string $libLongPosteAffectation): self {
-        $this->libLongPosteAffectation = $libLongPosteAffectation;
-
-        return $this;
-    }
-
-    public function getCodeUOAffectationHierarchique(): ?string {
-        return $this->codeUOAffectationHierarchique;
-    }
-    public function setCodeUOAffectationHierarchique(?string $codeUOAffectationHierarchique): self {
-        $this->codeUOAffectationHierarchique = $codeUOAffectationHierarchique;
-
-        return $this;
-    }
-    public function getLibLongUOAffectationHierarchique(): ?string {
-        return $this->libLongUOAffectationHierarchique;
-    }
-    public function setLibLongUOAffectationHierarchique(?string $libLongUOAffectationHierarchique): self {
-        $this->libLongUOAffectationHierarchique = $libLongUOAffectationHierarchique;
-
-        return $this;
-    }
-    public function getDateDebutAffectHierarchique(): ?\DateTimeInterface {
-        return $this->dateDebutAffectHierarchique;
-    }
-    public function setDateDebutAffectHierarchique(?\DateTimeInterface $dateDebutAffectHierarchique): self {
-        $this->dateDebutAffectHierarchique = $dateDebutAffectHierarchique;
-
-        return $this;
-    }
-    public function getDateFinAffectHierarchique(): ?\DateTimeInterface {
-        return $this->dateFinAffectHierarchique;
-    }
-    public function setDateFinAffectHierarchique(?\DateTimeInterface $dateFinAffectHierarchique): self {
-        $this->dateFinAffectHierarchique = $dateFinAffectHierarchique;
-
-        return $this;
-    }
-    public function getQuotiteAffectHierarchique(): ?int {
-        return $this->quotiteAffectHierarchique;
-    }
-    public function setQuotiteAffectHierarchique(?int $quotiteAffectHierarchique): self {
-        $this->quotiteAffectHierarchique = $quotiteAffectHierarchique;
+    public function setLastUpdate(?\DateTimeInterface $lastUpdate): self {
+        $this->lastUpdate = $lastUpdate;
 
         return $this;
     }
@@ -585,24 +504,6 @@ class Agent {
     }
     public function setMailPerso(?string $mailPerso): self {
         $this->mailPerso = $mailPerso;
-
-        return $this;
-    }
-
-    public function getNumDossierHarpege(): ?int {
-        return $this->numDossierHarpege;
-    }
-    public function setNumDossierHarpege(?int $numDossierHarpege): self {
-        $this->numDossierHarpege = $numDossierHarpege;
-
-        return $this;
-    }
-
-    public function getLastUpdate(): ?\DateTimeInterface {
-        return $this->lastUpdate;
-    }
-    public function setLastUpdate(?\DateTimeInterface $lastUpdate): self {
-        $this->lastUpdate = $lastUpdate;
 
         return $this;
     }
@@ -692,61 +593,43 @@ class Agent {
         return $this;
     }
 
+    public function getCodeEmploiAffectation(): ?string {
+        return $this->codeEmploiAffectation;
+    }
+    public function setCodeEmploiAffectation(?string $codeEmploiAffectation): self {
+        $this->codeEmploiAffectation = $codeEmploiAffectation;
+
+        return $this;
+    }
+    public function getLibLongEmploiAffectation(): ?string {
+        return $this->libLongEmploiAffectation;
+    }
+    public function setLibLongEmploiAffectation(?string $libLongEmploiAffectation): self {
+        $this->libLongEmploiAffectation = $libLongEmploiAffectation;
+
+        return $this;
+    }
+    public function getCodePosteAffectation(): ?string {
+        return $this->codePosteAffectation;
+    }
+    public function setCodePosteAffectation(?string $codePosteAffectation): self {
+        $this->codePosteAffectation = $codePosteAffectation;
+
+        return $this;
+    }
+    public function getLibLongPosteAffectation(): ?string {
+        return $this->libLongPosteAffectation;
+    }
+    public function setLibLongPosteAffectation(?string $libLongPosteAffectation): self {
+        $this->libLongPosteAffectation = $libLongPosteAffectation;
+
+        return $this;
+    }
     public function getCategorieEmploiPoste(): ?string {
         return $this->categorieEmploiPoste;
     }
     public function setCategorieEmploiPoste(?string $categorieEmploiPoste): self {
         $this->categorieEmploiPoste = $categorieEmploiPoste;
-
-        return $this;
-    }
-
-    public function getCodeUOAffectationsADR(): ?string {
-        return $this->codeUOAffectationsADR;
-    }
-    public function setCodeUOAffectationsADR(?string $codeUOAffectationsADR): self {
-        $this->codeUOAffectationsADR = $codeUOAffectationsADR;
-
-        return $this;
-    }
-    public function getNameUOAffectationsADR(): ?string {
-        return $this->nameUOAffectationsADR;
-    }
-    public function setNameUOAffectationsADR(?string $nameUOAffectationsADR): self {
-        $this->nameUOAffectationsADR = $nameUOAffectationsADR;
-
-        return $this;
-    }
-    public function getQuotUOAffectationsADR(): ?int {
-        return $this->quotUOAffectationsADR;
-    }
-    public function setQuotUOAffectationsADR(?int $quotUOAffectationsADR): self {
-        $this->quotUOAffectationsADR = $quotUOAffectationsADR;
-
-        return $this;
-    }
-
-    public function getCodeUOAffectationsFUN(): ?string {
-        return $this->codeUOAffectationsFUN;
-    }
-    public function setCodeUOAffectationsFUN(?string $codeUOAffectationsFUN): self {
-        $this->codeUOAffectationsFUN = $codeUOAffectationsFUN;
-
-        return $this;
-    }
-    public function getNameUOAffectationsFUN(): ?string {
-        return $this->nameUOAffectationsFUN;
-    }
-    public function setNameUOAffectationsFUN(?string $nameUOAffectationsFUN): self {
-        $this->nameUOAffectationsFUN = $nameUOAffectationsFUN;
-
-        return $this;
-    }
-    public function getQuotUOAffectationsFUN(): ?int {
-        return $this->quotUOAffectationsFUN;
-    }
-    public function setQuotUOAffectationsFUN(?int $quotUOAffectationsFUN): self {
-        $this->quotUOAffectationsFUN = $quotUOAffectationsFUN;
 
         return $this;
     }
@@ -767,11 +650,77 @@ class Agent {
 
         return $this;
     }
-    public function getQuotUOAffectationsHIE(): ?int {
-        return $this->quotUOAffectationsHIE;
+    public function getDateDebutAffectationsHIE(): ?string {
+        return $this->dateDebutAffectationsHIE;
     }
-    public function setQuotUOAffectationsHIE(?int $quotUOAffectationsHIE): self {
-        $this->quotUOAffectationsHIE = $quotUOAffectationsHIE;
+    public function setDateDebutAffectationsHIE(?string $dateDebutAffectationsHIE): self {
+        $this->dateDebutAffectationsHIE = $dateDebutAffectationsHIE;
+
+        return $this;
+    }
+    public function getDateFinAffectationsHIE(): ?string {
+        return $this->dateFinAffectationsHIE;
+    }
+    public function setDateFinAffectationsHIE(?string $dateFinAffectationsHIE): self {
+        $this->dateFinAffectationsHIE = $dateFinAffectationsHIE;
+
+        return $this;
+    }
+    public function getQuotiteUOAffectationsHIE(): ?int {
+        return $this->quotiteUOAffectationsHIE;
+    }
+    public function setQuotiteUOAffectationsHIE(?int $quotiteUOAffectationsHIE): self {
+        $this->quotiteUOAffectationsHIE = $quotiteUOAffectationsHIE;
+
+        return $this;
+    }
+
+    public function getCodeUOAffectationsFUN(): ?string {
+        return $this->codeUOAffectationsFUN;
+    }
+    public function setCodeUOAffectationsFUN(?string $codeUOAffectationsFUN): self {
+        $this->codeUOAffectationsFUN = $codeUOAffectationsFUN;
+
+        return $this;
+    }
+    public function getNameUOAffectationsFUN(): ?string {
+        return $this->nameUOAffectationsFUN;
+    }
+    public function setNameUOAffectationsFUN(?string $nameUOAffectationsFUN): self {
+        $this->nameUOAffectationsFUN = $nameUOAffectationsFUN;
+
+        return $this;
+    }
+    public function getQuotiteUOAffectationsFUN(): ?int {
+        return $this->quotiteUOAffectationsFUN;
+    }
+    public function setQuotiteUOAffectationsFUN(?int $quotiteUOAffectationsFUN): self {
+        $this->quotiteUOAffectationsFUN = $quotiteUOAffectationsFUN;
+
+        return $this;
+    }
+
+    public function getCodeUOAffectationsADR(): ?string {
+        return $this->codeUOAffectationsADR;
+    }
+    public function setCodeUOAffectationsADR(?string $codeUOAffectationsADR): self {
+        $this->codeUOAffectationsADR = $codeUOAffectationsADR;
+
+        return $this;
+    }
+    public function getNameUOAffectationsADR(): ?string {
+        return $this->nameUOAffectationsADR;
+    }
+    public function setNameUOAffectationsADR(?string $nameUOAffectationsADR): self {
+        $this->nameUOAffectationsADR = $nameUOAffectationsADR;
+
+        return $this;
+    }
+    public function getQuotiteUOAffectationsADR(): ?int {
+        return $this->quotiteUOAffectationsADR;
+    }
+    public function setQuotiteUOAffectationsADR(?int $quotiteUOAffectationsADR): self {
+        $this->quotiteUOAffectationsADR = $quotiteUOAffectationsADR;
 
         return $this;
     }
@@ -826,7 +775,6 @@ class Agent {
 
         return $this;
     }
-
     public function getCodePositionAdministrative(): ?string {
         return $this->codePositionAdministrative;
     }
@@ -872,28 +820,25 @@ class Agent {
     #endregion
 
     /**
-     * Set attributes from response of webservice listAgent
-     * @param listAgent object response of webservice 
-     */
-    public function addListAgentFields($listAgent) {
-        
-        foreach($listAgent as $attribute => $value) {
-            if (\property_exists($this, $attribute)) {
-                if (strpos($attribute, 'date') !== false) {
-                    $this->$attribute = new \DateTime(substr($value,0,10));
-                } else {
-                    $this->$attribute = $value;
-                }
-            }
-        }
-    }
-
-    /**
      * Set attributes from response of webservice dossierAgent
      * @param personalData object response of webservice 
      */
     public function addPersonalData($personalData) {
         
+        // Set the data with the same name
+        if (isset($personalData->donneesPersonnelles)) {
+            foreach($personalData->donneesPersonnelles as $attribute => $value) {
+                if (\property_exists($this, $attribute)) {
+                    if (strpos($attribute, 'date') !== false) {
+                        $this->$attribute = new \DateTime(substr($value,0,10));
+                    } else {
+                        $this->$attribute = $value;
+                    }
+                }
+            }
+        }
+
+        // Interpret phones and emails fields
         if (isset($personalData->listeNumerosMails)) {
             $listeNumerosMails = \is_object($personalData->listeNumerosMails) ? [$personalData->listeNumerosMails] : $personalData->listeNumerosMails;
             foreach($listeNumerosMails as $numeroMail) {
@@ -904,6 +849,7 @@ class Agent {
             }
         }
 
+        //Concatenate agent functions
         $codeFunctions = [];
         $nameFunctions = [];
         if (isset($personalData->listeFonctions)) {
@@ -923,34 +869,45 @@ class Agent {
      */
     public function addAdministrativeData($administrativeData) {
         
-        $codeUOAffectationsADR = []; $nameUOAffectationsADR = []; $quotUOAffectationsADR = [];
-        $codeUOAffectationsFUN = []; $nameUOAffectationsFUN = []; $quotUOAffectationsFUN = [];
-        $codeUOAffectationsHIE = []; $nameUOAffectationsHIE = []; $quotUOAffectationsHIE = [];
+        $codeUOAffectationsADR = []; $nameUOAffectationsADR = []; $quotiteUOAffectationsADR = [];
+        $codeUOAffectationsFUN = []; $nameUOAffectationsFUN = []; $quotiteUOAffectationsFUN = [];
+        $codeUOAffectationsHIE = []; $nameUOAffectationsHIE = []; $quotiteUOAffectationsHIE = []; $dateDebutAffectationsHIE = []; $dateFinAffectationsHIE = [];
+        $codeEmploiAffectation = NULL; $libLongEmploiAffectation = NULL;
+        $codePosteAffectation = NULL; $libLongPosteAffectation = NULL;
         $categorieEmploiPoste = NULL;
         if (isset($administrativeData->listeAffectations)) {
             $listeAffectations = \is_object($administrativeData->listeAffectations) ? [$administrativeData->listeAffectations] : $administrativeData->listeAffectations;
             foreach($listeAffectations as $listeAffectation) {
                 if ($listeAffectation->codeTypeRattachement == 'ADR') {
-                    if (isset($listeAffectation->codeUOAffectation))        $codeUOAffectationsADR[] = $listeAffectation->codeUOAffectation;
-                    if (isset($listeAffectation->libLongCodeUOAffectation)) $nameUOAffectationsADR[] = $listeAffectation->libLongCodeUOAffectation;
-                    if (isset($listeAffectation->quotiteAffectation))       $quotUOAffectationsADR[] = $listeAffectation->quotiteAffectation;
+                    if (isset($listeAffectation->codeUOAffectation))        $codeUOAffectationsADR[]    = $listeAffectation->codeUOAffectation;
+                    if (isset($listeAffectation->libLongCodeUOAffectation)) $nameUOAffectationsADR[]    = $listeAffectation->libLongCodeUOAffectation;
+                    if (isset($listeAffectation->quotiteAffectation))       $quotiteUOAffectationsADR[] = $listeAffectation->quotiteAffectation;
                 } else if ($listeAffectation->codeTypeRattachement == 'FUN') {
-                    if (isset($listeAffectation->codeUOAffectation))        $codeUOAffectationsFUN[] = $listeAffectation->codeUOAffectation;
-                    if (isset($listeAffectation->libLongCodeUOAffectation)) $nameUOAffectationsFUN[] = $listeAffectation->libLongCodeUOAffectation;
-                    if (isset($listeAffectation->quotiteAffectation))       $quotUOAffectationsFUN[] = $listeAffectation->quotiteAffectation;
+                    if (isset($listeAffectation->codeUOAffectation))        $codeUOAffectationsFUN[]    = $listeAffectation->codeUOAffectation;
+                    if (isset($listeAffectation->libLongCodeUOAffectation)) $nameUOAffectationsFUN[]    = $listeAffectation->libLongCodeUOAffectation;
+                    if (isset($listeAffectation->quotiteAffectation))       $quotiteUOAffectationsFUN[] = $listeAffectation->quotiteAffectation;
                 } else if ($listeAffectation->codeTypeRattachement == 'HIE') {
-                    if (isset($listeAffectation->codeUOAffectation))        $codeUOAffectationsHIE[] = $listeAffectation->codeUOAffectation;
-                    if (isset($listeAffectation->libLongCodeUOAffectation)) $nameUOAffectationsHIE[] = $listeAffectation->libLongCodeUOAffectation;
-                    if (isset($listeAffectation->quotiteAffectation))       $quotUOAffectationsHIE[] = $listeAffectation->quotiteAffectation;
-                    if (isset($listeAffectation->categorieEmploiPoste))     $categorieEmploiPoste = $listeAffectation->categorieEmploiPoste;
+                    if (isset($listeAffectation->codeUOAffectation))        $codeUOAffectationsHIE[]    = $listeAffectation->codeUOAffectation;
+                    if (isset($listeAffectation->libLongCodeUOAffectation)) $nameUOAffectationsHIE[]    = $listeAffectation->libLongCodeUOAffectation;
+                    $dateDebutAffectationsHIEFormatted = new \DateTime(substr($listeAffectation->dateDebutAffectation,0,10));
+                    if (isset($listeAffectation->dateDebutAffectation))     $dateDebutAffectationsHIE[] = $dateDebutAffectationsHIEFormatted->format('Y-m-d');
+                    $dateFinAffectationsHIEFormatted = new \DateTime(substr($listeAffectation->dateFinAffectation,0,10));
+                    if (isset($listeAffectation->dateFinAffectation))       $dateFinAffectationsHIE[]   = $dateFinAffectationsHIEFormatted->format('Y-m-d');
+                    if (isset($listeAffectation->quotiteAffectation))       $quotiteUOAffectationsHIE[] = $listeAffectation->quotiteAffectation;
+                    if (isset($listeAffectation->codeEmploiAffectation))    $codeEmploiAffectation      = $listeAffectation->codeEmploiAffectation;
+                    if (isset($listeAffectation->libLongEmploiAffectation)) $libLongEmploiAffectation   = $listeAffectation->libLongEmploiAffectation;
+                    if (isset($listeAffectation->codePosteAffectation))     $codePosteAffectation       = $listeAffectation->codePosteAffectation;
+                    if (isset($listeAffectation->libLongPoste))             $libLongPosteAffectation    = $listeAffectation->libLongPoste;
+                    if (isset($listeAffectation->categorieEmploiPoste))     $categorieEmploiPoste       = $listeAffectation->categorieEmploiPoste;
                 }
             }
         }
-        $this->codeUOAffectationsADR = \implode('|', $codeUOAffectationsADR); $this->nameUOAffectationsADR = \implode('|', $nameUOAffectationsADR); $this->quotUOAffectationsADR = \implode('|', $quotUOAffectationsADR);
-        $this->codeUOAffectationsFUN = \implode('|', $codeUOAffectationsFUN); $this->nameUOAffectationsFUN = \implode('|', $nameUOAffectationsFUN); $this->quotUOAffectationsFUN = \implode('|', $quotUOAffectationsFUN);
-        $this->codeUOAffectationsHIE = \implode('|', $codeUOAffectationsHIE); $this->nameUOAffectationsHIE = \implode('|', $nameUOAffectationsHIE); $this->quotUOAffectationsHIE = \implode('|', $quotUOAffectationsHIE);
+        $this->codeUOAffectationsADR = \implode('|', $codeUOAffectationsADR); $this->nameUOAffectationsADR = \implode('|', $nameUOAffectationsADR); $this->quotiteUOAffectationsADR = \implode('|', $quotiteUOAffectationsADR);
+        $this->codeUOAffectationsFUN = \implode('|', $codeUOAffectationsFUN); $this->nameUOAffectationsFUN = \implode('|', $nameUOAffectationsFUN); $this->quotiteUOAffectationsFUN = \implode('|', $quotiteUOAffectationsFUN);
+        $this->codeUOAffectationsHIE = \implode('|', $codeUOAffectationsHIE); $this->nameUOAffectationsHIE = \implode('|', $nameUOAffectationsHIE); $this->quotiteUOAffectationsHIE = \implode('|', $quotiteUOAffectationsHIE); $this->dateDebutAffectationsHIE = \implode('|', $dateDebutAffectationsHIE); $this->dateFinAffectationsHIE = \implode('|', $dateFinAffectationsHIE);
+        $this->codeEmploiAffectation = $codeEmploiAffectation; $this->libLongEmploiAffectation = $libLongEmploiAffectation;
+        $this->codePosteAffectation = $codePosteAffectation; $this->libLongPosteAffectation = $libLongPosteAffectation;
         $this->categorieEmploiPoste = $categorieEmploiPoste;
-
 
         $codeQualiteStatutaire = NULL;
         $codeGroupeHierarchique = NULL;

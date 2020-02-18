@@ -4,7 +4,7 @@ namespace App\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -31,8 +31,9 @@ class SyncStructureCommand extends Command
     protected function configure()
     {
         $this
-         // configure an argument
-         ->addArgument('logger_mode', InputArgument::OPTIONAL, 'The logger mode: console or logger.')
+        // configure an argument
+        ->addOption('logger', null, InputOption::VALUE_OPTIONAL, 'The logger mode: "console" (by default) or "file".', 'console')
+        
         // the short description shown while running "php bin/console list"
         ->setDescription('Sync all structures from SIHAM...')
 
@@ -47,9 +48,9 @@ class SyncStructureCommand extends Command
         $start = time();
         ini_set('default_socket_timeout', 300);
 
-        $loggerMode = $input->getArgument('logger_mode');
+        $loggerMode = $input->getOption('logger');
 
-        if ($loggerMode === 'logger') {
+        if ($loggerMode === 'file') {
             $this->logger->info('Start sync structures');
         } else {
             $io = new SymfonyStyle($input, $output);
@@ -61,7 +62,7 @@ class SyncStructureCommand extends Command
         if (isset($structures->return)) {
 
             $numberOfStructures = count($structures->return);
-            if ($loggerMode === 'logger') {
+            if ($loggerMode === 'file') {
                 $this->logger->info($numberOfStructures . ' structures found');
             } else {
                 $io->writeln(\sprintf('<info>%s</info> structures found', $numberOfStructures));
@@ -74,10 +75,10 @@ class SyncStructureCommand extends Command
             foreach($structures->return as $structureReturn) {
     
                 // retrieve structure
-                if ($loggerMode === 'logger') {
-                    $this->logger->info('Get structure ' . $structureReturn->codeUO . ' from database');
-                }
                 $structure = $this->em->getRepository(Structure::class)->findOneByCodeUO($structureReturn->codeUO);
+                if ($loggerMode === 'file') {
+                    $this->logger->info(($structure ? 'Update' : 'Add') . ' structure ' . $structureReturn->codeUO . ' from database');
+                }
                 if (!$structure) {
                     $structure = new Structure();
                 }
@@ -87,14 +88,14 @@ class SyncStructureCommand extends Command
                 $this->em->persist($structure);
                 $this->em->flush();
     
-                if ($loggerMode !== 'logger') {
+                if ($loggerMode !== 'file') {
                     // advances the progress bar 1 unit
                     $progressBar->advance();
                 }
 
             }
 
-            if ($loggerMode === 'logger') {
+            if ($loggerMode === 'file') {
                 $this->logger->info('Done in ' . (time() - $start) . 's');
             } else {
                 // ensures that the progress bar is at 100%
@@ -104,7 +105,7 @@ class SyncStructureCommand extends Command
             }
 
         } else {
-            if ($loggerMode === 'logger') {
+            if ($loggerMode === 'file') {
                 $this->logger->error('No response from WebService');
             } else {
                 $io->error('No response from WebService');
