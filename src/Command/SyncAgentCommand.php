@@ -54,7 +54,10 @@ class SyncAgentCommand extends Command
 
         $loggerMode = $input->getOption('logger');
         $fromDate = $input->getOption('from-date');
-        
+        $startObservationDate = new \DateTime($fromDate!= 'all' ? $fromDate : null);
+        $endObservationDate = new \DateTime($fromDate!= 'all' ? $fromDate : null);
+        $endObservationDate->modify('+60 days'); // to include the future contracts
+
         if ($loggerMode === 'file') {
             $this->logger->info('Start sync agents');
         } else {
@@ -64,15 +67,50 @@ class SyncAgentCommand extends Command
         }
 
         $listAgentsWS = new ListeAgentsWebService();
+
+        // Call SIHAM WS according to option (all or only updated agents)
         $listAgents = NULL;
         if ($fromDate === 'all') {
             $listAgents = $listAgentsWS->getListAgentsByName('%');
+            if ($loggerMode === 'file') {
+                $this->logger->info('with all agents');
+            } else {
+                $io->write(' with recupListAgents... ');
+            }
         } else {
-            $listAgents = $listAgentsWS->getListAgentsModifies($fromDate);
+            $listAgents = $listAgentsWS->getListAgentsUpdated($startObservationDate->format('Y-m-d'));
+            if ($loggerMode === 'file') {
+                $this->logger->info('with updated agents at ' . $fromDate);
+            } else {
+                $io->write(' with updated agents at ' . $fromDate . '... ');
+            }
+        }
+        
+        // Warning or bad response from SIHAM webservices
+        if (!isset($listAgents->return)) {
+            if ($loggerMode === 'file') {
+                $this->logger->error('No response from WebService');
+            } else {
+                $io->error('No response from WebService');
+            }
+            return 0;
         }
 
-        if (isset($listAgents->return)) {
-            $listAgents = is_array($listAgents->return) ? $listAgents->return : [$listAgents->return];
+        // Keep matricules, no more need other data
+        $listAgents = is_array($listAgents->return) ? $listAgents->return : [$listAgents->return];
+        $listAgents = \array_column($listAgents, 'matricule');
+
+        // Call SIHAM WS to retrieve due term agents
+        $dueTermAgents = $listAgentsWS->getListAgentsDueTerm($startObservationDate->format('Y-m-d'), $endObservationDate->format('Y-m-d'));
+        if (isset($dueTermAgents->return)) {
+            // And add them to the previous list
+            $dueTermAgents = is_array($dueTermAgents->return) ? $dueTermAgents->return : [$dueTermAgents->return];
+            $listAgents = \array_merge($listAgents, \array_column($dueTermAgents, 'matricule'));
+            $listAgents = \array_unique($listAgents);
+        }
+
+
+        if (!empty($listAgents)) {
             $numberOfUsers = count($listAgents);
             if ($loggerMode === 'file') {
                 $this->logger->info($numberOfUsers . ' agents found');
@@ -84,37 +122,41 @@ class SyncAgentCommand extends Command
                 $progressBar->start();
             }
             
-            $counterTempo = 1;
-            foreach($listAgents as $listAgent) {
+            // $counterTempo = 1;
+            foreach($listAgents as $agentSihamId) {
                 // retrieve agent
-                $agent = $this->em->getRepository(Agent::class)->findOneByMatricule($listAgent->matricule);
+                $agent = $this->em->getRepository(Agent::class)->findOneByMatricule($agentSihamId);
                 if ($loggerMode === 'file') {
-                    $this->logger->info('Get agent ' . $listAgent->matricule . ' from database: ' . ($agent ? 'found' : 'not found'));
+                    $this->logger->info('Get agent ' . $agentSihamId . ' from database: ' . ($agent ? 'found' : 'not found'));
                 }
+                // Or create
                 if (!$agent) {
                     $agent = new Agent();
-                    $agent->setMatricule($listAgent->matricule);
+                    $agent->setMatricule($agentSihamId);
                 }
 
 
                 $dossierAgentWS = new DossierAgentWebService();
 
+                // Call SIHAM WS to get personal data
                 if ($loggerMode === 'file') {
-                    $this->logger->info('-- Get personal data for ' . $listAgent->matricule);
+                    $this->logger->info('-- Get personal data for ' . $agentSihamId);
                 }
-                $personalData = $dossierAgentWS->getPersonalData($listAgent->matricule);
+                $personalData = $dossierAgentWS->getPersonalData($agentSihamId, $startObservationDate->format('Y-m-d'), $endObservationDate->format('Y-m-d'));
                 if (isset($personalData->return))
                     $agent->addPersonalData($personalData->return);
 
 
+                // Call SIHAM WS to get administrative data
                 if ($loggerMode === 'file') {
-                    $this->logger->info('-- Get administrative data for ' . $listAgent->matricule);
+                    $this->logger->info('-- Get administrative data for ' . $agentSihamId);
                 }
-                $administrativeData = $dossierAgentWS->getAdministrativeData($listAgent->matricule);
+                $administrativeData = $dossierAgentWS->getAdministrativeData($agentSihamId, $startObservationDate->format('Y-m-d'), $endObservationDate->format('Y-m-d'));
                 if (isset($administrativeData->return))
                     $agent->addAdministrativeData($administrativeData->return);
 
 
+                // Save it
                 $this->em->persist($agent);
                 $this->em->flush();
     
@@ -124,7 +166,7 @@ class SyncAgentCommand extends Command
                 }
 
                 // take a break for webservice :-( 
-                // Temporally disable since VM up memory to 6Go
+                // Temporally disable since VM up memory to 6Go --> 14go
                 // if ($counterTempo++ % 250 == 0) \sleep(15);
                 // if ($counterTempo++ % 1000 == 0) \sleep(30);
             }
