@@ -34,8 +34,7 @@
 - sass --no-source-map --style=compressed assets/scss/main.css public/css/main.min.css
 > if you need to update main style
 
-- php bin/console sync:structure logger
-- php bin/console sync:agent logger
-- php bin/console sync:ldap logger
-
-
+- php bin/console sync:structure --logger=file _//console by default_
+- php bin/console sync:agent_--logger=file --from-date=_(all/date("Y-m-d"))_
+- php bin/console sync:ldap --logger=file
+- php bin/console sync:geisha --logger=file
