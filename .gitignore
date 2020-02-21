@@ -22,8 +22,8 @@
 
 ###> test result from PHPUnits ###
 ### php bin/phpunit  --testdox-html templates/tests/test.all.html
-### php bin/phpunit test/path/specificTest.php --testdox-html templates/tests/test.specific.html
-/templates/tests/test.*.html
+### php bin/phpunit test/path/specificTest.php --testdox-html templates/tests/env.specific.html
+/templates/test/*.phpunit.html
 ###< test result from PHPUnits ###
 
 ###> sync result from Command sync:agent ###

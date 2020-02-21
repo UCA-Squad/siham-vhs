@@ -10,39 +10,50 @@ use Symfony\Component\Finder\Finder;
 class DefaultController extends AbstractController
 {
     /**
-     * @Route("/", name="tests_result")
+     * @Route("/", name="index")
      */
-    public function testsResult()
-    {
-        $title = 'No tests result yet';
+    public function index() {
+        return $this->redirectToRoute('test_result', ['env' => $_ENV['APP_ENV']]);
+    }
 
-        $testsResultFile = dirname(__DIR__) . '/../templates/tests/test.all.html';
+    /**
+     * @Route("/test/{env}", name="test_result")
+     */
+    public function testResult($env) {
+
+        if(!isset($env)) $env = $_ENV['APP_ENV'];
+
+        $title = 'No tests result yet';
+        $testsResultFile = dirname(__DIR__) . '/../templates/test/' . $env . '.phpunit.html';
         if (file_exists($testsResultFile)) {
             $title =  'Tests result at ' . date ('D jS M Y H:i:s', filemtime($testsResultFile));
         }
 
-        return $this->render('tests/result.html.twig', [
-            'title' => $title
+        return $this->render('test/result.html.twig', [
+            'title' => $title,
+            'env' => $env
         ]);
     }
 
     /**
-     * @Route("/sync/{fileName}", name="sync_result")
+     * @Route("/sync/{env}/{fileName}", name="sync_result")
      */
-    public function syncResult($fileName = null)
-    {
+    public function syncResult($env, $fileName = null) {
+
+        if(!isset($env)) $env = $_ENV['APP_ENV'];
+
         $title = 'No sync result yet';
 
         $files = [];
         $fileToDisplay = null;
         $finder = new Finder();
         $finder->files()->in(dirname(__DIR__) . '/../templates/sync/')
-                        ->name($_ENV['APP_ENV'] . '.sync.*.log')
+                        ->name($env . '.sync.*.log')
                         ->sortByName()->reverseSorting();
         if ($finder->hasResults()) {
             foreach ($finder as $file) {
                 // Set file from finder, we cannot simply use finder to twig 
-                preg_match('/' . $_ENV['APP_ENV'] . '.sync.(.*?)\-/s', $file->getPathname(), $matches);
+                preg_match('/' . $env . '.sync.(.*?)\-/s', $file->getPathname(), $matches);
                 if (!isset($logType) || $matches[1] != $logType)
                     $logType = $matches[1];
                 $files[$matches[1]][] = $file;
@@ -54,10 +65,11 @@ class DefaultController extends AbstractController
             }
         }
 
-        return $this->render('sync/sync_result.html.twig', [
+        return $this->render('sync/result.html.twig', [
             'title' => $title,
             'fileToDisplay' => $fileToDisplay,
-            'files' => $files
+            'files' => $files,
+            'env' => $env
         ]);
     }
 

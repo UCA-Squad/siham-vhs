@@ -6,6 +6,6 @@
 
 <div class="log-title">{{ title }}</div>
 
-{% include "tests/test.all.html" ignore missing %}
+{% include "test/" ~ env ~ ".phpunit.html" ignore missing %}
 
 {% endblock %}

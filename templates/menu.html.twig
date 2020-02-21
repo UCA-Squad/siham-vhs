@@ -1,4 +1,6 @@
 <div class="menu">
-    <a href="{{ path('tests_result') }}">Test results</a>
-    <a href="{{ path('sync_result') }}">Sync results</a>
+    <a href="{{ path('test_result', {'env': environment}) }}">{{ environment|upper }} - Test results</a>
+    <a href="{{ path('sync_result', {'env': environment}) }}">{{ environment|upper }} - Sync results</a>
+    <a href="{{ path('test_result', {'env': 'test'}) }}">TEST - Test results</a>
+    <a href="{{ path('sync_result', {'env': 'test'}) }}">TEST- Sync results</a>
 </div>
