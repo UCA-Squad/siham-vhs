@@ -74,7 +74,7 @@ class SyncGeishaCommand extends Command
             
             // Agreements exist or GEISHA response
             // REMOVE all AGR fields
-            $sqlRemoveAgreements = 'UPDATE `siham_vhs`.`agent` SET `codeUOAffectationsAGR` = NULL, `dateDebutUOAffectationsAGR` = NULL, `dateFinUOAffectationsAGR` = NULL';
+            $sqlRemoveAgreements = 'UPDATE `siham_vhs`.`agent` SET `codeUOAffectationsAGR` = NULL, `dateDebutAffectationsAGR` = NULL, `dateFinAffectationsAGR` = NULL';
             $conn = $this->em->getConnection();
             $stmt = $conn->prepare($sqlRemoveAgreements);
             $stmt->execute();
@@ -98,8 +98,8 @@ class SyncGeishaCommand extends Command
                 if ($agent) {
                     // Get previous UO and date of agreements to concatenate them
                     $codeUOAffectationsAGR      = explode('|', $agent->getCodeUOAffectationsAGR());
-                    $dateDebutUOAffectationsAGR = explode('|', $agent->getDateDebutUOAffectationsAGR());
-                    $dateFinUOAffectationsAGR   = explode('|', $agent->getDateFinUOAffectationsAGR());
+                    $dateDebutAffectationsAGR   = $agent->getDateDebutAffectationsAGR();
+                    $dateFinAffectationsAGR     = $agent->getDateFinAffectationsAGR();
                     
                     $structure = $this->em->getRepository(Structure::class)->findOneInCodeHarpege($agreement['C_STRUCTURE']);
                     $codeUOAffectationAGR = $agreement['C_STRUCTURE'];
@@ -109,15 +109,20 @@ class SyncGeishaCommand extends Command
                     if ($loggerMode === 'file') {
                         $this->logger->info('-- Set agreement ' . $agreement['C_STRUCTURE'] . ' -> ' . $codeUOAffectationAGR . '  for ' . $agent->getMatricule());
                     }
-                    
                     // Add next agreement
-                    $codeUOAffectationsAGR[]        = $codeUOAffectationAGR;
-                    $dateDebutUOAffectationsAGR[]   = $agreement['D_DEB_VAL'];
-                    $dateFinUOAffectationsAGR[]     = $agreement['D_FIN_VAL'];
+                    $codeUOAffectationsAGR[]    = $codeUOAffectationAGR;
+                    // Keep the smallest and the biggest date
+                    $dateDebutAffectationsAGRCurrent = new \DateTime(\substr($agreement['D_DEB_VAL'],0,10));
+                    if (empty($this->dateDebutAffectationsAGR) || $this->dateDebutAffectationsAGR > $dateDebutAffectationsAGRCurrent)
+                        $dateDebutAffectationsAGR = $dateDebutAffectationsAGRCurrent;
+                    $dateFinAffectationsAGRCurrent = new \DateTime(\substr($agreement['D_FIN_VAL'],0,10));
+                    if (empty($this->dateFinAffectationsAGR) || $this->dateFinAffectationsAGR < $dateFinAffectationsAGRCurrent)
+                        $dateFinAffectationsAGR = $dateFinAffectationsAGRCurrent;
+
                     // Save them
                     $agent->setCodeUOAffectationsAGR(\implode('|', \array_filter($codeUOAffectationsAGR)));
-                    $agent->setDateDebutUOAffectationsAGR(\implode('|', \array_filter($dateDebutUOAffectationsAGR)));
-                    $agent->setDateFinUOAffectationsAGR(\implode('|', \array_filter($dateFinUOAffectationsAGR)));
+                    $agent->setDateDebutAffectationsAGR($dateDebutAffectationsAGR);
+                    $agent->setDateFinAffectationsAGR($dateFinAffectationsAGR);
                     $this->em->persist($agent);
                     $this->em->flush();
                     

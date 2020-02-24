@@ -242,28 +242,28 @@ class Agent {
     /**
      * @var string|null
      *
-     * @ORM\Column(name="nameUOAffectationsHIE", type="text", nullable=true)
+     * @ORM\Column(name="nameAffectationsHIE", type="text", nullable=true)
      */
-    private $nameUOAffectationsHIE;
+    private $nameAffectationsHIE;
     /**
-     * @var string|null
+     * @var \DateTime|null
      *
-     * @ORM\Column(name="dateDebutAffectationsHIE", type="string", nullable=true)
+     * @ORM\Column(name="dateDebutAffectationsHIE", type="date", nullable=true)
      */
     private $dateDebutAffectationsHIE;
 
     /**
-     * @var string|null
+     * @var \DateTime|null
      *
-     * @ORM\Column(name="dateFinAffectationsHIE", type="string", nullable=true)
+     * @ORM\Column(name="dateFinAffectationsHIE", type="date", nullable=true)
      */
     private $dateFinAffectationsHIE;
     /**
      * @var string|null
      *
-     * @ORM\Column(name="quotiteUOAffectationsHIE", type="string", nullable=true)
+     * @ORM\Column(name="quotiteAffectationsHIE", type="string", nullable=true)
      */
-    private $quotiteUOAffectationsHIE;
+    private $quotiteAffectationsHIE;
 
     /**
      * @var string|null
@@ -274,15 +274,15 @@ class Agent {
     /**
      * @var string|null
      *
-     * @ORM\Column(name="nameUOAffectationsFUN", type="text", nullable=true)
+     * @ORM\Column(name="nameAffectationsFUN", type="text", nullable=true)
      */
-    private $nameUOAffectationsFUN;
+    private $nameAffectationsFUN;
     /**
      * @var string|null
      *
-     * @ORM\Column(name="quotiteUOAffectationsFUN", type="string", nullable=true)
+     * @ORM\Column(name="quotiteAffectationsFUN", type="string", nullable=true)
      */
-    private $quotiteUOAffectationsFUN;
+    private $quotiteAffectationsFUN;
 
     /**
      * @var string|null
@@ -293,15 +293,15 @@ class Agent {
     /**
      * @var string|null
      *
-     * @ORM\Column(name="nameUOAffectationsADR", type="text", nullable=true)
+     * @ORM\Column(name="nameAffectationsADR", type="text", nullable=true)
      */
-    private $nameUOAffectationsADR;
+    private $nameAffectationsADR;
     /**
      * @var string|null
      *
-     * @ORM\Column(name="quotiteUOAffectationsADR", type="string", nullable=true)
+     * @ORM\Column(name="quotiteAffectationsADR", type="string", nullable=true)
      */
-    private $quotiteUOAffectationsADR;
+    private $quotiteAffectationsADR;
 
     /**
      * @var string|null
@@ -310,17 +310,17 @@ class Agent {
      */
     private $codeUOAffectationsAGR;
     /**
-     * @var string|null
+     * @var \DateTime|null
      *
-     * @ORM\Column(name="dateDebutUOAffectationsAGR", type="string", nullable=true)
+     * @ORM\Column(name="dateDebutAffectationsAGR", type="date", nullable=true)
      */
-    private $dateDebutUOAffectationsAGR;
+    private $dateDebutAffectationsAGR;
     /**
-     * @var string|null
+     * @var \DateTime|null
      *
-     * @ORM\Column(name="dateFinUOAffectationsAGR", type="string", nullable=true)
+     * @ORM\Column(name="dateFinAffectationsAGR", type="date", nullable=true)
      */
-    private $dateFinUOAffectationsAGR;
+    private $dateFinAffectationsAGR;
 
     /**
      * @var string|null
@@ -642,35 +642,35 @@ class Agent {
 
         return $this;
     }
-    public function getNameUOAffectationsHIE(): ?string {
-        return $this->nameUOAffectationsHIE;
+    public function getNameAffectationsHIE(): ?string {
+        return $this->nameAffectationsHIE;
     }
-    public function setNameUOAffectationsHIE(?string $nameUOAffectationsHIE): self {
-        $this->nameUOAffectationsHIE = $nameUOAffectationsHIE;
+    public function setNameAffectationsHIE(?string $nameAffectationsHIE): self {
+        $this->nameAffectationsHIE = $nameAffectationsHIE;
 
         return $this;
     }
-    public function getDateDebutAffectationsHIE(): ?string {
+    public function getDateDebutAffectationsHIE(): ?\DateTimeInterface {
         return $this->dateDebutAffectationsHIE;
     }
-    public function setDateDebutAffectationsHIE(?string $dateDebutAffectationsHIE): self {
+    public function setDateDebutAffectationsHIE(?\DateTimeInterface $dateDebutAffectationsHIE): self {
         $this->dateDebutAffectationsHIE = $dateDebutAffectationsHIE;
 
         return $this;
     }
-    public function getDateFinAffectationsHIE(): ?string {
+    public function getDateFinAffectationsHIE(): ?\DateTimeInterface {
         return $this->dateFinAffectationsHIE;
     }
-    public function setDateFinAffectationsHIE(?string $dateFinAffectationsHIE): self {
+    public function setDateFinAffectationsHIE(?\DateTimeInterface $dateFinAffectationsHIE): self {
         $this->dateFinAffectationsHIE = $dateFinAffectationsHIE;
 
         return $this;
     }
-    public function getQuotiteUOAffectationsHIE(): ?int {
-        return $this->quotiteUOAffectationsHIE;
+    public function getQuotiteAffectationsHIE(): ?int {
+        return $this->quotiteAffectationsHIE;
     }
-    public function setQuotiteUOAffectationsHIE(?int $quotiteUOAffectationsHIE): self {
-        $this->quotiteUOAffectationsHIE = $quotiteUOAffectationsHIE;
+    public function setQuotiteAffectationsHIE(?int $quotiteAffectationsHIE): self {
+        $this->quotiteAffectationsHIE = $quotiteAffectationsHIE;
 
         return $this;
     }
@@ -683,19 +683,19 @@ class Agent {
 
         return $this;
     }
-    public function getNameUOAffectationsFUN(): ?string {
-        return $this->nameUOAffectationsFUN;
+    public function getNameAffectationsFUN(): ?string {
+        return $this->nameAffectationsFUN;
     }
-    public function setNameUOAffectationsFUN(?string $nameUOAffectationsFUN): self {
-        $this->nameUOAffectationsFUN = $nameUOAffectationsFUN;
+    public function setNameAffectationsFUN(?string $nameAffectationsFUN): self {
+        $this->nameAffectationsFUN = $nameAffectationsFUN;
 
         return $this;
     }
-    public function getQuotiteUOAffectationsFUN(): ?int {
-        return $this->quotiteUOAffectationsFUN;
+    public function getQuotiteAffectationsFUN(): ?int {
+        return $this->quotiteAffectationsFUN;
     }
-    public function setQuotiteUOAffectationsFUN(?int $quotiteUOAffectationsFUN): self {
-        $this->quotiteUOAffectationsFUN = $quotiteUOAffectationsFUN;
+    public function setQuotiteAffectationsFUN(?int $quotiteAffectationsFUN): self {
+        $this->quotiteAffectationsFUN = $quotiteAffectationsFUN;
 
         return $this;
     }
@@ -708,19 +708,19 @@ class Agent {
 
         return $this;
     }
-    public function getNameUOAffectationsADR(): ?string {
-        return $this->nameUOAffectationsADR;
+    public function getNameAffectationsADR(): ?string {
+        return $this->nameAffectationsADR;
     }
-    public function setNameUOAffectationsADR(?string $nameUOAffectationsADR): self {
-        $this->nameUOAffectationsADR = $nameUOAffectationsADR;
+    public function setNameAffectationsADR(?string $nameAffectationsADR): self {
+        $this->nameAffectationsADR = $nameAffectationsADR;
 
         return $this;
     }
-    public function getQuotiteUOAffectationsADR(): ?int {
-        return $this->quotiteUOAffectationsADR;
+    public function getQuotiteAffectationsADR(): ?int {
+        return $this->quotiteAffectationsADR;
     }
-    public function setQuotiteUOAffectationsADR(?int $quotiteUOAffectationsADR): self {
-        $this->quotiteUOAffectationsADR = $quotiteUOAffectationsADR;
+    public function setQuotiteAffectationsADR(?int $quotiteAffectationsADR): self {
+        $this->quotiteAffectationsADR = $quotiteAffectationsADR;
 
         return $this;
     }
@@ -733,19 +733,19 @@ class Agent {
 
         return $this;
     }
-    public function getDateDebutUOAffectationsAGR(): ?string {
-        return $this->dateDebutUOAffectationsAGR;
+    public function getDateDebutAffectationsAGR(): ?\DateTimeInterface {
+        return $this->dateDebutAffectationsAGR;
     }
-    public function setDateDebutUOAffectationsAGR(?string $dateDebutUOAffectationsAGR): self {
-        $this->dateDebutUOAffectationsAGR = $dateDebutUOAffectationsAGR;
+    public function setDateDebutAffectationsAGR(?\DateTimeInterface $dateDebutAffectationsAGR): self {
+        $this->dateDebutAffectationsAGR = $dateDebutAffectationsAGR;
 
         return $this;
     }
-    public function getDateFinUOAffectationsAGR(): ?string {
-        return $this->dateFinUOAffectationsAGR;
+    public function getDateFinAffectationsAGR(): ?\DateTimeInterface {
+        return $this->dateFinAffectationsAGR;
     }
-    public function setDateFinUOAffectationsAGR(?string $dateFinUOAffectationsAGR): self {
-        $this->dateFinUOAffectationsAGR = $dateFinUOAffectationsAGR;
+    public function setDateFinAffectationsAGR(?\DateTimeInterface $dateFinAffectationsAGR): self {
+        $this->dateFinAffectationsAGR = $dateFinAffectationsAGR;
 
         return $this;
     }
@@ -830,7 +830,7 @@ class Agent {
             foreach($personalData->donneesPersonnelles as $attribute => $value) {
                 if (\property_exists($this, $attribute)) {
                     if (strpos($attribute, 'date') !== false) {
-                        $this->$attribute = new \DateTime(substr($value,0,10));
+                        $this->$attribute = new \DateTime(\substr($value,0,10));
                     } else {
                         $this->$attribute = $value;
                     }
@@ -869,9 +869,9 @@ class Agent {
      */
     public function addAdministrativeData($administrativeData) {
         
-        $codeUOAffectationsADR = []; $nameUOAffectationsADR = []; $quotiteUOAffectationsADR = [];
-        $codeUOAffectationsFUN = []; $nameUOAffectationsFUN = []; $quotiteUOAffectationsFUN = [];
-        $codeUOAffectationsHIE = []; $nameUOAffectationsHIE = []; $quotiteUOAffectationsHIE = []; $dateDebutAffectationsHIE = []; $dateFinAffectationsHIE = [];
+        $codeUOAffectationsADR = []; $nameAffectationsADR = []; $quotiteAffectationsADR = [];
+        $codeUOAffectationsFUN = []; $nameAffectationsFUN = []; $quotiteAffectationsFUN = [];
+        $codeUOAffectationsHIE = NULL; $nameAffectationsHIE = NULL; $quotiteAffectationsHIE = NULL; $dateDebutAffectationsHIE = NULL; $dateFinAffectationsHIE = NULL;
         $codeEmploiAffectation = NULL; $libLongEmploiAffectation = NULL;
         $codePosteAffectation = NULL; $libLongPosteAffectation = NULL;
         $categorieEmploiPoste = NULL;
@@ -880,20 +880,27 @@ class Agent {
             foreach($listeAffectations as $listeAffectation) {
                 if ($listeAffectation->codeTypeRattachement == 'ADR') {
                     if (isset($listeAffectation->codeUOAffectation))        $codeUOAffectationsADR[]    = $listeAffectation->codeUOAffectation;
-                    if (isset($listeAffectation->libLongCodeUOAffectation)) $nameUOAffectationsADR[]    = $listeAffectation->libLongCodeUOAffectation;
-                    if (isset($listeAffectation->quotiteAffectation))       $quotiteUOAffectationsADR[] = $listeAffectation->quotiteAffectation;
+                    if (isset($listeAffectation->libLongCodeUOAffectation)) $nameAffectationsADR[]    = $listeAffectation->libLongCodeUOAffectation;
+                    if (isset($listeAffectation->quotiteAffectation))       $quotiteAffectationsADR[] = $listeAffectation->quotiteAffectation;
                 } else if ($listeAffectation->codeTypeRattachement == 'FUN') {
                     if (isset($listeAffectation->codeUOAffectation))        $codeUOAffectationsFUN[]    = $listeAffectation->codeUOAffectation;
-                    if (isset($listeAffectation->libLongCodeUOAffectation)) $nameUOAffectationsFUN[]    = $listeAffectation->libLongCodeUOAffectation;
-                    if (isset($listeAffectation->quotiteAffectation))       $quotiteUOAffectationsFUN[] = $listeAffectation->quotiteAffectation;
+                    if (isset($listeAffectation->libLongCodeUOAffectation)) $nameAffectationsFUN[]    = $listeAffectation->libLongCodeUOAffectation;
+                    if (isset($listeAffectation->quotiteAffectation))       $quotiteAffectationsFUN[] = $listeAffectation->quotiteAffectation;
                 } else if ($listeAffectation->codeTypeRattachement == 'HIE') {
-                    if (isset($listeAffectation->codeUOAffectation))        $codeUOAffectationsHIE[]    = $listeAffectation->codeUOAffectation;
-                    if (isset($listeAffectation->libLongCodeUOAffectation)) $nameUOAffectationsHIE[]    = $listeAffectation->libLongCodeUOAffectation;
-                    $dateDebutAffectationsHIEFormatted = new \DateTime(substr($listeAffectation->dateDebutAffectation,0,10));
-                    if (isset($listeAffectation->dateDebutAffectation))     $dateDebutAffectationsHIE[] = $dateDebutAffectationsHIEFormatted->format('Y-m-d');
-                    $dateFinAffectationsHIEFormatted = new \DateTime(substr($listeAffectation->dateFinAffectation,0,10));
-                    if (isset($listeAffectation->dateFinAffectation))       $dateFinAffectationsHIE[]   = $dateFinAffectationsHIEFormatted->format('Y-m-d');
-                    if (isset($listeAffectation->quotiteAffectation))       $quotiteUOAffectationsHIE[] = $listeAffectation->quotiteAffectation;
+                    if (isset($listeAffectation->codeUOAffectation) && empty($codeUOAffectationsHIE)) $codeUOAffectationsHIE = $listeAffectation->codeUOAffectation;
+                    if (isset($listeAffectation->libLongCodeUOAffectation) && empty($nameAffectationsHIE)) $nameAffectationsHIE = $listeAffectation->libLongCodeUOAffectation;
+                    // Keep the smallest and the biggest date
+                    if (isset($listeAffectation->dateDebutAffectation)) {
+                        $dateDebutAffectationsHIECurrent = new \DateTime(\substr($listeAffectation->dateDebutAffectation,0,10));
+                        if (empty($this->dateDebutAffectationsHIE) || $this->dateDebutAffectationsHIE > $dateDebutAffectationsHIECurrent)
+                            $dateDebutAffectationsHIE = $dateDebutAffectationsHIECurrent;
+                    }     
+                    if (isset($listeAffectation->dateFinAffectation)) {
+                        $dateFinAffectationsHIECurrent = new \DateTime(\substr($listeAffectation->dateFinAffectation,0,10));
+                        if (empty($this->dateFinAffectationsHIE) || $this->dateFinAffectationsHIE < $dateFinAffectationsHIECurrent)
+                            $dateFinAffectationsHIE = $dateFinAffectationsHIECurrent;
+                    }
+                    if (isset($listeAffectation->quotiteAffectation) && empty($quotiteAffectationsHIE)) $quotiteAffectationsHIE = $listeAffectation->quotiteAffectation;
                     if (isset($listeAffectation->codeEmploiAffectation))    $codeEmploiAffectation      = $listeAffectation->codeEmploiAffectation;
                     if (isset($listeAffectation->libLongEmploiAffectation)) $libLongEmploiAffectation   = $listeAffectation->libLongEmploiAffectation;
                     if (isset($listeAffectation->codePosteAffectation))     $codePosteAffectation       = $listeAffectation->codePosteAffectation;
@@ -902,9 +909,9 @@ class Agent {
                 }
             }
         }
-        $this->codeUOAffectationsADR = \implode('|', $codeUOAffectationsADR); $this->nameUOAffectationsADR = \implode('|', $nameUOAffectationsADR); $this->quotiteUOAffectationsADR = \implode('|', $quotiteUOAffectationsADR);
-        $this->codeUOAffectationsFUN = \implode('|', $codeUOAffectationsFUN); $this->nameUOAffectationsFUN = \implode('|', $nameUOAffectationsFUN); $this->quotiteUOAffectationsFUN = \implode('|', $quotiteUOAffectationsFUN);
-        $this->codeUOAffectationsHIE = \implode('|', $codeUOAffectationsHIE); $this->nameUOAffectationsHIE = \implode('|', $nameUOAffectationsHIE); $this->quotiteUOAffectationsHIE = \implode('|', $quotiteUOAffectationsHIE); $this->dateDebutAffectationsHIE = \implode('|', $dateDebutAffectationsHIE); $this->dateFinAffectationsHIE = \implode('|', $dateFinAffectationsHIE);
+        $this->codeUOAffectationsADR = \implode('|', $codeUOAffectationsADR); $this->nameAffectationsADR = \implode('|', $nameAffectationsADR); $this->quotiteAffectationsADR = \implode('|', $quotiteAffectationsADR);
+        $this->codeUOAffectationsFUN = \implode('|', $codeUOAffectationsFUN); $this->nameAffectationsFUN = \implode('|', $nameAffectationsFUN); $this->quotiteAffectationsFUN = \implode('|', $quotiteAffectationsFUN);
+        $this->codeUOAffectationsHIE = $codeUOAffectationsHIE; $this->nameAffectationsHIE = $nameAffectationsHIE; $this->quotiteAffectationsHIE = $quotiteAffectationsHIE; $this->dateDebutAffectationsHIE =$dateDebutAffectationsHIE; $this->dateFinAffectationsHIE = $dateFinAffectationsHIE;
         $this->codeEmploiAffectation = $codeEmploiAffectation; $this->libLongEmploiAffectation = $libLongEmploiAffectation;
         $this->codePosteAffectation = $codePosteAffectation; $this->libLongPosteAffectation = $libLongPosteAffectation;
         $this->categorieEmploiPoste = $categorieEmploiPoste;
