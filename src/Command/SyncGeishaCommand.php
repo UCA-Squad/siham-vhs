@@ -74,7 +74,7 @@ class SyncGeishaCommand extends Command
             
             // Agreements exist or GEISHA response
             // REMOVE all AGR fields
-            $sqlRemoveAgreements = 'UPDATE `siham_vhs`.`agent` SET `codeUOAffectationsAGR` = NULL, `dateDebutAffectationsAGR` = NULL, `dateFinAffectationsAGR` = NULL';
+            $sqlRemoveAgreements = 'UPDATE `agent` SET `codeUOAffectationsAGR` = NULL, `dateDebutAffectationsAGR` = NULL, `dateFinAffectationsAGR` = NULL';
             $conn = $this->em->getConnection();
             $stmt = $conn->prepare($sqlRemoveAgreements);
             $stmt->execute();
