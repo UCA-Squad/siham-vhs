@@ -889,15 +889,16 @@ class Agent {
                 } else if ($listeAffectation->codeTypeRattachement == 'HIE') {
                     if (isset($listeAffectation->codeUOAffectation) && empty($codeUOAffectationsHIE)) $codeUOAffectationsHIE = $listeAffectation->codeUOAffectation;
                     if (isset($listeAffectation->libLongCodeUOAffectation) && empty($nameAffectationsHIE)) $nameAffectationsHIE = $listeAffectation->libLongCodeUOAffectation;
-                    // Keep the smallest and the biggest date
+                    // Keep the smallest start date
                     if (isset($listeAffectation->dateDebutAffectation)) {
                         $dateDebutAffectationsHIECurrent = new \DateTime(\substr($listeAffectation->dateDebutAffectation,0,10));
-                        if (empty($this->dateDebutAffectationsHIE) || $this->dateDebutAffectationsHIE > $dateDebutAffectationsHIECurrent)
+                        if (empty($this->dateDebutAffectationsHIE) || $this->dateDebutAffectationsHIE >= $dateDebutAffectationsHIECurrent)
                             $dateDebutAffectationsHIE = $dateDebutAffectationsHIECurrent;
-                    }     
+                    }
+                    // and the biggest end date
                     if (isset($listeAffectation->dateFinAffectation)) {
                         $dateFinAffectationsHIECurrent = new \DateTime(\substr($listeAffectation->dateFinAffectation,0,10));
-                        if (empty($this->dateFinAffectationsHIE) || $this->dateFinAffectationsHIE < $dateFinAffectationsHIECurrent)
+                        if (empty($this->dateFinAffectationsHIE) || $this->dateFinAffectationsHIE <= $dateFinAffectationsHIECurrent)
                             $dateFinAffectationsHIE = $dateFinAffectationsHIECurrent;
                     }
                     if (isset($listeAffectation->quotiteAffectation) && empty($quotiteAffectationsHIE)) $quotiteAffectationsHIE = $listeAffectation->quotiteAffectation;
