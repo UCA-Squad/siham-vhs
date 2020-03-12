@@ -20,14 +20,14 @@ class SyncAgentCommand extends Command
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'sync:agent';
     private $em;
-    private $geishaEm;
+    private $sihamEm;
     private $logger;
 
     public function __construct(ManagerRegistry $doctrine, LoggerInterface $logger)
     {
         parent::__construct();
         $this->em = $doctrine->getManager();// siham_vhs by default;
-        $this->geishaEm = $doctrine->getManager('geisha');
+        $this->sihamEm = $doctrine->getManager('siham');
         $this->logger = $logger;
     }   
 
@@ -57,6 +57,8 @@ class SyncAgentCommand extends Command
         $startObservationDate = new \DateTime($fromDate!= 'all' ? $fromDate : null);
         $endObservationDate = new \DateTime($fromDate!= 'all' ? $fromDate : null);
         $endObservationDate->modify('+60 days'); // to include the future contracts
+
+        $connSiham = $this->sihamEm->getConnection();
 
         if ($loggerMode === 'file') {
             $this->logger->info('Start sync agents');
@@ -122,7 +124,6 @@ class SyncAgentCommand extends Command
                 $progressBar->start();
             }
             
-            // $counterTempo = 1;
             foreach($listAgents as $agentSihamId) {
                 // retrieve agent
                 $agent = $this->em->getRepository(Agent::class)->findOneByMatricule($agentSihamId);
@@ -135,10 +136,9 @@ class SyncAgentCommand extends Command
                     $agent->setMatricule($agentSihamId);
                 }
 
-
                 $dossierAgentWS = new DossierAgentWebService();
 
-                // Call SIHAM WS to get personal data
+                // ** Call SIHAM WS to get personal data
                 if ($loggerMode === 'file') {
                     $this->logger->info('-- Get personal data for ' . $agentSihamId);
                 }
@@ -147,7 +147,7 @@ class SyncAgentCommand extends Command
                     $agent->addPersonalData($personalData->return);
 
 
-                // Call SIHAM WS to get administrative data
+                // ** Call SIHAM WS to get administrative data
                 if ($loggerMode === 'file') {
                     $this->logger->info('-- Get administrative data for ' . $agentSihamId);
                 }
@@ -155,6 +155,29 @@ class SyncAgentCommand extends Command
                 if (isset($administrativeData->return))
                     $agent->addAdministrativeData($administrativeData->return);
 
+                // ** Call SIHAM db to get population type
+                $codePopulationType = NULL;
+                $sqlSihamPopulationType = 'SELECT POPULA, TO_CHAR(DTEF00, \'YYYY-MM-DD\') AS DTEF00, TO_CHAR(DATXXX, \'YYYY-MM-DD\') AS DATXXX FROM HR.ZYYP 
+                WHERE NUDOSS IN (SELECT NUDOSS FROM HR.ZY00 WHERE matcle = :matricule)
+                AND :endObservationDate >= DTEF00
+                AND :startObservationDate <= DATXXX ORDER BY DTEF00';
+                $stmtSihamPopulationType = $connSiham->prepare($sqlSihamPopulationType);
+                $stmtSihamPopulationType->bindValue('matricule', $agent->getMatricule());
+                $stmtSihamPopulationType->bindValue('startObservationDate', $startObservationDate->format('Y-m-d'));
+                $stmtSihamPopulationType->bindValue('endObservationDate', $endObservationDate->format('Y-m-d'));
+                $stmtSihamPopulationType->execute();
+                $resPopulationTypes = $stmtSihamPopulationType->fetchAll();
+                if (!empty($resPopulationTypes)) {
+                    // Loop on each agreement to set it to the agent
+                    foreach ($resPopulationTypes as $resPopulationType) {
+                        $startPopulationTypeDate = new \DateTime(\substr($resPopulationType['DTEF00'],0,10));
+                        $endPopulationTypeDate = new \DateTime(\substr($resPopulationType['DATXXX'],0,10));
+                        if ($startObservationDate >= $startPopulationTypeDate && $startObservationDate <= $endPopulationTypeDate) {
+                            $codePopulationType = $resPopulationType['POPULA'];
+                        }
+                    }
+                }
+                $agent->setCodePopulationType($codePopulationType);
 
                 // Save it
                 $this->em->persist($agent);
@@ -164,11 +187,6 @@ class SyncAgentCommand extends Command
                     // advances the progress bar 1 unit
                     $progressBar->advance();
                 }
-
-                // take a break for webservice :-( 
-                // Temporally disable since VM up memory to 6Go --> 14go
-                // if ($counterTempo++ % 250 == 0) \sleep(15);
-                // if ($counterTempo++ % 1000 == 0) \sleep(30);
             }
 
             if ($loggerMode === 'file') {

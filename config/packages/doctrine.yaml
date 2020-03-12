@@ -19,6 +19,9 @@ doctrine:
             geisha:
                 url: '%env(resolve:DATABASE_GEISHA_URL)%'
                 driver: 'oci8'
+            siham:
+                url: '%env(resolve:DATABASE_SIHAM_URL)%'
+                driver: 'oci8'
     orm:
         auto_generate_proxy_classes: true
        
@@ -42,3 +45,5 @@ doctrine:
                         FIND_IN_SET: DoctrineExtensions\Query\Mysql\FindInSet
             geisha:
                 connection: geisha
+            siham:
+                connection: siham

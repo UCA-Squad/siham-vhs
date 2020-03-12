@@ -145,8 +145,16 @@ class Agent {
     /**
      * @var string|null
      *
+     * @ORM\Column(name="codePopulationType", type="string", length=5, nullable=true)
+     */
+    private $codePopulationType;
+
+    /**
+     * @var string|null
+     *
      * @ORM\Column(name="codeGroupeHierarchique", type="string", length=2, nullable=true)
      */
+
     private $codeGroupeHierarchique;
 
     /**
@@ -522,6 +530,14 @@ class Agent {
     }
     public function setCodeQualiteStatutaire(?string $codeQualiteStatutaire): self {
         $this->codeQualiteStatutaire = $codeQualiteStatutaire;
+
+        return $this;
+    }
+    public function getCodePopulationType(): ?string {
+        return $this->codePopulationType;
+    }
+    public function setCodePopulationType(?string $codePopulationType): self {
+        $this->codePopulationType = $codePopulationType;
 
         return $this;
     }
