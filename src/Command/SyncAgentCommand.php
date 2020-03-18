@@ -157,7 +157,9 @@ class SyncAgentCommand extends Command
 
                 // ** Call SIHAM db to get population type
                 $codePopulationType = NULL;
-                $sqlSihamPopulationType = 'SELECT POPULA, TO_CHAR(DTEF00, \'YYYY-MM-DD\') AS DTEF00, TO_CHAR(DATXXX, \'YYYY-MM-DD\') AS DATXXX FROM HR.ZYYP 
+                $codeCategoryPopulationType = NULL;
+                $codeSubCategoryPopulationType = NULL;
+                $sqlSihamPopulationType = 'SELECT CATEGO, SSCATE, POPULA, TO_CHAR(DTEF00, \'YYYY-MM-DD\') AS DTEF00, TO_CHAR(DATXXX, \'YYYY-MM-DD\') AS DATXXX FROM HR.ZYYP 
                 WHERE NUDOSS IN (SELECT NUDOSS FROM HR.ZY00 WHERE matcle = :matricule)
                 AND :endObservationDate >= DTEF00
                 AND :startObservationDate <= DATXXX ORDER BY DTEF00';
@@ -174,10 +176,14 @@ class SyncAgentCommand extends Command
                         $endPopulationTypeDate = new \DateTime(\substr($resPopulationType['DATXXX'],0,10));
                         if ($startObservationDate >= $startPopulationTypeDate && $startObservationDate <= $endPopulationTypeDate) {
                             $codePopulationType = $resPopulationType['POPULA'];
+                            $codeCategoryPopulationType = $resPopulationType['CATEGO'];
+                            $codeSubPopulationType = $resPopulationType['SSCATE'];
                         }
                     }
                 }
                 $agent->setCodePopulationType($codePopulationType);
+                $agent->setCodeCategoryPopulationType($codeCategoryPopulationType);
+                $agent->setCodeSubCategoryPopulationType($codeSubCategoryPopulationType);
 
                 // Save it
                 $this->em->persist($agent);

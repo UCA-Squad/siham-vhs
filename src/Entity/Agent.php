@@ -148,6 +148,18 @@ class Agent {
      * @ORM\Column(name="codePopulationType", type="string", length=5, nullable=true)
      */
     private $codePopulationType;
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="codeCategoryPopulationType", type="string", length=1, nullable=true)
+     */
+    private $codeCategoryPopulationType;
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="codeSubCategoryPopulationType", type="string", length=1, nullable=true)
+     */
+    private $codeSubCategoryPopulationType;
 
     /**
      * @var string|null
@@ -538,6 +550,22 @@ class Agent {
     }
     public function setCodePopulationType(?string $codePopulationType): self {
         $this->codePopulationType = $codePopulationType;
+
+        return $this;
+    }
+    public function getCodeCategoryPopulationType(): ?string {
+        return $this->codeCategoryPopulationType;
+    }
+    public function setCodeCategoryPopulationType(?string $codeCategoryPopulationType): self {
+        $this->codeCategoryPopulationType = $codeCategoryPopulationType;
+
+        return $this;
+    }
+    public function getCodeSubCategoryPopulationType(): ?string {
+        return $this->codeSubCategoryPopulationType;
+    }
+    public function setCodeSubCategoryPopulationType(?string $codeSubCategoryPopulationType): self {
+        $this->codeSubCategoryPopulationType = $codeSubCategoryPopulationType;
 
         return $this;
     }
