@@ -82,8 +82,7 @@ class SyncLdapCommand extends Command
                 $detailAgent = array_combine($fields, explode(';', $row));
 
                 // retrieve agent
-                // $agent = $this->em->getRepository(Agent::class)->findOneByMatricule($detailAgent['matricule']);
-                $agent = $this->em->getRepository(Agent::class)->findOneByNumDossierHarpege($detailAgent['matricule']);
+                $agent = $this->em->getRepository(Agent::class)->findOneByMatricule($detailAgent['matricule']);
                 if ($loggerMode === 'file') {
                     $this->logger->info('Get agent ' . $detailAgent['matricule'] . ' from database: ' . ($agent ? 'found' : 'not found'));
                 }
@@ -91,7 +90,6 @@ class SyncLdapCommand extends Command
                     continue;
                 }
                 
-                $detailAgent['matricule'] = $agent->getMatricule();// because called by numDossierHarpege
                 // For each attribute set if different and call webservice to write
                 if ($agent->getBadge() != $detailAgent['badge']) {
                     $agent->setBadge($detailAgent['badge']);
