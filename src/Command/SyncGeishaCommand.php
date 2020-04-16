@@ -63,7 +63,12 @@ class SyncGeishaCommand extends Command
         }
 
         $connGeisha = $this->geishaEm->getConnection();
-        $sqlGeishaAgreements = 'SELECT NO_INDIVIDU, C_STRUCTURE, TO_CHAR(D_DEB_VAL, \'YYYY-MM-DD\') AS D_DEB_VAL, TO_CHAR(D_FIN_VAL, \'YYYY-MM-DD\') AS D_FIN_VAL FROM AGREMENT WHERE D_DEB_VAL <= TO_DATE(:dateFinObservation, \'YYYY-MM-DD\') AND D_FIN_VAL >= TO_DATE(:dateDebutObservation, \'YYYY-MM-DD\') ORDER BY NO_INDIVIDU, D_DEB_VAL';
+        // $sqlGeishaAgreements = 'SELECT NO_INDIVIDU, C_STRUCTURE, TO_CHAR(D_DEB_VAL, \'YYYY-MM-DD\') AS D_DEB_VAL, TO_CHAR(D_FIN_VAL, \'YYYY-MM-DD\') AS D_FIN_VAL FROM AGREMENT WHERE D_DEB_VAL <= TO_DATE(:dateFinObservation, \'YYYY-MM-DD\') AND D_FIN_VAL >= TO_DATE(:dateDebutObservation, \'YYYY-MM-DD\') ORDER BY NO_INDIVIDU, D_DEB_VAL';
+        $sqlGeishaAgreements = 'SELECT I.MATCLE, A.C_STRUCTURE, TO_CHAR(A.D_DEB_VAL, \'YYYY-MM-DD\') AS D_DEB_VAL, TO_CHAR(A.D_FIN_VAL, \'YYYY-MM-DD\') AS D_FIN_VAL 
+            FROM GEI_ADM.AGREMENT A
+            LEFT JOIN GEI_ADM.INDIVIDU2 I ON I.NO_INDIVIDU = A.NO_INDIVIDU 
+            WHERE A.D_DEB_VAL <= TO_DATE(:dateFinObservation, \'YYYY-MM-DD\') AND A.D_FIN_VAL >= TO_DATE(:dateDebutObservation, \'YYYY-MM-DD\')
+            ORDER BY I.MATCLE, A.D_DEB_VAL';
         $stmtGeisha = $connGeisha->prepare($sqlGeishaAgreements);
         $dateObservation = new \DateTime();
         $stmtGeisha->bindValue('dateDebutObservation', $dateObservation->format('Y-m-d'));
@@ -94,7 +99,7 @@ class SyncGeishaCommand extends Command
 
             // Loop on each agreement to set it to the agent
             foreach ($agreements as $agreement) {
-                $agent = $this->em->getRepository(Agent::class)->findOneByNumDossierHarpege($agreement['NO_INDIVIDU']);
+                $agent = $this->em->getRepository(Agent::class)->findOneByMatricule($agreement['MATCLE']);
                 if ($agent) {
                     // Get previous UO and date of agreements to concatenate them
                     $codeUOAffectationsAGR      = explode('|', $agent->getCodeUOAffectationsAGR());
