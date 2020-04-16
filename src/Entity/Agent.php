@@ -73,6 +73,13 @@ class Agent {
     private $dateNaissance;
 
     /**
+     * @var \DateTime|null
+     *
+     * @ORM\Column(name="dateDeces", type="date", nullable=true)
+     */
+    private $dateDeces;
+
+    /**
      * @var bool|null
      *
      * @ORM\Column(name="civilite", type="string", length=1, nullable=true)
@@ -456,6 +463,14 @@ class Agent {
     }
     public function setDateNaissance(?\DateTimeInterface $dateNaissance): self {
         $this->dateNaissance = $dateNaissance;
+
+        return $this;
+    }
+    public function getDateDeces(): ?\DateTimeInterface {
+        return $this->dateDeces;
+    }
+    public function setDateDeces(?\DateTimeInterface $dateDeces): self {
+        $this->dateDeces = $dateDeces;
 
         return $this;
     }
