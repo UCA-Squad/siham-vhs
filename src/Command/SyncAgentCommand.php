@@ -57,6 +57,8 @@ class SyncAgentCommand extends Command
         $startObservationDate = new \DateTime($fromDate!= 'all' ? $fromDate : null);
         $endObservationDate = new \DateTime($fromDate!= 'all' ? $fromDate : null);
         $endObservationDate->modify('+60 days'); // to include the future contracts
+        $maxObservationDate = new \DateTime('2999-12-31'); // max date for SIHAM instead of empty or null when no end date ...
+        $minObservationDate = new \DateTime('0001-01-01'); // an other date for SIHAM that mean empty or null when no end date ...
 
         $connSiham = $this->sihamEm->getConnection();
 
@@ -151,9 +153,9 @@ class SyncAgentCommand extends Command
                 if ($loggerMode === 'file') {
                     $this->logger->info('-- Get administrative data for ' . $agentSihamId);
                 }
-                $administrativeData = $dossierAgentWS->getAdministrativeData($agentSihamId, $startObservationDate->format('Y-m-d'), $endObservationDate->format('Y-m-d'));
+                $administrativeData = $dossierAgentWS->getAdministrativeData($agentSihamId, $startObservationDate->format('Y-m-d'), $maxObservationDate->format('Y-m-d'));
                 if (isset($administrativeData->return))
-                    $agent->addAdministrativeData($administrativeData->return);
+                    $agent->addAdministrativeData($administrativeData->return, $startObservationDate);
 
                 // ** Call SIHAM db to get population type
                 $codePopulationType = NULL;

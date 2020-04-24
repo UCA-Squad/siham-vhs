@@ -926,8 +926,9 @@ class Agent {
      * Set attributes from response of webservice dossierAgent
      * @param administrativeData object response of webservice 
      */
-    public function addAdministrativeData($administrativeData) {
-        $dateNow = new \DateTime();
+    public function addAdministrativeData($administrativeData, $startObservationDate = null) {
+        if (empty($startObservationDate))
+            $startObservationDate = new \DateTime();
         $dateEndSIHAM = new \DateTime('0001-01-01');
 
         $codeUOAffectationsADR = []; $nameAffectationsADR = []; $quotiteAffectationsADR = [];
@@ -939,35 +940,37 @@ class Agent {
         if (isset($administrativeData->listeAffectations)) {
             $listeAffectations = \is_object($administrativeData->listeAffectations) ? [$administrativeData->listeAffectations] : $administrativeData->listeAffectations;
             foreach($listeAffectations as $listeAffectation) {
+                $dateDebutAffectationsCurrent = new \DateTime(\substr($listeAffectation->dateDebutAffectation,0,10));
+                $dateFinAffectationsCurrent = new \DateTime(\substr($listeAffectation->dateFinAffectation,0,10));
                 if ($listeAffectation->codeTypeRattachement == 'ADR') {
-                    if (isset($listeAffectation->codeUOAffectation))        $codeUOAffectationsADR[]    = $listeAffectation->codeUOAffectation;
-                    if (isset($listeAffectation->libLongCodeUOAffectation)) $nameAffectationsADR[]    = $listeAffectation->libLongCodeUOAffectation;
-                    if (isset($listeAffectation->quotiteAffectation))       $quotiteAffectationsADR[] = $listeAffectation->quotiteAffectation;
+                    if ($dateDebutAffectationsCurrent <= $startObservationDate && $dateFinAffectationsCurrent >= $startObservationDate) {
+                        $codeUOAffectationsADR[]    = $listeAffectation->codeUOAffectation;
+                        $nameAffectationsADR[]      = $listeAffectation->libLongCodeUOAffectation;
+                        $quotiteAffectationsADR[]   = $listeAffectation->quotiteAffectation;
+                    }
                 } else if ($listeAffectation->codeTypeRattachement == 'FUN') {
-                    if (isset($listeAffectation->codeUOAffectation))        $codeUOAffectationsFUN[]    = $listeAffectation->codeUOAffectation;
-                    if (isset($listeAffectation->libLongCodeUOAffectation)) $nameAffectationsFUN[]    = $listeAffectation->libLongCodeUOAffectation;
-                    if (isset($listeAffectation->quotiteAffectation))       $quotiteAffectationsFUN[] = $listeAffectation->quotiteAffectation;
+                    if ($dateDebutAffectationsCurrent <= $startObservationDate && $dateFinAffectationsCurrent >= $startObservationDate) {
+                        $codeUOAffectationsFUN[]    = $listeAffectation->codeUOAffectation;
+                        $nameAffectationsFUN[]      = $listeAffectation->libLongCodeUOAffectation;
+                        $quotiteAffectationsFUN[]   = $listeAffectation->quotiteAffectation;
+                    }
                 } else if ($listeAffectation->codeTypeRattachement == 'HIE') {
-                    if (isset($listeAffectation->codeUOAffectation) && empty($codeUOAffectationsHIE)) $codeUOAffectationsHIE = $listeAffectation->codeUOAffectation;
-                    if (isset($listeAffectation->libLongCodeUOAffectation) && empty($nameAffectationsHIE)) $nameAffectationsHIE = $listeAffectation->libLongCodeUOAffectation;
-                    // Keep the smallest start date
-                    if (isset($listeAffectation->dateDebutAffectation)) {
-                        $dateDebutAffectationsHIECurrent = new \DateTime(\substr($listeAffectation->dateDebutAffectation,0,10));
-                        if (empty($this->dateDebutAffectationsHIE) || $this->dateDebutAffectationsHIE >= $dateDebutAffectationsHIECurrent)
-                            $dateDebutAffectationsHIE = $dateDebutAffectationsHIECurrent;
+                    if ($dateDebutAffectationsCurrent <= $startObservationDate && $dateFinAffectationsCurrent >= $startObservationDate) {
+                        $codeUOAffectationsHIE  = $listeAffectation->codeUOAffectation;
+                        $nameAffectationsHIE    = $listeAffectation->libLongCodeUOAffectation;
+                        $quotiteAffectationsHIE = $listeAffectation->quotiteAffectation;
+                        
+                        $dateDebutAffectationsHIE = $dateDebutAffectationsCurrent;
+                        
+                        if (isset($listeAffectation->codeEmploiAffectation))    $codeEmploiAffectation      = $listeAffectation->codeEmploiAffectation;
+                        if (isset($listeAffectation->libLongEmploiAffectation)) $libLongEmploiAffectation   = $listeAffectation->libLongEmploiAffectation;
+                        if (isset($listeAffectation->codePosteAffectation))     $codePosteAffectation       = $listeAffectation->codePosteAffectation;
+                        if (isset($listeAffectation->libLongPoste))             $libLongPosteAffectation    = $listeAffectation->libLongPoste;
+                        if (isset($listeAffectation->categorieEmploiPoste))     $categorieEmploiPoste       = $listeAffectation->categorieEmploiPoste;
                     }
                     // and the biggest end date
-                    if (isset($listeAffectation->dateFinAffectation)) {
-                        $dateFinAffectationsHIECurrent = new \DateTime(\substr($listeAffectation->dateFinAffectation,0,10));
-                        if (empty($this->dateFinAffectationsHIE) || $this->dateFinAffectationsHIE <= $dateFinAffectationsHIECurrent)
-                            $dateFinAffectationsHIE = $dateFinAffectationsHIECurrent;
-                    }
-                    if (isset($listeAffectation->quotiteAffectation) && empty($quotiteAffectationsHIE)) $quotiteAffectationsHIE = $listeAffectation->quotiteAffectation;
-                    if (isset($listeAffectation->codeEmploiAffectation))    $codeEmploiAffectation      = $listeAffectation->codeEmploiAffectation;
-                    if (isset($listeAffectation->libLongEmploiAffectation)) $libLongEmploiAffectation   = $listeAffectation->libLongEmploiAffectation;
-                    if (isset($listeAffectation->codePosteAffectation))     $codePosteAffectation       = $listeAffectation->codePosteAffectation;
-                    if (isset($listeAffectation->libLongPoste))             $libLongPosteAffectation    = $listeAffectation->libLongPoste;
-                    if (isset($listeAffectation->categorieEmploiPoste))     $categorieEmploiPoste       = $listeAffectation->categorieEmploiPoste;
+                    if (empty($this->dateFinAffectationsHIE) || $this->dateFinAffectationsHIE <= $dateFinAffectationsCurrent)
+                        $dateFinAffectationsHIE = $dateFinAffectationsCurrent;
                 }
             }
         }
@@ -1038,7 +1041,7 @@ class Agent {
                     $dateDebutPositionAdministrativeCurrent = new \DateTime(\substr($listePositionAdministrative->dateDebutPositionAdmin,0,10));
                     $dateFinPositionAdministrativeCurrent = new \DateTime(\substr($listePositionAdministrative->dateFinReellePositionAdmin,0,10));
 
-                    if ($dateDebutPositionAdministrativeCurrent <= $dateNow && ($dateFinPositionAdministrativeCurrent >= $dateNow || $dateFinPositionAdministrativeCurrent == $dateEndSIHAM)) {
+                    if ($dateDebutPositionAdministrativeCurrent <= $startObservationDate && ($dateFinPositionAdministrativeCurrent >= $startObservationDate || $dateFinPositionAdministrativeCurrent == $dateEndSIHAM)) {
                         $codePositionStatutaire = $listePositionAdministrative->codePositionStatutaire;
                         $codePositionAdministrative = $listePositionAdministrative->codePositionAdmin;
                         $dateDebutPositionAdministrative = $dateDebutPositionAdministrativeCurrent;
@@ -1066,7 +1069,7 @@ class Agent {
                     $dateDebutAbsenceCongeCurrent = new \DateTime(\substr($listeAbsenceConges->dateDebutAbsenceConge,0,10));
                     $dateFinAbsenceCongeCurrent = new \DateTime(\substr($listeAbsenceConges->dateFinAbsenceConge,0,10));
 
-                    if ($dateDebutAbsenceCongeCurrent <= $dateNow && ($dateFinAbsenceCongeCurrent >= $dateNow || $dateFinAbsenceCongeCurrent == $dateEndSIHAM)) {
+                    if ($dateDebutAbsenceCongeCurrent <= $startObservationDate && ($dateFinAbsenceCongeCurrent >= $startObservationDate || $dateFinAbsenceCongeCurrent == $dateEndSIHAM)) {
                         $codeAbsence = $listeAbsenceConges->codeMotifAbsenceConge;
                         $nameAbsence = $listeAbsenceConges->libLongMotifAbsenceConge;
                     }
