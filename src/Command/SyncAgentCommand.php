@@ -37,6 +37,7 @@ class SyncAgentCommand extends Command
          // configure options
         ->addOption('logger', null, InputOption::VALUE_OPTIONAL, 'The logger mode: "console" (by default) or "file".', 'console')
         ->addOption('from-date', null, InputOption::VALUE_OPTIONAL, '"all" or date in "Y-m-d" format (date of the day by default)', date('Y-m-d'))
+        ->addOption('matricule', null, InputOption::VALUE_OPTIONAL, 'set a SIHAM id or a list sperated by a comma', null)
 
         // the short description shown while running "php bin/console list"
         ->setDescription('Sync all users from SIHAM...')
@@ -54,6 +55,7 @@ class SyncAgentCommand extends Command
 
         $loggerMode = $input->getOption('logger');
         $fromDate = $input->getOption('from-date');
+        $matricules = \explode(',', $input->getOption('matricule'));
         $startObservationDate = new \DateTime($fromDate!= 'all' ? $fromDate : null);
         $endObservationDate = new \DateTime($fromDate!= 'all' ? $fromDate : null);
         $endObservationDate->modify('+60 days'); // to include the future contracts
@@ -74,44 +76,50 @@ class SyncAgentCommand extends Command
 
         // Call SIHAM WS according to option (all or only updated agents)
         $listAgents = NULL;
-        if ($fromDate === 'all') {
-            $listAgents = $listAgentsWS->getListAgentsByName('%');
-            if ($loggerMode === 'file') {
-                $this->logger->info('with all agents');
+        if (empty($matricules)) {
+            if ($fromDate === 'all') {
+                $listAgents = $listAgentsWS->getListAgentsByName('%');
+                if ($loggerMode === 'file') {
+                    $this->logger->info('with all agents');
+                } else {
+                    $io->write(' with recupListAgents... ');
+                }
             } else {
-                $io->write(' with recupListAgents... ');
+                $listAgents = $listAgentsWS->getListAgentsUpdated($startObservationDate->format('Y-m-d'));
+                if ($loggerMode === 'file') {
+                    $this->logger->info('with updated agents at ' . $fromDate);
+                } else {
+                    $io->write(' with updated agents at ' . $fromDate . '... ');
+                }
             }
+            // Warning or bad response from SIHAM webservices
+            if (!isset($listAgents->return)) {
+                if ($loggerMode === 'file') {
+                    $this->logger->error('No response from WebService');
+                } else {
+                    $io->error('No response from WebService');
+                }
+                return 0;
+            }
+
+            // Keep matricules, no more need other data
+            $listAgents = is_array($listAgents->return) ? $listAgents->return : [$listAgents->return];
+            $listAgents = \array_column($listAgents, 'matricule');
+    
+            // Call SIHAM WS to retrieve due term agents
+            $dueTermAgents = $listAgentsWS->getListAgentsDueTerm($startObservationDate->format('Y-m-d'), $endObservationDate->format('Y-m-d'));
+            if (isset($dueTermAgents->return)) {
+                // And add them to the previous list
+                $dueTermAgents = is_array($dueTermAgents->return) ? $dueTermAgents->return : [$dueTermAgents->return];
+                $listAgents = \array_merge($listAgents, \array_column($dueTermAgents, 'matricule'));
+                $listAgents = \array_unique($listAgents);
+            }
+
         } else {
-            $listAgents = $listAgentsWS->getListAgentsUpdated($startObservationDate->format('Y-m-d'));
-            if ($loggerMode === 'file') {
-                $this->logger->info('with updated agents at ' . $fromDate);
-            } else {
-                $io->write(' with updated agents at ' . $fromDate . '... ');
-            }
+            $listAgents = $matricules;
         }
         
-        // Warning or bad response from SIHAM webservices
-        if (!isset($listAgents->return)) {
-            if ($loggerMode === 'file') {
-                $this->logger->error('No response from WebService');
-            } else {
-                $io->error('No response from WebService');
-            }
-            return 0;
-        }
 
-        // Keep matricules, no more need other data
-        $listAgents = is_array($listAgents->return) ? $listAgents->return : [$listAgents->return];
-        $listAgents = \array_column($listAgents, 'matricule');
-
-        // Call SIHAM WS to retrieve due term agents
-        $dueTermAgents = $listAgentsWS->getListAgentsDueTerm($startObservationDate->format('Y-m-d'), $endObservationDate->format('Y-m-d'));
-        if (isset($dueTermAgents->return)) {
-            // And add them to the previous list
-            $dueTermAgents = is_array($dueTermAgents->return) ? $dueTermAgents->return : [$dueTermAgents->return];
-            $listAgents = \array_merge($listAgents, \array_column($dueTermAgents, 'matricule'));
-            $listAgents = \array_unique($listAgents);
-        }
 
 
         if (!empty($listAgents)) {
