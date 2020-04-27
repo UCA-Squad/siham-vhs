@@ -37,7 +37,7 @@ class SyncAgentCommand extends Command
          // configure options
         ->addOption('logger', null, InputOption::VALUE_OPTIONAL, 'The logger mode: "console" (by default) or "file".', 'console')
         ->addOption('from-date', null, InputOption::VALUE_OPTIONAL, '"all" or date in "Y-m-d" format (date of the day by default)', date('Y-m-d'))
-        ->addOption('matricule', null, InputOption::VALUE_OPTIONAL, 'set a SIHAM id or a list sperated by a comma', null)
+        ->addOption('matricule', null, InputOption::VALUE_OPTIONAL, 'set a SIHAM id or a list separated by a comma', null)
 
         // the short description shown while running "php bin/console list"
         ->setDescription('Sync all users from SIHAM...')
