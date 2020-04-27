@@ -929,8 +929,10 @@ class Agent {
     public function addAdministrativeData($administrativeData, $startObservationDate = null) {
         if (empty($startObservationDate))
             $startObservationDate = new \DateTime();
-        $dateEndSIHAM = new \DateTime('0001-01-01');
+        $maxSihamDate = new \DateTime('2999-12-31');
+        $endSihamDate = new \DateTime('0001-01-01');
 
+        #region AFFECTATION
         $codeUOAffectationsADR = []; $nameAffectationsADR = []; $quotiteAffectationsADR = [];
         $codeUOAffectationsFUN = []; $nameAffectationsFUN = []; $quotiteAffectationsFUN = [];
         $codeUOAffectationsHIE = NULL; $nameAffectationsHIE = NULL; $quotiteAffectationsHIE = NULL; $dateDebutAffectationsHIE = NULL; $dateFinAffectationsHIE = NULL;
@@ -980,7 +982,9 @@ class Agent {
         $this->codeEmploiAffectation = $codeEmploiAffectation; $this->libLongEmploiAffectation = $libLongEmploiAffectation;
         $this->codePosteAffectation = $codePosteAffectation; $this->libLongPosteAffectation = $libLongPosteAffectation;
         $this->categorieEmploiPoste = $categorieEmploiPoste;
+        #endregion
 
+        #region CARRIERE
         $codeQualiteStatutaire = NULL;
         $codeGroupeHierarchique = NULL;
         $codeCategory = NULL;
@@ -993,16 +997,19 @@ class Agent {
         if (isset($administrativeData->listeCarrieres)) {
             $listeCarrieres = \is_object($administrativeData->listeCarrieres) ? [$administrativeData->listeCarrieres] : $administrativeData->listeCarrieres;
             foreach($listeCarrieres as $listeCarriere) {
-                // only date effect so keep on saving the last
-                if (isset($listeCarriere->codeQualiteStatutaire))   $codeQualiteStatutaire = $listeCarriere->codeQualiteStatutaire;
-                if (isset($listeCarriere->codeGroupeHierarchique))  $codeGroupeHierarchique = $listeCarriere->codeGroupeHierarchique;
-                if (isset($listeCarriere->libCourtCategorieFP))     $codeCategory = $listeCarriere->libCourtCategorieFP;
-                if (isset($listeCarriere->codeEchelon))             $codeEchelon = $listeCarriere->codeEchelon;
-                if (isset($listeCarriere->indiceMajore))            $indiceMajore = $listeCarriere->indiceMajore;
-                if (isset($listeCarriere->codeCorps))               $codeCorps = $listeCarriere->codeCorps;
-                if (isset($listeCarriere->codeGrade))               $codeGrade = $listeCarriere->codeGrade;
-                if (isset($listeCarriere->temEnseignantChercheur))  $temEnseignantChercheur = $listeCarriere->temEnseignantChercheur;
-                if (isset($listeCarriere->organismePrincipal))      $organismePrincipal = $listeCarriere->organismePrincipal;
+                $dateDebutCarriereCurrent = new \DateTime(\substr($listeCarriere->dateEffetCarriere,0,10));
+                $dateFinCarriereCurrent = isset($listeCarriere->dateFinCarriere) ? new \DateTime(\substr($listeCarriere->dateFinCarriere,0,10)) : $maxSihamDate;
+                if ($dateDebutCarriereCurrent <= $startObservationDate && $dateFinCarriereCurrent >= $startObservationDate) {
+                    if (isset($listeCarriere->codeQualiteStatutaire))   $codeQualiteStatutaire = $listeCarriere->codeQualiteStatutaire;
+                    if (isset($listeCarriere->codeGroupeHierarchique))  $codeGroupeHierarchique = $listeCarriere->codeGroupeHierarchique;
+                    if (isset($listeCarriere->libCourtCategorieFP))     $codeCategory = $listeCarriere->libCourtCategorieFP;
+                    if (isset($listeCarriere->codeEchelon))             $codeEchelon = $listeCarriere->codeEchelon;
+                    if (isset($listeCarriere->indiceMajore))            $indiceMajore = $listeCarriere->indiceMajore;
+                    if (isset($listeCarriere->codeCorps))               $codeCorps = $listeCarriere->codeCorps;
+                    if (isset($listeCarriere->codeGrade))               $codeGrade = $listeCarriere->codeGrade;
+                    if (isset($listeCarriere->temEnseignantChercheur))  $temEnseignantChercheur = $listeCarriere->temEnseignantChercheur;
+                    if (isset($listeCarriere->organismePrincipal))      $organismePrincipal = $listeCarriere->organismePrincipal;
+                }
             }
         }
         $this->codeQualiteStatutaire = $codeQualiteStatutaire;
@@ -1014,17 +1021,24 @@ class Agent {
         $this->codeGrade = $codeGrade;
         $this->temEnseignantChercheur = $temEnseignantChercheur;
         $this->organismePrincipal = $organismePrincipal;
+        #endregion
 
+        #region PIP
         $codePIP = NULL;
         if (isset($administrativeData->listePIP)) {
             $listePIPs = \is_object($administrativeData->listePIP) ? [$administrativeData->listePIP] : $administrativeData->listePIP;
             foreach($listePIPs as $listePIP) {
-                // only date effect so keep on saving the last
-                if (isset($listePIP->codePIP)) $codePIP = $listePIP->codePIP;
+                $dateDebutPIPCurrent = new \DateTime(\substr($listePIP->dateEffetPIP,0,10));
+                $dateFinPIPCurrent = isset($listePIP->dateFinPIP) ? new \DateTime(\substr($listePIP->dateFinPIP,0,10)) : $maxSihamDate;
+                if ($dateDebutPIPCurrent <= $startObservationDate && $dateFinPIPCurrent >= $startObservationDate) {
+                    if (isset($listePIP->codePIP)) $codePIP = $listePIP->codePIP;
+                }
             }
         }
         $this->codePIP = $codePIP;
+        #endregion
 
+        #region POSITION ADMINISTRATIVE
         $codePositionStatutaire = NULL;
         $codePositionAdministrative = NULL;
         $dateDebutPositionAdministrative = NULL;
@@ -1033,20 +1047,13 @@ class Agent {
             $listePositionsAdministratives = \is_object($administrativeData->listePositionsAdministratives) ? [$administrativeData->listePositionsAdministratives] : $administrativeData->listePositionsAdministratives;
             foreach($listePositionsAdministratives as $listePositionAdministrative) {
                 // keep the first start date and the related end date
-                if (isset($listePositionAdministrative->codePositionStatutaire)
-                && isset($listePositionAdministrative->codePositionAdmin)
-                && isset($listePositionAdministrative->dateDebutPositionAdmin)
-                && isset($listePositionAdministrative->dateFinReellePositionAdmin)
-                ) {
-                    $dateDebutPositionAdministrativeCurrent = new \DateTime(\substr($listePositionAdministrative->dateDebutPositionAdmin,0,10));
-                    $dateFinPositionAdministrativeCurrent = new \DateTime(\substr($listePositionAdministrative->dateFinReellePositionAdmin,0,10));
-
-                    if ($dateDebutPositionAdministrativeCurrent <= $startObservationDate && ($dateFinPositionAdministrativeCurrent >= $startObservationDate || $dateFinPositionAdministrativeCurrent == $dateEndSIHAM)) {
-                        $codePositionStatutaire = $listePositionAdministrative->codePositionStatutaire;
-                        $codePositionAdministrative = $listePositionAdministrative->codePositionAdmin;
-                        $dateDebutPositionAdministrative = $dateDebutPositionAdministrativeCurrent;
-                        $dateFinPositionAdministrative = $dateFinPositionAdministrativeCurrent;
-                    }
+                $dateDebutPositionAdministrativeCurrent = new \DateTime(\substr($listePositionAdministrative->dateDebutPositionAdmin,0,10));
+                $dateFinPositionAdministrativeCurrent = new \DateTime(\substr($listePositionAdministrative->dateFinReellePositionAdmin,0,10));
+                if ($dateDebutPositionAdministrativeCurrent <= $startObservationDate && ($dateFinPositionAdministrativeCurrent >= $startObservationDate || $dateFinPositionAdministrativeCurrent == $endSihamDate)) {
+                    $codePositionStatutaire = $listePositionAdministrative->codePositionStatutaire;
+                    $codePositionAdministrative = $listePositionAdministrative->codePositionAdmin;
+                    $dateDebutPositionAdministrative = $dateDebutPositionAdministrativeCurrent;
+                    $dateFinPositionAdministrative = $dateFinPositionAdministrativeCurrent;
                 }
             }
         }
@@ -1054,30 +1061,26 @@ class Agent {
         $this->codePositionAdministrative = $codePositionAdministrative;
         $this->dateDebutPositionAdministrative = $dateDebutPositionAdministrative;
         $this->dateFinPositionAdministrative = $dateFinPositionAdministrative;
+        #endregion
 
+        #region ABSENCE
         $codeAbsence = NULL;
         $nameAbsence = NULL;
         if (isset($administrativeData->listeAbsencesConges)) {
             $listeAbsencesConges = \is_object($administrativeData->listeAbsencesConges) ? [$administrativeData->listeAbsencesConges] : $administrativeData->listeAbsencesConges;
             foreach($listeAbsencesConges as $listeAbsenceConges) {
                 // keep the first start date and the related end date
-                if (isset($listeAbsenceConges->codeMotifAbsenceConge)
-                && isset($listeAbsenceConges->libLongMotifAbsenceConge)
-                && isset($listeAbsenceConges->DateDebutAbsenceConge)
-                && isset($listeAbsenceConges->DateFinAbsenceConge)
-                ) {
-                    $dateDebutAbsenceCongeCurrent = new \DateTime(\substr($listeAbsenceConges->dateDebutAbsenceConge,0,10));
-                    $dateFinAbsenceCongeCurrent = new \DateTime(\substr($listeAbsenceConges->dateFinAbsenceConge,0,10));
-
-                    if ($dateDebutAbsenceCongeCurrent <= $startObservationDate && ($dateFinAbsenceCongeCurrent >= $startObservationDate || $dateFinAbsenceCongeCurrent == $dateEndSIHAM)) {
-                        $codeAbsence = $listeAbsenceConges->codeMotifAbsenceConge;
-                        $nameAbsence = $listeAbsenceConges->libLongMotifAbsenceConge;
-                    }
+                $dateDebutAbsenceCongeCurrent = new \DateTime(\substr($listeAbsenceConges->dateDebutAbsenceConge,0,10));
+                $dateFinAbsenceCongeCurrent = new \DateTime(\substr($listeAbsenceConges->dateFinAbsenceConge,0,10));
+                if ($dateDebutAbsenceCongeCurrent <= $startObservationDate && ($dateFinAbsenceCongeCurrent >= $startObservationDate || $dateFinAbsenceCongeCurrent == $endSihamDate)) {
+                    $codeAbsence = $listeAbsenceConges->codeMotifAbsenceConge;
+                    $nameAbsence = $listeAbsenceConges->libLongMotifAbsenceConge;
                 }
             }
         }
         $this->codeAbsence = $codeAbsence;
         $this->nameAbsence = $nameAbsence;
+        #endregion
     }
 
 }
