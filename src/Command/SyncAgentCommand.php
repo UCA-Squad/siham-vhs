@@ -55,7 +55,7 @@ class SyncAgentCommand extends Command
 
         $loggerMode = $input->getOption('logger');
         $fromDate = $input->getOption('from-date');
-        $matricules = \explode(',', $input->getOption('matricule'));
+        $matricules = $input->getOption('matricule');
         $startObservationDate = new \DateTime($fromDate!= 'all' ? $fromDate : null);
         $endObservationDate = new \DateTime($fromDate!= 'all' ? $fromDate : null);
         $endObservationDate->modify('+60 days'); // to include the future contracts
@@ -78,6 +78,7 @@ class SyncAgentCommand extends Command
         $listAgents = NULL;
         if (empty($matricules)) {
             if ($fromDate === 'all') {
+                dump('là');
                 $listAgents = $listAgentsWS->getListAgentsByName('%');
                 if ($loggerMode === 'file') {
                     $this->logger->info('with all agents');
@@ -116,7 +117,7 @@ class SyncAgentCommand extends Command
             }
 
         } else {
-            $listAgents = $matricules;
+            $listAgents = \explode(',', $matricules);
         }
         
 
