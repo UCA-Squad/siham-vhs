@@ -68,7 +68,7 @@ class SyncGeishaCommand extends Command
             FROM GEI_ADM.AGREMENT A
             LEFT JOIN GEI_ADM.INDIVIDU2 I ON I.NO_INDIVIDU = A.NO_INDIVIDU 
             WHERE A.D_DEB_VAL <= TO_DATE(:dateFinObservation, \'YYYY-MM-DD\') AND A.D_FIN_VAL >= TO_DATE(:dateDebutObservation, \'YYYY-MM-DD\')
-            ORDER BY I.MATCLE, A.D_DEB_VAL';
+            ORDER BY I.MATCLE, A.C_STRUCTURE, A.D_DEB_VAL';
         $stmtGeisha = $connGeisha->prepare($sqlGeishaAgreements);
         $dateObservation = new \DateTime();
         $stmtGeisha->bindValue('dateDebutObservation', $dateObservation->format('Y-m-d'));
