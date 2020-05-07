@@ -926,160 +926,181 @@ class Agent {
      * Set attributes from response of webservice dossierAgent
      * @param administrativeData object response of webservice 
      */
-    public function addAdministrativeData($administrativeData, $startObservationDate = null) {
+    public function addAdministrativeData($administrativeData, $startObservationDate = null, $endObservationDate = null) {
         if (empty($startObservationDate))
             $startObservationDate = new \DateTime();
+        if (empty($endObservationDate))
+            $endObservationDate = new \DateTime();
         $maxSihamDate = new \DateTime('2999-12-31');
         $endSihamDate = new \DateTime('0001-01-01');
 
         #region AFFECTATION
-        $codeUOAffectationsADR = []; $nameAffectationsADR = []; $quotiteAffectationsADR = [];
-        $codeUOAffectationsFUN = []; $nameAffectationsFUN = []; $quotiteAffectationsFUN = [];
-        $codeUOAffectationsHIE = NULL; $nameAffectationsHIE = NULL; $quotiteAffectationsHIE = NULL; $dateDebutAffectationsHIE = NULL; $dateFinAffectationsHIE = NULL;
-        $codeEmploiAffectation = NULL; $libLongEmploiAffectation = NULL;
-        $codePosteAffectation = NULL; $libLongPosteAffectation = NULL;
-        $categorieEmploiPoste = NULL;
+        // Simplify and common data in order to reduce the tests
+        $initType = ['ADR' => [], 'FUN' => [], 'HIE' => []];
+        $codeUOAffectations = $initType; $nameAffectations = $initType; $quotiteAffectations = $initType; $dateDebutAffectations = $initType; $dateFinAffectations = $initType;
+        $codeEmploiAffectation = $initType; $libLongEmploiAffectation = $initType; $codePosteAffectation = $initType; $libLongPosteAffectation = $initType; $categorieEmploiPoste = $initType;
         if (isset($administrativeData->listeAffectations)) {
             $listeAffectations = \is_object($administrativeData->listeAffectations) ? [$administrativeData->listeAffectations] : $administrativeData->listeAffectations;
             foreach($listeAffectations as $listeAffectation) {
-                $dateDebutAffectationsCurrent = new \DateTime(\substr($listeAffectation->dateDebutAffectation,0,10));
-                $dateFinAffectationsCurrent = new \DateTime(\substr($listeAffectation->dateFinAffectation,0,10));
-                if ($listeAffectation->codeTypeRattachement == 'ADR') {
-                    if ($dateDebutAffectationsCurrent <= $startObservationDate && $dateFinAffectationsCurrent >= $startObservationDate) {
-                        $codeUOAffectationsADR[]    = $listeAffectation->codeUOAffectation;
-                        $nameAffectationsADR[]      = $listeAffectation->libLongCodeUOAffectation;
-                        $quotiteAffectationsADR[]   = $listeAffectation->quotiteAffectation;
-                    }
-                } else if ($listeAffectation->codeTypeRattachement == 'FUN') {
-                    if ($dateDebutAffectationsCurrent <= $startObservationDate && $dateFinAffectationsCurrent >= $startObservationDate) {
-                        $codeUOAffectationsFUN[]    = $listeAffectation->codeUOAffectation;
-                        $nameAffectationsFUN[]      = $listeAffectation->libLongCodeUOAffectation;
-                        $quotiteAffectationsFUN[]   = $listeAffectation->quotiteAffectation;
-                    }
-                } else if ($listeAffectation->codeTypeRattachement == 'HIE') {
-                    if ($dateDebutAffectationsCurrent <= $startObservationDate && $dateFinAffectationsCurrent >= $startObservationDate) {
-                        $codeUOAffectationsHIE  = $listeAffectation->codeUOAffectation;
-                        $nameAffectationsHIE    = $listeAffectation->libLongCodeUOAffectation;
-                        $quotiteAffectationsHIE = $listeAffectation->quotiteAffectation;
-                        
-                        $dateDebutAffectationsHIE = $dateDebutAffectationsCurrent;
-                        
-                        if (isset($listeAffectation->codeEmploiAffectation))    $codeEmploiAffectation      = $listeAffectation->codeEmploiAffectation;
-                        if (isset($listeAffectation->libLongEmploiAffectation)) $libLongEmploiAffectation   = $listeAffectation->libLongEmploiAffectation;
-                        if (isset($listeAffectation->codePosteAffectation))     $codePosteAffectation       = $listeAffectation->codePosteAffectation;
-                        if (isset($listeAffectation->libLongPoste))             $libLongPosteAffectation    = $listeAffectation->libLongPoste;
-                        if (isset($listeAffectation->categorieEmploiPoste))     $categorieEmploiPoste       = $listeAffectation->categorieEmploiPoste;
-                    }
-                    // and the biggest end date
-                    if (empty($this->dateFinAffectationsHIE) || $this->dateFinAffectationsHIE <= $dateFinAffectationsCurrent)
-                        $dateFinAffectationsHIE = $dateFinAffectationsCurrent;
+                // Convert string to DateTime
+                $dateDebutAffectationsCurrent = new \DateTime(\substr($listeAffectation->dateDebutAffectation, 0, 10));
+                $dateFinAffectationsCurrent   = new \DateTime(\substr($listeAffectation->dateFinAffectation, 0, 10));
+                // Distinct the affectations between the observation dates
+                $when = $dateDebutAffectationsCurrent <= $startObservationDate ? 'current' : ($dateDebutAffectationsCurrent <= $endObservationDate ? 'next' : null);
+                $type = $listeAffectation->codeTypeRattachement;
+                if (!empty($when)) {
+                
+                    $codeUOAffectations [$type][$when][] = $listeAffectation->codeUOAffectation;
+                    $nameAffectations   [$type][$when][] = $listeAffectation->libLongCodeUOAffectation;
+                    $quotiteAffectations[$type][$when][] = $listeAffectation->quotiteAffectation;
+                    
+                    $dateDebutAffectations[$type][$when][] = $dateDebutAffectationsCurrent;
+                    
+                    $codeEmploiAffectation   [$type][$when] = isset($listeAffectation->codeEmploiAffectation)    ? $listeAffectation->codeEmploiAffectation    : null;
+                    $libLongEmploiAffectation[$type][$when] = isset($listeAffectation->libLongEmploiAffectation) ? $listeAffectation->libLongEmploiAffectation : null;
+                    $codePosteAffectation    [$type][$when] = isset($listeAffectation->codePosteAffectation)     ? $listeAffectation->codePosteAffectation     : null;
+                    $libLongPosteAffectation [$type][$when] = isset($listeAffectation->libLongPoste)             ? $listeAffectation->libLongPoste             : null;
+                    $categorieEmploiPoste    [$type][$when] = isset($listeAffectation->categorieEmploiPoste)     ? $listeAffectation->categorieEmploiPoste     : null;
                 }
+                // To have all dates and keep the biggest
+                $dateFinAffectations  [$type][!empty($when) ? $when : 'next'][] = $dateFinAffectationsCurrent;
             }
         }
-        $this->codeUOAffectationsADR = \implode('|', $codeUOAffectationsADR); $this->nameAffectationsADR = \implode('|', $nameAffectationsADR); $this->quotiteAffectationsADR = \implode('|', $quotiteAffectationsADR);
-        $this->codeUOAffectationsFUN = \implode('|', $codeUOAffectationsFUN); $this->nameAffectationsFUN = \implode('|', $nameAffectationsFUN); $this->quotiteAffectationsFUN = \implode('|', $quotiteAffectationsFUN);
-        $this->codeUOAffectationsHIE = $codeUOAffectationsHIE; $this->nameAffectationsHIE = $nameAffectationsHIE; $this->quotiteAffectationsHIE = $quotiteAffectationsHIE; $this->dateDebutAffectationsHIE =$dateDebutAffectationsHIE; $this->dateFinAffectationsHIE = $dateFinAffectationsHIE;
-        $this->codeEmploiAffectation = $codeEmploiAffectation; $this->libLongEmploiAffectation = $libLongEmploiAffectation;
-        $this->codePosteAffectation = $codePosteAffectation; $this->libLongPosteAffectation = $libLongPosteAffectation;
-        $this->categorieEmploiPoste = $categorieEmploiPoste;
+        $this->codeUOAffectationsADR = \implode('|', isset($codeUOAffectations  ['ADR']['current']) ? $codeUOAffectations   ['ADR']['current'] : (isset($codeUOAffectations   ['ADR']['next']) ? $codeUOAffectations   ['ADR']['next'] : []));
+        $this->nameAffectationsADR   = \implode('|', isset($nameAffectations    ['ADR']['current']) ? $nameAffectations     ['ADR']['current'] : (isset($nameAffectations     ['ADR']['next']) ? $nameAffectations     ['ADR']['next'] : []));
+        $this->quotiteAffectationsADR= \implode('|', isset($quotiteAffectations ['ADR']['current']) ? $quotiteAffectations  ['ADR']['current'] : (isset($quotiteAffectations  ['ADR']['next']) ? $quotiteAffectations  ['ADR']['next'] : []));
+        $this->codeUOAffectationsFUN = \implode('|', isset($codeUOAffectations  ['FUN']['current']) ? $codeUOAffectations   ['FUN']['current'] : (isset($codeUOAffectations   ['FUN']['next']) ? $codeUOAffectations   ['FUN']['next'] : []));
+        $this->nameAffectationsFUN   = \implode('|', isset($nameAffectations    ['FUN']['current']) ? $nameAffectations     ['FUN']['current'] : (isset($nameAffectations     ['FUN']['next']) ? $nameAffectations     ['FUN']['next'] : []));
+        $this->quotiteAffectationsFUN= \implode('|', isset($quotiteAffectations ['FUN']['current']) ? $quotiteAffectations  ['FUN']['current'] : (isset($quotiteAffectations  ['FUN']['next']) ? $quotiteAffectations  ['FUN']['next'] : []));
+        $this->codeUOAffectationsHIE = \implode('|', isset($codeUOAffectations  ['HIE']['current']) ? $codeUOAffectations   ['HIE']['current'] : (isset($codeUOAffectations   ['HIE']['next']) ? $codeUOAffectations   ['HIE']['next'] : []));
+        $this->nameAffectationsHIE   = \implode('|', isset($nameAffectations    ['HIE']['current']) ? $nameAffectations     ['HIE']['current'] : (isset($nameAffectations     ['HIE']['next']) ? $nameAffectations     ['HIE']['next'] : []));
+        $this->quotiteAffectationsHIE= \implode('|', isset($quotiteAffectations ['HIE']['current']) ? $quotiteAffectations  ['HIE']['current'] : (isset($quotiteAffectations  ['HIE']['next']) ? $quotiteAffectations  ['HIE']['next'] : []));
+        
+        // Keep the min date and the max date
+        $datesDebut = isset($dateDebutAffectations['HIE']['current']) ? $dateDebutAffectations['HIE']['current'] : (isset($dateDebutAffectations['HIE']['next']) ? $dateDebutAffectations['HIE']['next'] : []);
+        $minDate = min(\array_map(function($dateTime) { return $dateTime->getTimestamp(); }, $datesDebut));
+        $dateDebutFromTimestamp = new \DateTime();
+        $dateDebutFromTimestamp->setTimestamp($minDate);
+        $this->dateDebutAffectationsHIE = $dateDebutFromTimestamp;
+        $datesFin = \array_merge(isset($dateFinAffectations['HIE']['current']) ? $dateFinAffectations['HIE']['current'] : [], isset($dateFinAffectations['HIE']['next']) ? $dateFinAffectations['HIE']['next'] : []);
+        $maxDate = max(array_map(function($dateTime) { return $dateTime->getTimestamp(); }, $datesFin));
+        $dateFinFromTimestamp = new \DateTime();
+        $dateFinFromTimestamp->setTimestamp($maxDate);
+        $this->dateFinAffectationsHIE   = $dateFinFromTimestamp;
+        
+        $this->codeEmploiAffectation    = isset($codeEmploiAffectation      ['HIE']['current']) ? $codeEmploiAffectation    ['HIE']['current'] : (isset($codeEmploiAffectation      ['HIE']['next']) ? $codeEmploiAffectation    ['HIE']['next'] : null);
+        $this->libLongEmploiAffectation = isset($libLongEmploiAffectation   ['HIE']['current']) ? $libLongEmploiAffectation ['HIE']['current'] : (isset($libLongEmploiAffectation   ['HIE']['next']) ? $libLongEmploiAffectation ['HIE']['next'] : null);
+        $this->codePosteAffectation     = isset($codePosteAffectation       ['HIE']['current']) ? $codePosteAffectation     ['HIE']['current'] : (isset($codePosteAffectation       ['HIE']['next']) ? $codePosteAffectation     ['HIE']['next'] : null);
+        $this->libLongPosteAffectation  = isset($libLongPosteAffectation    ['HIE']['current']) ? $libLongPosteAffectation  ['HIE']['current'] : (isset($libLongPosteAffectation    ['HIE']['next']) ? $libLongPosteAffectation  ['HIE']['next'] : null);
+        $this->categorieEmploiPoste     = isset($categorieEmploiPoste       ['HIE']['current']) ? $categorieEmploiPoste     ['HIE']['current'] : (isset($categorieEmploiPoste       ['HIE']['next']) ? $categorieEmploiPoste     ['HIE']['next'] : null);
         #endregion
 
         #region CARRIERE
-        $codeQualiteStatutaire = NULL;
-        $codeGroupeHierarchique = NULL;
-        $codeCategory = NULL;
-        $codeEchelon = NULL;
-        $indiceMajore = NULL;
-        $codeCorps = NULL;
-        $codeGrade = NULL;
-        $temEnseignantChercheur = NULL;
-        $organismePrincipal = NULL;
+        $codeQualiteStatutaire  = [];
+        $codeGroupeHierarchique = [];
+        $codeCategory           = [];
+        $codeEchelon            = [];
+        $indiceMajore           = [];
+        $codeCorps              = [];
+        $codeGrade              = [];
+        $temEnseignantChercheur = [];
+        $organismePrincipal     = [];
         if (isset($administrativeData->listeCarrieres)) {
             $listeCarrieres = \is_object($administrativeData->listeCarrieres) ? [$administrativeData->listeCarrieres] : $administrativeData->listeCarrieres;
             foreach($listeCarrieres as $listeCarriere) {
-                $dateDebutCarriereCurrent = new \DateTime(\substr($listeCarriere->dateEffetCarriere,0,10));
-                $dateFinCarriereCurrent = isset($listeCarriere->dateFinCarriere) ? new \DateTime(\substr($listeCarriere->dateFinCarriere,0,10)) : $maxSihamDate;
-                if ($dateDebutCarriereCurrent <= $startObservationDate && $dateFinCarriereCurrent >= $startObservationDate) {
-                    if (isset($listeCarriere->codeQualiteStatutaire))   $codeQualiteStatutaire = $listeCarriere->codeQualiteStatutaire;
-                    if (isset($listeCarriere->codeGroupeHierarchique))  $codeGroupeHierarchique = $listeCarriere->codeGroupeHierarchique;
-                    if (isset($listeCarriere->libCourtCategorieFP))     $codeCategory = $listeCarriere->libCourtCategorieFP;
-                    if (isset($listeCarriere->codeEchelon))             $codeEchelon = $listeCarriere->codeEchelon;
-                    if (isset($listeCarriere->indiceMajore))            $indiceMajore = $listeCarriere->indiceMajore;
-                    if (isset($listeCarriere->codeCorps))               $codeCorps = $listeCarriere->codeCorps;
-                    if (isset($listeCarriere->codeGrade))               $codeGrade = $listeCarriere->codeGrade;
-                    if (isset($listeCarriere->temEnseignantChercheur))  $temEnseignantChercheur = $listeCarriere->temEnseignantChercheur;
-                    if (isset($listeCarriere->organismePrincipal))      $organismePrincipal = $listeCarriere->organismePrincipal;
+                // Convert string to DateTime
+                $dateDebutCarriereCurrent = new \DateTime(\substr($listeCarriere->dateEffetCarriere, 0, 10));
+                $dateFinCarriereCurrent = isset($listeCarriere->dateFinCarriere) ? new \DateTime(\substr($listeCarriere->dateFinCarriere, 0, 10)) : $maxSihamDate;
+                // Distinct the affectations between the observation dates
+                $when = $dateDebutCarriereCurrent <= $startObservationDate ? 'current' : ($dateDebutCarriereCurrent <= $endObservationDate ? 'next' : null);
+                if (!empty($when)) {
+                    if (isset($listeCarriere->codeQualiteStatutaire))   $codeQualiteStatutaire[$when]   = $listeCarriere->codeQualiteStatutaire;
+                    if (isset($listeCarriere->codeGroupeHierarchique))  $codeGroupeHierarchique[$when]  = $listeCarriere->codeGroupeHierarchique;
+                    if (isset($listeCarriere->libCourtCategorieFP))     $codeCategory[$when]            = $listeCarriere->libCourtCategorieFP;
+                    if (isset($listeCarriere->codeEchelon))             $codeEchelon[$when]             = $listeCarriere->codeEchelon;
+                    if (isset($listeCarriere->indiceMajore))            $indiceMajore[$when]            = $listeCarriere->indiceMajore;
+                    if (isset($listeCarriere->codeCorps))               $codeCorps[$when]               = $listeCarriere->codeCorps;
+                    if (isset($listeCarriere->codeGrade))               $codeGrade[$when]               = $listeCarriere->codeGrade;
+                    if (isset($listeCarriere->temEnseignantChercheur))  $temEnseignantChercheur[$when]  = $listeCarriere->temEnseignantChercheur;
+                    if (isset($listeCarriere->organismePrincipal))      $organismePrincipal[$when]      = $listeCarriere->organismePrincipal;
                 }
             }
         }
-        $this->codeQualiteStatutaire = $codeQualiteStatutaire;
-        $this->codeGroupeHierarchique = $codeGroupeHierarchique;
-        $this->codeCategory = $codeCategory;
-        $this->codeEchelon = $codeEchelon;
-        $this->indiceMajore = $indiceMajore;
-        $this->codeCorps = $codeCorps;
-        $this->codeGrade = $codeGrade;
-        $this->temEnseignantChercheur = $temEnseignantChercheur;
-        $this->organismePrincipal = $organismePrincipal;
+        $this->codeQualiteStatutaire    = isset($codeQualiteStatutaire['current'])  ? $codeQualiteStatutaire['current'] : (isset($codeQualiteStatutaire['next'])    ? $codeQualiteStatutaire['next']    : null);
+        $this->codeGroupeHierarchique   = isset($codeGroupeHierarchique['current']) ? $codeGroupeHierarchique['current']: (isset($codeGroupeHierarchique['next'])   ? $codeGroupeHierarchique['next']   : null);
+        $this->codeCategory             = isset($codeCategory['current'])           ? $codeCategory['current']          : (isset($codeCategory['next'])             ? $codeCategory['next']             : null);
+        $this->codeEchelon              = isset($codeEchelon['current'])            ? $codeEchelon['current']           : (isset($codeEchelon['next'])              ? $codeEchelon['next']              : null);
+        $this->indiceMajore             = isset($indiceMajore['current'])           ? $indiceMajore['current']          : (isset($indiceMajore['next'])             ? $indiceMajore['next']             : null);
+        $this->codeCorps                = isset($codeCorps['current'])              ? $codeCorps['current']             : (isset($codeCorps['next'])                ? $codeCorps['next']                : null);
+        $this->codeGrade                = isset($codeGrade['current'])              ? $codeGrade['current']             : (isset($codeGrade['next'])                ? $codeGrade['next']                : null);
+        $this->temEnseignantChercheur   = isset($temEnseignantChercheur['current']) ? $temEnseignantChercheur['current']: (isset($temEnseignantChercheur['next'])   ? $temEnseignantChercheur['next']   : null);
+        $this->organismePrincipal       = isset($organismePrincipal['current'])     ? $organismePrincipal['current']    : (isset($organismePrincipal['next'])       ? $organismePrincipal['next']       : null);
         #endregion
 
         #region PIP
-        $codePIP = NULL;
+        $codePIP = [];
         if (isset($administrativeData->listePIP)) {
             $listePIPs = \is_object($administrativeData->listePIP) ? [$administrativeData->listePIP] : $administrativeData->listePIP;
             foreach($listePIPs as $listePIP) {
-                $dateDebutPIPCurrent = new \DateTime(\substr($listePIP->dateEffetPIP,0,10));
-                $dateFinPIPCurrent = isset($listePIP->dateFinPIP) ? new \DateTime(\substr($listePIP->dateFinPIP,0,10)) : $maxSihamDate;
-                if ($dateDebutPIPCurrent <= $startObservationDate && $dateFinPIPCurrent >= $startObservationDate) {
-                    if (isset($listePIP->codePIP)) $codePIP = $listePIP->codePIP;
+                // Convert string to DateTime
+                $dateDebutPIPCurrent = new \DateTime(\substr($listePIP->dateEffetPIP, 0, 10));
+                $dateFinPIPCurrent = isset($listePIP->dateFinPIP) ? new \DateTime(\substr($listePIP->dateFinPIP, 0, 10)) : $maxSihamDate;
+                // Distinct the affectations between the observation dates
+                $when = $dateDebutPIPCurrent <= $startObservationDate ? 'current' : ($dateDebutPIPCurrent <= $endObservationDate ? 'next' : null);
+                if (!empty($when)) {
+                    if (isset($listePIP->codePIP)) $codePIP[$when] = $listePIP->codePIP;
                 }
             }
         }
-        $this->codePIP = $codePIP;
+        $this->codePIP = isset($codePIP['current']) ? $codePIP['current'] : (isset($codePIP['next']) ? $codePIP['next'] : null);
         #endregion
 
         #region POSITION ADMINISTRATIVE
-        $codePositionStatutaire = NULL;
-        $codePositionAdministrative = NULL;
-        $dateDebutPositionAdministrative = NULL;
-        $dateFinPositionAdministrative = NULL;
+        $codePositionStatutaire         = [];
+        $codePositionAdministrative     = [];
+        $dateDebutPositionAdministrative= [];
+        $dateFinPositionAdministrative  = [];
         if (isset($administrativeData->listePositionsAdministratives)) {
             $listePositionsAdministratives = \is_object($administrativeData->listePositionsAdministratives) ? [$administrativeData->listePositionsAdministratives] : $administrativeData->listePositionsAdministratives;
             foreach($listePositionsAdministratives as $listePositionAdministrative) {
-                // keep the first start date and the related end date
-                $dateDebutPositionAdministrativeCurrent = new \DateTime(\substr($listePositionAdministrative->dateDebutPositionAdmin,0,10));
-                $dateFinPositionAdministrativeCurrent = new \DateTime(\substr($listePositionAdministrative->dateFinReellePositionAdmin,0,10));
-                if ($dateDebutPositionAdministrativeCurrent <= $startObservationDate && ($dateFinPositionAdministrativeCurrent >= $startObservationDate || $dateFinPositionAdministrativeCurrent == $endSihamDate)) {
-                    $codePositionStatutaire = $listePositionAdministrative->codePositionStatutaire;
-                    $codePositionAdministrative = $listePositionAdministrative->codePositionAdmin;
-                    $dateDebutPositionAdministrative = $dateDebutPositionAdministrativeCurrent;
-                    $dateFinPositionAdministrative = $dateFinPositionAdministrativeCurrent;
+                // Convert string to DateTime
+                $dateDebutPositionAdministrativeCurrent = new \DateTime(\substr($listePositionAdministrative->dateDebutPositionAdmin, 0, 10));
+                $dateFinPositionAdministrativeCurrent   = new \DateTime(\substr($listePositionAdministrative->dateFinReellePositionAdmin, 0, 10));
+                // Distinct the affectations between the observation dates
+                $when = $dateDebutPIPCurrent <= $startObservationDate ? 'current' : ($dateDebutPIPCurrent <= $endObservationDate ? 'next' : null);
+                if (!empty($when)) {
+                    $codePositionStatutaire[$when]          = $listePositionAdministrative->codePositionStatutaire;
+                    $codePositionAdministrative[$when]      = $listePositionAdministrative->codePositionAdmin;
+                    $dateDebutPositionAdministrative[$when] = $dateDebutPositionAdministrativeCurrent;
+                    $dateFinPositionAdministrative[$when]   = $dateFinPositionAdministrativeCurrent;
                 }
             }
         }
-        $this->codePositionStatutaire = $codePositionStatutaire;
-        $this->codePositionAdministrative = $codePositionAdministrative;
-        $this->dateDebutPositionAdministrative = $dateDebutPositionAdministrative;
-        $this->dateFinPositionAdministrative = $dateFinPositionAdministrative;
+        $this->codePositionStatutaire           = isset($codePositionStatutaire['current'])         ? $codePositionStatutaire['current']            : (isset($codePositionStatutaire['next'])           ? $codePositionStatutaire['next']           : null);
+        $this->codePositionAdministrative       = isset($codePositionAdministrative['current'])     ? $codePositionAdministrative['current']        : (isset($codePositionAdministrative['next'])       ? $codePositionAdministrative['next']       : null);
+        $this->dateDebutPositionAdministrative  = isset($dateDebutPositionAdministrative['current'])? $dateDebutPositionAdministrative['current']   : (isset($dateDebutPositionAdministrative['next'])  ? $dateDebutPositionAdministrative['next']  : null);
+        $this->dateFinPositionAdministrative    = isset($dateFinPositionAdministrative['current'])  ? $dateFinPositionAdministrative['current']     : (isset($dateFinPositionAdministrative['next'])    ? $dateFinPositionAdministrative['next']    : null);
         #endregion
 
         #region ABSENCE
-        $codeAbsence = NULL;
-        $nameAbsence = NULL;
+        $codeAbsence = [];
+        $nameAbsence = [];
         if (isset($administrativeData->listeAbsencesConges)) {
             $listeAbsencesConges = \is_object($administrativeData->listeAbsencesConges) ? [$administrativeData->listeAbsencesConges] : $administrativeData->listeAbsencesConges;
             foreach($listeAbsencesConges as $listeAbsenceConges) {
-                // keep the first start date and the related end date
-                $dateDebutAbsenceCongeCurrent = new \DateTime(\substr($listeAbsenceConges->dateDebutAbsenceConge,0,10));
-                $dateFinAbsenceCongeCurrent = new \DateTime(\substr($listeAbsenceConges->dateFinAbsenceConge,0,10));
-                if ($dateDebutAbsenceCongeCurrent <= $startObservationDate && ($dateFinAbsenceCongeCurrent >= $startObservationDate || $dateFinAbsenceCongeCurrent == $endSihamDate)) {
-                    $codeAbsence = $listeAbsenceConges->codeMotifAbsenceConge;
-                    $nameAbsence = $listeAbsenceConges->libLongMotifAbsenceConge;
+                // Convert string to DateTime
+                $dateDebutAbsenceCongeCurrent = new \DateTime(\substr($listeAbsenceConges->dateDebutAbsenceConge, 0, 10));
+                $dateFinAbsenceCongeCurrent   = new \DateTime(\substr($listeAbsenceConges->dateFinAbsenceConge, 0, 10));
+                // Distinct the affectations between the observation dates
+                $when = $dateDebutPIPCurrent <= $startObservationDate ? 'current' : ($dateDebutPIPCurrent <= $endObservationDate ? 'next' : null);
+                if (!empty($when)) {
+                    $codeAbsence[$when] = $listeAbsenceConges->codeMotifAbsenceConge;
+                    $nameAbsence[$when] = $listeAbsenceConges->libLongMotifAbsenceConge;
                 }
             }
         }
-        $this->codeAbsence = $codeAbsence;
-        $this->nameAbsence = $nameAbsence;
+        $this->codeAbsence = isset($codeAbsence['current']) ? $codeAbsence['current'] : (isset($codeAbsence['next']) ? $codeAbsence['next'] : null);
+        $this->nameAbsence = isset($nameAbsence['current']) ? $nameAbsence['current'] : (isset($nameAbsence['next']) ? $nameAbsence['next'] : null);
         #endregion
     }
 
