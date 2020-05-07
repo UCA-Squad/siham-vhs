@@ -75,10 +75,9 @@ class SyncAgentCommand extends Command
         $listAgentsWS = new ListeAgentsWebService();
 
         // Call SIHAM WS according to option (all or only updated agents)
-        $listAgents = NULL;
+        $listAgents = [];
         if (empty($matricules)) {
             if ($fromDate === 'all') {
-                dump('là');
                 $listAgents = $listAgentsWS->getListAgentsByName('%');
                 if ($loggerMode === 'file') {
                     $this->logger->info('with all agents');
@@ -164,7 +163,7 @@ class SyncAgentCommand extends Command
                 }
                 $administrativeData = $dossierAgentWS->getAdministrativeData($agentSihamId, $startObservationDate->format('Y-m-d'), $maxObservationDate->format('Y-m-d'));
                 if (isset($administrativeData->return))
-                    $agent->addAdministrativeData($administrativeData->return, $startObservationDate);
+                    $agent->addAdministrativeData($administrativeData->return, $startObservationDate, $endObservationDate);
 
                 // ** Call SIHAM db to get population type
                 $codePopulationType = NULL;
