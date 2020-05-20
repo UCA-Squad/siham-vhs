@@ -263,6 +263,31 @@ class Agent {
     /**
      * @var string|null
      *
+     * @ORM\Column(name="codeTypeModaliteService", type="string", length=15, nullable=true)
+     */
+    private $codeTypeModaliteService;
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="ratioModaliteService", type="decimal", scale=2, nullable=true)
+     */
+    private $ratioModaliteService;
+    /**
+     * @var \DateTime|null
+     *
+     * @ORM\Column(name="dateDebutModaliteService", type="date", nullable=true)
+     */
+    private $dateDebutModaliteService;
+    /**
+     * @var \DateTime|null
+     *
+     * @ORM\Column(name="dateFinModaliteService", type="date", nullable=true)
+     */
+    private $dateFinModaliteService;
+
+    /**
+     * @var string|null
+     *
      * @ORM\Column(name="codeUOAffectationsHIE", type="string", nullable=true)
      */
     private $codeUOAffectationsHIE;
@@ -278,7 +303,6 @@ class Agent {
      * @ORM\Column(name="dateDebutAffectationsHIE", type="date", nullable=true)
      */
     private $dateDebutAffectationsHIE;
-
     /**
      * @var \DateTime|null
      *
@@ -693,6 +717,39 @@ class Agent {
         return $this;
     }
 
+    public function getCodeTypeModaliteService(): ?string {
+        return $this->codeTypeModaliteService;
+    }
+    public function setCodeTypeModaliteService(?string $codeTypeModaliteService): self {
+        $this->codeTypeModaliteService = $codeTypeModaliteService;
+
+        return $this;
+    }
+    public function getRatioModaliteService(): ?double {
+        return $this->ratioModaliteService;
+    }
+    public function setRatioModaliteService(?double $ratioModaliteService): self {
+        $this->ratioModaliteService = $ratioModaliteService;
+
+        return $this;
+    }
+    public function getDateDebutModaliteService(): ?\DateTimeInterface {
+        return $this->dateDebutModaliteService;
+    }
+    public function setDateDebutModaliteService(?\DateTimeInterface $dateDebutModaliteService): self {
+        $this->dateDebutModaliteService = $dateDebutModaliteService;
+
+        return $this;
+    }
+    public function getDateFinModaliteService(): ?\DateTimeInterface {
+        return $this->dateFinModaliteService;
+    }
+    public function setDateFinModaliteService(?\DateTimeInterface $dateFinModaliteService): self {
+        $this->dateFinModaliteService = $dateFinModaliteService;
+
+        return $this;
+    }
+
     public function getCodeUOAffectationsHIE(): ?string {
         return $this->codeUOAffectationsHIE;
     }
@@ -1102,6 +1159,34 @@ class Agent {
         $this->codeAbsence = isset($codeAbsence['current']) ? $codeAbsence['current'] : (isset($codeAbsence['next']) ? $codeAbsence['next'] : null);
         $this->nameAbsence = isset($nameAbsence['current']) ? $nameAbsence['current'] : (isset($nameAbsence['next']) ? $nameAbsence['next'] : null);
         #endregion
+
+        #region MODALITE SERVICE
+        $codeTypeModaliteService = [];
+        $ratioModaliteService   = [];
+        $dateDebutModaliteService= [];
+        $dateFinModaliteService  = [];
+        if (isset($administrativeData->listeModalitesServices)) {
+            $listeModalitesServices = \is_object($administrativeData->listeModalitesServices) ? [$administrativeData->listeModalitesServices] : $administrativeData->listeModalitesServices;
+            foreach($listeModalitesServices as $listeModaliteService) {
+                // Convert string to DateTime
+                $dateDebutModaliteServiceCurrent = new \DateTime(\substr($listeModaliteService->dateDebutModaliteService, 0, 10));
+                $dateFinModaliteServiceCurrent   = new \DateTime(\substr($listeModaliteService->dateFinModaliteService, 0, 10));
+                // Distinct the affectations between the observation dates
+                $when = $dateDebutModaliteServiceCurrent <= $startObservationDate ? 'current' : ($dateDebutModaliteServiceCurrent <= $endObservationDate ? 'next' : null);
+                if (!empty($when)) {
+                    $codeTypeModaliteService[$when] = $listeModaliteService->codeTypeModaliteService;
+                    $ratioModaliteService[$when]    = $listeModaliteService->ratioHeurePresenceTempsPlein;
+                    $dateDebutModaliteService[$when]= $dateDebutModaliteServiceCurrent;
+                    $dateFinModaliteService[$when]  = $dateFinModaliteServiceCurrent;
+                }
+            }
+        }
+        $this->codeTypeModaliteService  = isset($codeTypeModaliteService['current']) ? $codeTypeModaliteService['current']  : (isset($codeTypeModaliteService['next'])  ? $codeTypeModaliteService['next']  : null);
+        $this->ratioModaliteService     = isset($ratioModaliteService['current'])    ? $ratioModaliteService['current']     : (isset($ratioModaliteService['next'])     ? $ratioModaliteService['next']     : null);
+        $this->dateDebutModaliteService = isset($dateDebutModaliteService['current'])? $dateDebutModaliteService['current'] : (isset($dateDebutModaliteService['next']) ? $dateDebutModaliteService['next'] : null);
+        $this->dateFinModaliteService   = isset($dateFinModaliteService['current'])  ? $dateFinModaliteService['current']   : (isset($dateFinModaliteService['next'])   ? $dateFinModaliteService['next']   : null);
+        #endregion
+
     }
 
 }
