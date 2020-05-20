@@ -1067,7 +1067,7 @@ class Agent {
                 $dateDebutPositionAdministrativeCurrent = new \DateTime(\substr($listePositionAdministrative->dateDebutPositionAdmin, 0, 10));
                 $dateFinPositionAdministrativeCurrent   = new \DateTime(\substr($listePositionAdministrative->dateFinReellePositionAdmin, 0, 10));
                 // Distinct the affectations between the observation dates
-                $when = $dateDebutPIPCurrent <= $startObservationDate ? 'current' : ($dateDebutPIPCurrent <= $endObservationDate ? 'next' : null);
+                $when = $dateDebutPositionAdministrativeCurrent <= $startObservationDate ? 'current' : ($dateDebutPositionAdministrativeCurrent <= $endObservationDate ? 'next' : null);
                 if (!empty($when)) {
                     $codePositionStatutaire[$when]          = $listePositionAdministrative->codePositionStatutaire;
                     $codePositionAdministrative[$when]      = $listePositionAdministrative->codePositionAdmin;
@@ -1092,7 +1092,7 @@ class Agent {
                 $dateDebutAbsenceCongeCurrent = new \DateTime(\substr($listeAbsenceConges->dateDebutAbsenceConge, 0, 10));
                 $dateFinAbsenceCongeCurrent   = new \DateTime(\substr($listeAbsenceConges->dateFinAbsenceConge, 0, 10));
                 // Distinct the affectations between the observation dates
-                $when = $dateDebutPIPCurrent <= $startObservationDate ? 'current' : ($dateDebutPIPCurrent <= $endObservationDate ? 'next' : null);
+                $when = $dateDebutAbsenceCongeCurrent <= $startObservationDate ? 'current' : ($dateDebutAbsenceCongeCurrent <= $endObservationDate ? 'next' : null);
                 if (!empty($when)) {
                     $codeAbsence[$when] = $listeAbsenceConges->codeMotifAbsenceConge;
                     $nameAbsence[$when] = $listeAbsenceConges->libLongMotifAbsenceConge;
