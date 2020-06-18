@@ -214,6 +214,13 @@ class Agent {
     /**
      * @var string|null
      *
+     * @ORM\Column(name="libLongGrade", type="string", length=45, nullable=true)
+     */
+    private $libLongGrade;
+
+    /**
+     * @var string|null
+     *
      * @ORM\Column(name="temEnseignantChercheur", type="string", length=1, nullable=true)
      */
     private $temEnseignantChercheur;
@@ -657,6 +664,14 @@ class Agent {
 
         return $this;
     }
+    public function getLibLongGrade(): ?string {
+        return $this->libLongGrade;
+    }
+    public function setLibLongGrade(?string $libLongGrade): self {
+        $this->libLongGrade = $libLongGrade;
+
+        return $this;
+    }
 
     public function getTemEnseignantChercheur(): ?string {
         return $this->temEnseignantChercheur;
@@ -1060,6 +1075,7 @@ class Agent {
         $indiceMajore           = [];
         $codeCorps              = [];
         $codeGrade              = [];
+        $libLongGrade           = [];
         $temEnseignantChercheur = [];
         $organismePrincipal     = [];
         if (isset($administrativeData->listeCarrieres)) {
@@ -1078,6 +1094,7 @@ class Agent {
                     if (isset($listeCarriere->indiceMajore))            $indiceMajore[$when]            = $listeCarriere->indiceMajore;
                     if (isset($listeCarriere->codeCorps))               $codeCorps[$when]               = $listeCarriere->codeCorps;
                     if (isset($listeCarriere->codeGrade))               $codeGrade[$when]               = $listeCarriere->codeGrade;
+                    if (isset($listeCarriere->libLongGrade))            $libLongGrade[$when]            = $listeCarriere->libLongGrade;
                     if (isset($listeCarriere->temEnseignantChercheur))  $temEnseignantChercheur[$when]  = $listeCarriere->temEnseignantChercheur;
                     if (isset($listeCarriere->organismePrincipal))      $organismePrincipal[$when]      = $listeCarriere->organismePrincipal;
                 }
@@ -1090,6 +1107,7 @@ class Agent {
         $this->indiceMajore             = isset($indiceMajore['current'])           ? $indiceMajore['current']          : (isset($indiceMajore['next'])             ? $indiceMajore['next']             : null);
         $this->codeCorps                = isset($codeCorps['current'])              ? $codeCorps['current']             : (isset($codeCorps['next'])                ? $codeCorps['next']                : null);
         $this->codeGrade                = isset($codeGrade['current'])              ? $codeGrade['current']             : (isset($codeGrade['next'])                ? $codeGrade['next']                : null);
+        $this->libLongGrade             = isset($libLongGrade['current'])           ? $libLongGrade['current']          : (isset($libLongGrade['next'])             ? $libLongGrade['next']             : null);
         $this->temEnseignantChercheur   = isset($temEnseignantChercheur['current']) ? $temEnseignantChercheur['current']: (isset($temEnseignantChercheur['next'])   ? $temEnseignantChercheur['next']   : null);
         $this->organismePrincipal       = isset($organismePrincipal['current'])     ? $organismePrincipal['current']    : (isset($organismePrincipal['next'])       ? $organismePrincipal['next']       : null);
         #endregion
