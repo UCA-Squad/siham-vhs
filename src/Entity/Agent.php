@@ -1050,15 +1050,23 @@ class Agent {
         
         // Keep the min date and the max date
         $datesDebut = isset($dateDebutAffectations['HIE']['current']) ? $dateDebutAffectations['HIE']['current'] : (isset($dateDebutAffectations['HIE']['next']) ? $dateDebutAffectations['HIE']['next'] : []);
-        $minDate = min(\array_map(function($dateTime) { return $dateTime->getTimestamp(); }, $datesDebut));
-        $dateDebutFromTimestamp = new \DateTime();
-        $dateDebutFromTimestamp->setTimestamp($minDate);
-        $this->dateDebutAffectationsHIE = $dateDebutFromTimestamp;
+        if (!empty($datesDebut)) {
+            $minDate = min(\array_map(function($dateTime) { return $dateTime->getTimestamp(); }, $datesDebut));
+            $dateDebutFromTimestamp = new \DateTime();
+            $dateDebutFromTimestamp->setTimestamp($minDate);
+            $this->dateDebutAffectationsHIE = $dateDebutFromTimestamp;
+        } else  {
+            $this->dateDebutAffectationsHIE = null;
+        }
         $datesFin = \array_merge(isset($dateFinAffectations['HIE']['current']) ? $dateFinAffectations['HIE']['current'] : [], isset($dateFinAffectations['HIE']['next']) ? $dateFinAffectations['HIE']['next'] : []);
-        $maxDate = max(array_map(function($dateTime) { return $dateTime->getTimestamp(); }, $datesFin));
-        $dateFinFromTimestamp = new \DateTime();
-        $dateFinFromTimestamp->setTimestamp($maxDate);
-        $this->dateFinAffectationsHIE   = $dateFinFromTimestamp;
+        if (!empty($datesFin)) {
+            $maxDate = max(array_map(function($dateTime) { return $dateTime->getTimestamp(); }, $datesFin));
+            $dateFinFromTimestamp = new \DateTime();
+            $dateFinFromTimestamp->setTimestamp($maxDate);
+            $this->dateFinAffectationsHIE   = $dateFinFromTimestamp;
+        } else {
+            $this->dateFinAffectationsHIE   = null;
+        }
         
         $this->codeEmploiAffectation    = isset($codeEmploiAffectation      ['HIE']['current']) ? $codeEmploiAffectation    ['HIE']['current'] : (isset($codeEmploiAffectation      ['HIE']['next']) ? $codeEmploiAffectation    ['HIE']['next'] : null);
         $this->libLongEmploiAffectation = isset($libLongEmploiAffectation   ['HIE']['current']) ? $libLongEmploiAffectation ['HIE']['current'] : (isset($libLongEmploiAffectation   ['HIE']['next']) ? $libLongEmploiAffectation ['HIE']['next'] : null);
