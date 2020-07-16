@@ -57,6 +57,7 @@ class SyncAgentCommand extends Command
         $fromDate = $input->getOption('from-date');
         $matricules = $input->getOption('matricule');
         $startObservationDate = new \DateTime($fromDate!= 'all' ? $fromDate : null);
+        $startObservationDate->modify('-1 day');
         $endObservationDate = new \DateTime($fromDate!= 'all' ? $fromDate : null);
         $endObservationDate->modify('+60 days'); // to include the future contracts
         $maxObservationDate = new \DateTime('2999-12-31'); // max date for SIHAM instead of empty or null when no end date ...
