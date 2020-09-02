@@ -134,6 +134,7 @@ class SyncAgentCommand extends Command
                 // starts and displays the progress bar
                 $progressBar->start();
             }
+            $counterTempo = 0;
             
             foreach($listAgents as $agentSihamId) {
                 // retrieve agent
