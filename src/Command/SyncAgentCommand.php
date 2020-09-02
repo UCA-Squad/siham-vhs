@@ -204,6 +204,11 @@ class SyncAgentCommand extends Command
                     // advances the progress bar 1 unit
                     $progressBar->advance();
                 }
+
+                // Take a break for webservice :-( 
+                // Temporally disable since VM up memory to 6Go
+                if ($counterTempo++ % 250 == 0) \sleep(15);
+                if ($counterTempo++ % 1000 == 0) \sleep(30);
             }
 
             if ($loggerMode === 'file') {
