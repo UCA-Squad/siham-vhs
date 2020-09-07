@@ -57,9 +57,11 @@ class SyncAgentCommand extends Command
         $fromDate = $input->getOption('from-date');
         $matricules = $input->getOption('matricule');
         $startObservationDate = new \DateTime($fromDate!= 'all' ? $fromDate : null);
+        $endObservationDate = clone $startObservationDate;
+        $considerationDate = clone $startObservationDate;
         $startObservationDate->modify('-1 day');
-        $endObservationDate = new \DateTime($fromDate!= 'all' ? $fromDate : null);
         $endObservationDate->modify('+60 days'); // to include the future contracts
+        $considerationDate->modify('+1 day'); // the sync is launched the evening
         $maxObservationDate = new \DateTime('2999-12-31'); // max date for SIHAM instead of empty or null when no end date ...
         $minObservationDate = new \DateTime('0001-01-01'); // an other date for SIHAM that mean empty or null when no end date ...
 
@@ -134,7 +136,7 @@ class SyncAgentCommand extends Command
                 // starts and displays the progress bar
                 $progressBar->start();
             }
-            $counterTempo = 0;
+            $counterTempo = 1;
             
             foreach($listAgents as $agentSihamId) {
                 // retrieve agent
@@ -165,7 +167,7 @@ class SyncAgentCommand extends Command
                 }
                 $administrativeData = $dossierAgentWS->getAdministrativeData($agentSihamId, $startObservationDate->format('Y-m-d'), $maxObservationDate->format('Y-m-d'));
                 if (isset($administrativeData->return))
-                    $agent->addAdministrativeData($administrativeData->return, $startObservationDate, $endObservationDate);
+                    $agent->addAdministrativeData($administrativeData->return, $considerationDate, $endObservationDate);
 
                 // ** Call SIHAM db to get population type
                 $codePopulationType = NULL;
@@ -173,8 +175,9 @@ class SyncAgentCommand extends Command
                 $codeSubCategoryPopulationType = NULL;
                 $sqlSihamPopulationType = 'SELECT CATEGO, SSCATE, POPULA, TO_CHAR(DTEF00, \'YYYY-MM-DD\') AS DTEF00, TO_CHAR(DATXXX, \'YYYY-MM-DD\') AS DATXXX FROM HR.ZYYP 
                 WHERE NUDOSS IN (SELECT NUDOSS FROM HR.ZY00 WHERE matcle = :matricule)
-                AND :endObservationDate >= DTEF00
-                AND :startObservationDate <= DATXXX ORDER BY DTEF00';
+                AND TO_DATE(:endObservationDate, \'YYYY-MM-DD\') >= DTEF00
+                AND TO_DATE(:startObservationDate, \'YYYY-MM-DD\') <= DATXXX 
+                ORDER BY DTEF00';
                 $stmtSihamPopulationType = $connSiham->prepare($sqlSihamPopulationType);
                 $stmtSihamPopulationType->bindValue('matricule', $agent->getMatricule());
                 $stmtSihamPopulationType->bindValue('startObservationDate', $startObservationDate->format('Y-m-d'));
@@ -186,7 +189,7 @@ class SyncAgentCommand extends Command
                     foreach ($resPopulationTypes as $resPopulationType) {
                         $startPopulationTypeDate = new \DateTime(\substr($resPopulationType['DTEF00'],0,10));
                         $endPopulationTypeDate = new \DateTime(\substr($resPopulationType['DATXXX'],0,10));
-                        if ($startObservationDate >= $startPopulationTypeDate && $startObservationDate <= $endPopulationTypeDate) {
+                        if ($considerationDate >= $startPopulationTypeDate && $considerationDate <= $endPopulationTypeDate) {
                             $codePopulationType = $resPopulationType['POPULA'];
                             $codeCategoryPopulationType = $resPopulationType['CATEGO'];
                             $codeSubPopulationType = $resPopulationType['SSCATE'];
