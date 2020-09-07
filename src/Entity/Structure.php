@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Table(name="structure")
  * @ORM\Entity(repositoryClass="App\Repository\StructureRepository")
+ * @ORM\HasLifecycleCallbacks()
  */
 class Structure {
 
@@ -180,6 +181,15 @@ class Structure {
     }
 
     #endregion
+
+    /**
+     * @ORM\PrePersist()
+     * @ORM\PreUpdate()
+     */
+    public function prePersistPreUpdate()
+    {
+        $this->lastUpdate = new \DateTime();
+    }
 
     /**
      * Set attributes from response of webservice dossierParametrage

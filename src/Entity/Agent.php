@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Table(name="agent", uniqueConstraints={@ORM\UniqueConstraint(name="matricule_UNIQUE", columns={"matricule"})})
  * @ORM\Entity
+ * @ORM\HasLifecycleCallbacks()
  */
 class Agent {
 
@@ -949,6 +950,15 @@ class Agent {
     }
 
     #endregion
+
+    /**
+     * @ORM\PrePersist()
+     * @ORM\PreUpdate()
+     */
+    public function prePersistPreUpdate()
+    {
+        $this->lastUpdate = new \DateTime();
+    }
 
     /**
      * Set attributes from response of webservice dossierAgent
