@@ -176,7 +176,7 @@ class SyncAgentCommand extends Command
                 $sqlSihamPopulationType = 'SELECT CATEGO, SSCATE, POPULA, TO_CHAR(DTEF00, \'YYYY-MM-DD\') AS DTEF00, TO_CHAR(DATXXX, \'YYYY-MM-DD\') AS DATXXX FROM HR.ZYYP 
                 WHERE NUDOSS IN (SELECT NUDOSS FROM HR.ZY00 WHERE matcle = :matricule)
                 AND TO_DATE(:endObservationDate, \'YYYY-MM-DD\') >= DTEF00
-                AND TO_DATE(:startObservationDate, \'YYYY-MM-DD\') <= DATXXX 
+                AND TO_DATE(:startObservationDate, \'YYYY-MM-DD\') = DATXXX 
                 ORDER BY DTEF00';
                 $stmtSihamPopulationType = $connSiham->prepare($sqlSihamPopulationType);
                 $stmtSihamPopulationType->bindValue('matricule', $agent->getMatricule());
