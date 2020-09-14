@@ -68,11 +68,11 @@ class SyncAgentCommand extends Command
         $connSiham = $this->sihamEm->getConnection();
 
         if ($loggerMode === 'file') {
-            $this->logger->info('Start sync agents');
+            $this->logger->info('Start sync agents from SIHAM...');
         } else {
             $io = new SymfonyStyle($input, $output);
             $io->newLine();
-            $io->write('Call ListeAgentsWebService... ');
+            $io->write('Start sync agents from SIHAM... ');
         }
 
         $listAgentsWS = new ListeAgentsWebService();
@@ -81,16 +81,18 @@ class SyncAgentCommand extends Command
         $listAgents = [];
         if (empty($matricules)) {
             if ($fromDate === 'all') {
+                $startTempo = microtime(true);
                 $listAgents = $listAgentsWS->getListAgentsByName('%');
                 if ($loggerMode === 'file') {
-                    $this->logger->info('with all agents');
+                    $this->logger->info('with all agents', ['ws' => 'ListeAgentsWebService', 'method' => 'recupListeAgents', 'duration' => (number_format(microtime(true) - $startTempo, 3)) . 's']);
                 } else {
                     $io->write(' with recupListAgents... ');
                 }
             } else {
+                $startTempo = microtime(true);
                 $listAgents = $listAgentsWS->getListAgentsUpdated($startObservationDate->format('Y-m-d'));
                 if ($loggerMode === 'file') {
-                    $this->logger->info('with updated agents at ' . $fromDate);
+                    $this->logger->info('with updated agents at ' . $fromDate, ['ws' => 'ListeAgentsWebService', 'method' => 'recupAgentsModifies', 'duration' => (number_format(microtime(true) - $startTempo, 3)) . 's']);
                 } else {
                     $io->write(' with updated agents at ' . $fromDate . '... ');
                 }
@@ -98,7 +100,7 @@ class SyncAgentCommand extends Command
             // Warning or bad response from SIHAM webservices
             if (!isset($listAgents->return)) {
                 if ($loggerMode === 'file') {
-                    $this->logger->error('No response from WebService');
+                    $this->logger->error('No response from WebService OR no agent', ['ws' => 'ListeAgentsWebService', 'cause' => 'empty response']);
                 } else {
                     $io->error('No response from WebService');
                 }
@@ -110,16 +112,33 @@ class SyncAgentCommand extends Command
             $listAgents = \array_column($listAgents, 'matricule');
     
             // Call SIHAM WS to retrieve due term agents
+            $startTempo = microtime(true);
             $dueTermAgents = $listAgentsWS->getListAgentsDueTerm($startObservationDate->format('Y-m-d'), $endObservationDate->format('Y-m-d'));
+            if ($loggerMode === 'file') {
+                $this->logger->info('add agents with due terms at ' . $endObservationDate->format('Y-m-d'), ['ws' => 'ListeAgentsWebService', 'method' => 'recupAgentsEcheance', 'duration' => (number_format(microtime(true) - $startTempo, 3)) . 's']);
+            } else {
+                $io->writeln('add agents with due terms at ' . $endObservationDate->format('Y-m-d'));
+            }
             if (isset($dueTermAgents->return)) {
                 // And add them to the previous list
                 $dueTermAgents = is_array($dueTermAgents->return) ? $dueTermAgents->return : [$dueTermAgents->return];
                 $listAgents = \array_merge($listAgents, \array_column($dueTermAgents, 'matricule'));
                 $listAgents = \array_unique($listAgents);
+            } else {
+                if ($loggerMode === 'file') {
+                    $this->logger->warning('no agent with due terms', ['ws' => 'ListeAgentsWebService', 'cause' => 'empty response']);
+                } else {
+                    $io->warning('No agent with due terms');
+                }
             }
 
         } else {
             $listAgents = \explode(',', $matricules);
+            if ($loggerMode === 'file') {
+                $this->logger->info('with a matricules list', ['webservice' => 'no', 'matricules' => $matricules]);
+            } else {
+                $io->writeln(' with a matricules list');
+            }
         }
         
 
@@ -130,7 +149,7 @@ class SyncAgentCommand extends Command
             if ($loggerMode === 'file') {
                 $this->logger->info($numberOfUsers . ' agents found');
             } else {
-                $io->writeln(\sprintf('<info>%s</info> agents found', $numberOfUsers));
+                $io->writeln(\sprintf(' <info>%s</info> agents found', $numberOfUsers));
                 // creates a new progress bar
                 $progressBar = new ProgressBar($io, $numberOfUsers);
                 // starts and displays the progress bar
@@ -142,7 +161,7 @@ class SyncAgentCommand extends Command
                 // retrieve agent
                 $agent = $this->em->getRepository(Agent::class)->findOneByMatricule($agentSihamId);
                 if ($loggerMode === 'file') {
-                    $this->logger->info('Get agent ' . $agentSihamId . ' from database: ' . ($agent ? 'found' : 'not found'));
+                    $this->logger->info('Get agent ' . $agentSihamId . ' from VHS database', ['found' => ($agent ? 'yes => UPDATE' : 'no => CREATE')]);
                 }
                 // Or create
                 if (!$agent) {
@@ -153,23 +172,40 @@ class SyncAgentCommand extends Command
                 $dossierAgentWS = new DossierAgentWebService();
 
                 // ** Call SIHAM WS to get personal data
-                if ($loggerMode === 'file') {
-                    $this->logger->info('-- Get personal data for ' . $agentSihamId);
-                }
+                $startTempo = microtime(true);
                 $personalData = $dossierAgentWS->getPersonalData($agentSihamId, $startObservationDate->format('Y-m-d'), $endObservationDate->format('Y-m-d'));
-                if (isset($personalData->return))
+                if (!isset($personalData->return))
                     $agent->addPersonalData($personalData->return);
-
+                    if ($loggerMode === 'file') {
+                        $this->logger->info('- receive personal data', ['duration' => (number_format(microtime(true) - $startTempo, 3)) . 's']);
+                    }
+                else {
+                    if ($loggerMode === 'file') {
+                        $this->logger->warning('- no personal data', ['ws' => 'DossierAgentWebService', 'method' => 'recupDonneesPersonnelles', 'cause' => 'empty response']);
+                    } else {
+                        $io->warning('No personal data for ' . $agentSihamId);
+                    }
+                }
+        
 
                 // ** Call SIHAM WS to get administrative data
-                if ($loggerMode === 'file') {
-                    $this->logger->info('-- Get administrative data for ' . $agentSihamId);
-                }
+                $startTempo = microtime(true);
                 $administrativeData = $dossierAgentWS->getAdministrativeData($agentSihamId, $startObservationDate->format('Y-m-d'), $maxObservationDate->format('Y-m-d'));
-                if (isset($administrativeData->return))
+                if (!isset($administrativeData->return))
                     $agent->addAdministrativeData($administrativeData->return, $considerationDate, $endObservationDate);
+                    if ($loggerMode === 'file') {
+                        $this->logger->info('- receive administrative data', ['duration' => (number_format(microtime(true) - $startTempo, 3)) . 's']);
+                    }
+                else {
+                    if ($loggerMode === 'file') {
+                        $this->logger->warning('- no administrative data', ['ws' => 'DossierAgentWebService', 'method' => 'recupDonneesAdministratives', 'cause' => 'empty response']);
+                    } else {
+                        $io->warning('No administrative data for' . $agentSihamId);
+                    }
+                }
 
-                // ** Call SIHAM db to get population type
+                // ** Call SIHAM db to get population type*
+                $startTempo = microtime(true);
                 $codePopulationType = NULL;
                 $codeCategoryPopulationType = NULL;
                 $codeSubCategoryPopulationType = NULL;
@@ -185,6 +221,9 @@ class SyncAgentCommand extends Command
                 $stmtSihamPopulationType->execute();
                 $resPopulationTypes = $stmtSihamPopulationType->fetchAll();
                 if (!empty($resPopulationTypes)) {
+                    if ($loggerMode === 'file') {
+                        $this->logger->info('- receive population type', ['duration' => (number_format(microtime(true) - $startTempo, 3)) . 's']);
+                    }
                     // Loop on each agreement to set it to the agent
                     foreach ($resPopulationTypes as $resPopulationType) {
                         $startPopulationTypeDate = new \DateTime(\substr($resPopulationType['DTEF00'],0,10));
@@ -194,6 +233,10 @@ class SyncAgentCommand extends Command
                             $codeCategoryPopulationType = $resPopulationType['CATEGO'];
                             $codeSubPopulationType = $resPopulationType['SSCATE'];
                         }
+                    }
+                } else {
+                    if ($loggerMode === 'file') {
+                        $this->logger->info('- no population type', ['ws' => 'no', 'db' => 'SIHAM']);
                     }
                 }
                 $agent->setCodePopulationType($codePopulationType);
@@ -226,7 +269,7 @@ class SyncAgentCommand extends Command
 
         } else {
             if ($loggerMode === 'file') {
-                $this->logger->error('No response from WebService');
+                $this->logger->error('No response from WebService OR no agent', ['ws' => 'ListeAgentsWebService', 'cause' => 'empty response']);
             } else {
                 $io->error('No response from WebService');
             }

@@ -55,7 +55,7 @@ class SyncGeishaCommand extends Command
         $loggerMode = $input->getOption('logger');
         
         if ($loggerMode === 'file') {
-            $this->logger->info('Start sync agreements from GEISHA');
+            $this->logger->info('Start sync agreements from GEISHA ...');
         } else {
             $io = new SymfonyStyle($input, $output);
             $io->newLine();
@@ -63,7 +63,6 @@ class SyncGeishaCommand extends Command
         }
 
         $connGeisha = $this->geishaEm->getConnection();
-        // $sqlGeishaAgreements = 'SELECT NO_INDIVIDU, C_STRUCTURE, TO_CHAR(D_DEB_VAL, \'YYYY-MM-DD\') AS D_DEB_VAL, TO_CHAR(D_FIN_VAL, \'YYYY-MM-DD\') AS D_FIN_VAL FROM AGREMENT WHERE D_DEB_VAL <= TO_DATE(:dateFinObservation, \'YYYY-MM-DD\') AND D_FIN_VAL >= TO_DATE(:dateDebutObservation, \'YYYY-MM-DD\') ORDER BY NO_INDIVIDU, D_DEB_VAL';
         $sqlGeishaAgreements = 'SELECT I.MATCLE, A.C_STRUCTURE, TO_CHAR(A.D_DEB_VAL, \'YYYY-MM-DD\') AS D_DEB_VAL, TO_CHAR(A.D_FIN_VAL, \'YYYY-MM-DD\') AS D_FIN_VAL 
             FROM GEI_ADM.AGREMENT A
             LEFT JOIN GEI_ADM.INDIVIDU2 I ON I.NO_INDIVIDU = A.NO_INDIVIDU 
@@ -87,7 +86,8 @@ class SyncGeishaCommand extends Command
             
             $numberOfAgreementsGeisha = count($agreements);
             if ($loggerMode === 'file') {
-                $this->logger->info('(' . $numberOfAgreementsUpdated . ' agent agreements reset) ' . $numberOfAgreementsGeisha . ' agreements found');
+                $this->logger->info($numberOfAgreementsUpdated . ' agents with reset agreements', ['db' => 'VHS']);
+                $this->logger->info($numberOfAgreementsGeisha . ' agreements found', ['db' => 'GEISHA']);
             } else {
                 $io->writeln(\sprintf('(<info>%s</info> agent agreements reset) <info>%s</info> agreements found', $numberOfAgreementsUpdated, $numberOfAgreementsGeisha));
                 // creates a new progress bar
@@ -106,13 +106,15 @@ class SyncGeishaCommand extends Command
                     $dateDebutAffectationsAGR   = $agent->getDateDebutAffectationsAGR();
                     $dateFinAffectationsAGR     = $agent->getDateFinAffectationsAGR();
                     
-                    $structure = $this->em->getRepository(Structure::class)->findOneInCodeHarpege($agreement['C_STRUCTURE']);
                     $codeUOAffectationAGR = $agreement['C_STRUCTURE'];
+                    $structure = $this->em->getRepository(Structure::class)->findOneInCodeHarpege($agreement['C_STRUCTURE']);
                     if ($structure) {
                         $codeUOAffectationAGR = $structure->getCodeUO();
                     }
                     if ($loggerMode === 'file') {
-                        $this->logger->info('-- Set agreement ' . $agreement['C_STRUCTURE'] . ' -> ' . $codeUOAffectationAGR . '  for ' . $agent->getMatricule());
+                        $this->logger->info('Set agreement ' . $agreement['C_STRUCTURE']  . '  for ' . $agent->getMatricule());
+                        if ($agreement['C_STRUCTURE'] != $codeUOAffectationAGR)
+                            $this->logger->info('- Set agreement ' . $agreement['C_STRUCTURE'] . ' with SIHAM code ' . $codeUOAffectationAGR);
                     }
                     // Add next agreement
                     $codeUOAffectationsAGR[]    = $codeUOAffectationAGR;

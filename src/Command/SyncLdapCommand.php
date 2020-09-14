@@ -54,11 +54,11 @@ class SyncLdapCommand extends Command
         $loggerMode = $input->getOption('logger');
 
         if ($loggerMode === 'file') {
-            $this->logger->info('Start sync ldap');
+            $this->logger->info('Start sync ldap...');
         } else {
             $io = new SymfonyStyle($input, $output);
             $io->newLine();
-            $io->write('Read extract file... ');
+            $io->write('Start sync ldap... ');
         }
 
         // Read extract file from LDAP
@@ -84,7 +84,7 @@ class SyncLdapCommand extends Command
                 // retrieve agent
                 $agent = $this->em->getRepository(Agent::class)->findOneByMatricule($detailAgent['matricule']);
                 if ($loggerMode === 'file') {
-                    $this->logger->info('Get agent ' . $detailAgent['matricule'] . ' from database: ' . ($agent ? 'found' : 'not found'));
+                    $this->logger->info('Get agent ' . $detailAgent['matricule'] . ' from VHS database: ', ['found' => ($agent ? 'yes => CONTINUE' : 'no => BREAK')]);
                 }
                 if (!$agent) {
                     continue;
@@ -94,18 +94,18 @@ class SyncLdapCommand extends Command
                 if ($agent->getBadge() != $detailAgent['badge']) {
                     $agent->setBadge($detailAgent['badge']);
 
-                    if ($loggerMode === 'file') $this->logger->info('-- Update badge for ' . $detailAgent['matricule']);
+                    if ($loggerMode === 'file') $this->logger->info('- Update badge');
                 }
                 if ($agent->getUsername() != $detailAgent['username']) {
                     $agent->setUsername($detailAgent['username']);
 
-                    if ($loggerMode === 'file') $this->logger->info('-- Update username for ' . $detailAgent['matricule']);    
+                    if ($loggerMode === 'file') $this->logger->info('- Update username');    
                 }
                 if ($agent->getTelephonePro() != $detailAgent['telephonePro']) {
                     $agent->setTelephonePro($detailAgent['telephonePro']);
 
                     $action = empty($detailAgent['telephonePro']) ? 'Remove' : (empty($agent->getTelephonePro()) ? 'Add' : 'Update');
-                    if ($loggerMode === 'file') $this->logger->info('-- ' . $action . ' (VHS and SIHAM) phone pro for ' . $detailAgent['matricule']);
+                    if ($loggerMode === 'file') $this->logger->info('- ' . $action . ' (VHS and SIHAM) phone pro for ' . $detailAgent['matricule']);
 
                     if ($action == 'Remove')    $personalData = $dossierAgentWS->removePhonePro($detailAgent['matricule']);
                     else if ($action == 'Add')  $personalData = $dossierAgentWS->addPhonePro($detailAgent['matricule'], $detailAgent['telephonePro']);
@@ -115,7 +115,7 @@ class SyncLdapCommand extends Command
                     $agent->setMailPro($detailAgent['mailPro']);
 
                     $action = empty($detailAgent['mailPro']) ? 'Remove' : (empty($agent->getMailPro()) ? 'Add' : 'Update');
-                    if ($loggerMode === 'file') $this->logger->info('-- ' . $action . ' (VHS and SIHAM) email pro for ' . $detailAgent['matricule']);
+                    if ($loggerMode === 'file') $this->logger->info('- ' . $action . ' (VHS and SIHAM) email pro for ' . $detailAgent['matricule']);
                     
                     if ($action == 'Remove')    $personalData = $dossierAgentWS->removeEmailPro($detailAgent['matricule']);
                     else if ($action == 'Add')  $personalData = $dossierAgentWS->addEmailPro($detailAgent['matricule'], $detailAgent['mailPro']);
@@ -125,7 +125,7 @@ class SyncLdapCommand extends Command
                     $agent->setMailPerso($detailAgent['mailPerso']);
 
                     $action = empty($detailAgent['mailPerso']) ? 'Remove' : (empty($agent->getMailPerso()) ? 'Add' : 'Update');
-                    if ($loggerMode === 'file') $this->logger->info('-- ' . $action . ' (VHS and SIHAM) email perso for ' . $detailAgent['matricule']);
+                    if ($loggerMode === 'file') $this->logger->info('- ' . $action . ' (VHS and SIHAM) email perso for ' . $detailAgent['matricule']);
 
                     if ($action == 'Remove')    $personalData = $dossierAgentWS->removeEmailPerso($detailAgent['matricule']);
                     else if ($action == 'Add')  $personalData = $dossierAgentWS->addEmailPerso($detailAgent['matricule'], $detailAgent['mailPerso']);

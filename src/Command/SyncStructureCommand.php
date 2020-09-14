@@ -51,11 +51,11 @@ class SyncStructureCommand extends Command
         $loggerMode = $input->getOption('logger');
 
         if ($loggerMode === 'file') {
-            $this->logger->info('Start sync structures');
+            $this->logger->info('Start sync structures...');
         } else {
             $io = new SymfonyStyle($input, $output);
             $io->newLine();
-            $io->write('Call DossierParametrageWebService... ');
+            $io->write('Start sync structures... ');
         }
         $dossierParametrageWS = new DossierParametrageWebService();
         $structures = $dossierParametrageWS->getStructures();
@@ -77,7 +77,7 @@ class SyncStructureCommand extends Command
                 // retrieve structure
                 $structure = $this->em->getRepository(Structure::class)->findOneByCodeUO($structureReturn->codeUO);
                 if ($loggerMode === 'file') {
-                    $this->logger->info(($structure ? 'Update' : 'Add') . ' structure ' . $structureReturn->codeUO . ' from database');
+                    $this->logger->info(($structure ? 'Update' : 'Add') . ' structure ' . $structureReturn->codeUO);
                 }
                 if (!$structure) {
                     $structure = new Structure();
