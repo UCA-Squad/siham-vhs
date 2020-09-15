@@ -114,7 +114,7 @@ class SyncGeishaCommand extends Command
                     if ($loggerMode === 'file') {
                         $this->logger->info('Set agreement ' . $agreement['C_STRUCTURE']  . '  for ' . $agent->getMatricule());
                         if ($agreement['C_STRUCTURE'] != $codeUOAffectationAGR)
-                            $this->logger->info('- Set agreement ' . $agreement['C_STRUCTURE'] . ' with SIHAM code ' . $codeUOAffectationAGR);
+                            $this->logger->info('- Set GEISHA agreement ' . $agreement['C_STRUCTURE'] . ' with correspond SIHAM code ' . $codeUOAffectationAGR);
                     }
                     // Add next agreement
                     $codeUOAffectationsAGR[]    = $codeUOAffectationAGR;
