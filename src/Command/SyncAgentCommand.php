@@ -174,14 +174,14 @@ class SyncAgentCommand extends Command
                 // ** Call SIHAM WS to get personal data
                 $startTempo = microtime(true);
                 $personalData = $dossierAgentWS->getPersonalData($agentSihamId, $startObservationDate->format('Y-m-d'), $endObservationDate->format('Y-m-d'));
-                if (!isset($personalData->return))
+                if (isset($personalData->return)) {
                     $agent->addPersonalData($personalData->return);
                     if ($loggerMode === 'file') {
-                        $this->logger->info('- receive personal data', ['duration' => (number_format(microtime(true) - $startTempo, 3)) . 's']);
+                        $this->logger->info('- receive personal data' . \str_repeat('&nbsp;', 6), ['duration' => (number_format(microtime(true) - $startTempo, 3)) . 's']);
                     }
-                else {
+                } else {
                     if ($loggerMode === 'file') {
-                        $this->logger->warning('- no personal data', ['ws' => 'DossierAgentWebService', 'method' => 'recupDonneesPersonnelles', 'cause' => 'empty response']);
+                        $this->logger->warning('- no personal data' . \str_repeat('&nbsp;', 6), ['ws' => 'DossierAgentWebService', 'method' => 'recupDonneesPersonnelles', 'cause' => 'empty response']);
                     } else {
                         $io->warning('No personal data for ' . $agentSihamId);
                     }
@@ -191,12 +191,12 @@ class SyncAgentCommand extends Command
                 // ** Call SIHAM WS to get administrative data
                 $startTempo = microtime(true);
                 $administrativeData = $dossierAgentWS->getAdministrativeData($agentSihamId, $startObservationDate->format('Y-m-d'), $maxObservationDate->format('Y-m-d'));
-                if (!isset($administrativeData->return))
+                if (isset($administrativeData->return)) {
                     $agent->addAdministrativeData($administrativeData->return, $considerationDate, $endObservationDate);
                     if ($loggerMode === 'file') {
                         $this->logger->info('- receive administrative data', ['duration' => (number_format(microtime(true) - $startTempo, 3)) . 's']);
                     }
-                else {
+                } else {
                     if ($loggerMode === 'file') {
                         $this->logger->warning('- no administrative data', ['ws' => 'DossierAgentWebService', 'method' => 'recupDonneesAdministratives', 'cause' => 'empty response']);
                     } else {
@@ -222,7 +222,7 @@ class SyncAgentCommand extends Command
                 $resPopulationTypes = $stmtSihamPopulationType->fetchAll();
                 if (!empty($resPopulationTypes)) {
                     if ($loggerMode === 'file') {
-                        $this->logger->info('- receive population type', ['duration' => (number_format(microtime(true) - $startTempo, 3)) . 's']);
+                        $this->logger->info('- receive population type' . \str_repeat('&nbsp;', 4), ['duration' => (number_format(microtime(true) - $startTempo, 3)) . 's']);
                     }
                     // Loop on each agreement to set it to the agent
                     foreach ($resPopulationTypes as $resPopulationType) {
@@ -236,7 +236,7 @@ class SyncAgentCommand extends Command
                     }
                 } else {
                     if ($loggerMode === 'file') {
-                        $this->logger->info('- no population type', ['ws' => 'no', 'db' => 'SIHAM']);
+                        $this->logger->info('- no population type' . \str_repeat('&nbsp;', 7), ['ws' => 'no', 'db' => 'SIHAM']);
                     }
                 }
                 $agent->setCodePopulationType($codePopulationType);
