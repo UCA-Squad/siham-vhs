@@ -25,14 +25,15 @@
         CustomLog /var/www/siham-vhs/var/log/siham-vhs_access.log combined
     </VirtualHost>
 ```
+### Parameters
 > duplicate `.env` to `.env.local` and add your parameters,
 > and to `.env.test.local` to add sync with a test instance
-
+---
+### Tests
 > - `php bin/phpunit` _(execute into folder to test all)_
 > - `php bin/phpunit --testdox-html templates/tests/test.all.html > /dev/null` _(and create a render view)_
-
-> `sass --no-source-map --style=compressed assets/scss/main.css public/css/main.min.css` _(if you need to update main style)_
-
+---
+### Commands
 >- `php bin/console sync:structure`
 >- `php bin/console sync:agent --from-date=all` _(for a complete sync)_
 >- `php bin/console sync:agent --from-date=YYYY-MM-DD` _(for the last updated, today by default)_
@@ -41,3 +42,6 @@
 >- `php bin/console sync:geisha`
 > 
 > for each command, add `--logger=file` to display to the webview
+---
+### Style
+> `sass --no-source-map --style=compressed assets/scss/main.css public/css/main.min.css` _(if you need to update main style)_
