@@ -25,16 +25,19 @@
         CustomLog /var/www/siham-vhs/var/log/siham-vhs_access.log combined
     </VirtualHost>
 ```
-- composer dump-env prod
-> duplique le .env, modifier le fichier .env.local.php généré avec vos paramètres de connexion
-- php bin/phpunit 
-> à executer dans le répertoire de déploiement pour tester les services
-- php bin/phpunit --testdox-html templates/tests/test.all.html > /dev/null
-> à mettre en cron et rendre disponible à la racine de l'application
-- sass --no-source-map --style=compressed assets/scss/main.css public/css/main.min.css
-> if you need to update main style
+> duplicate `.env` to `.env.local` and add your parameters,
+> and to `.env.test.local` to add sync with a test instance
 
-- php bin/console sync:structure --logger=file _//console by default_
-- php bin/console sync:agent_--logger=file --from-date=_(all/date("Y-m-d"))_
-- php bin/console sync:ldap --logger=file
-- php bin/console sync:geisha --logger=file
+> - `php bin/phpunit` _(execute into folder to test all)_
+> - `php bin/phpunit --testdox-html templates/tests/test.all.html > /dev/null` _(and create a render view)_
+
+> `sass --no-source-map --style=compressed assets/scss/main.css public/css/main.min.css` _(if you need to update main style)_
+
+>- `php bin/console sync:structure`
+>- `php bin/console sync:agent --from-date=all` _(for a complete sync)_
+>- `php bin/console sync:agent --from-date=YYYY-MM-DD` _(for the last updated, today by default)_
+>- `php bin/console sync:agent --matricule=XXXXX` _(to update only one)_
+>- `php bin/console sync:ldap`
+>- `php bin/console sync:geisha`
+> 
+> for each command, add `--logger=file` to display to the webview
