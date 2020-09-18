@@ -56,11 +56,11 @@ class SyncAgentCommand extends Command
         $fromDate = $input->getOption('from-date');
         $matricules = $input->getOption('matricule');
         $startObservationDate = new \DateTime($fromDate!= 'all' ? $fromDate : null);
-        $endObservationDate = clone $startObservationDate;
-        $considerationDate = clone $startObservationDate;
-        $startObservationDate->modify('-1 day');
-        $endObservationDate->modify('+60 days'); // to include the future contracts
+        $startObservationDate->modify('-1 day');// to make a retrospective relaunch
+        $considerationDate = new \DateTime();
+        $endObservationDate = clone $considerationDate;
         $considerationDate->modify('+1 day'); // the sync is launched the evening
+        $endObservationDate->modify('+60 days'); // to include the future contracts
         $maxObservationDate = new \DateTime('2999-12-31'); // max date for SIHAM instead of empty or null when no end date ...
         $minObservationDate = new \DateTime('0001-01-01'); // an other date for SIHAM that mean empty or null when no end date ...
 
@@ -171,7 +171,7 @@ class SyncAgentCommand extends Command
 
                 #region Call SIHAM WS to get personal data
                 $startTempo = microtime(true);
-                $personalData = $dossierAgentWS->getPersonalData($agentSihamId, $startObservationDate->format('Y-m-d'), $endObservationDate->format('Y-m-d'));
+                $personalData = $dossierAgentWS->getPersonalData($agentSihamId, $considerationDate->format('Y-m-d'), $endObservationDate->format('Y-m-d'));
                 // exit if X timeout achieved
                 $duration = microtime(true) - $startTempo;
                 if ($duration > 30) {
@@ -201,7 +201,7 @@ class SyncAgentCommand extends Command
 
                 #region Call SIHAM WS to get administrative data
                 $startTempo = microtime(true);
-                $administrativeData = $dossierAgentWS->getAdministrativeData($agentSihamId, $startObservationDate->format('Y-m-d'), $maxObservationDate->format('Y-m-d'));
+                $administrativeData = $dossierAgentWS->getAdministrativeData($agentSihamId, $considerationDate->format('Y-m-d'), $maxObservationDate->format('Y-m-d'));
                 // exit if X timeout achieved
                 $duration = microtime(true) - $startTempo;
                 if ($duration > 30) {
@@ -241,7 +241,7 @@ class SyncAgentCommand extends Command
                 ORDER BY DTEF00';
                 $stmtSihamPopulationType = $connSiham->prepare($sqlSihamPopulationType);
                 $stmtSihamPopulationType->bindValue('matricule', $agent->getMatricule());
-                $stmtSihamPopulationType->bindValue('startObservationDate', $startObservationDate->format('Y-m-d'));
+                $stmtSihamPopulationType->bindValue('startObservationDate', $considerationDate->format('Y-m-d'));
                 $stmtSihamPopulationType->bindValue('endObservationDate', $endObservationDate->format('Y-m-d'));
                 $stmtSihamPopulationType->execute();
                 $resPopulationTypes = $stmtSihamPopulationType->fetchAll();
