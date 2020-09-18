@@ -8,6 +8,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 use App\Util\ListeAgentsWebService;
@@ -22,13 +24,15 @@ class SyncAgentCommand extends Command
     private $em;
     private $sihamEm;
     private $logger;
+    private $mailer;
 
-    public function __construct(ManagerRegistry $doctrine, LoggerInterface $logger)
+    public function __construct(ManagerRegistry $doctrine, LoggerInterface $logger, MailerInterface $mailer)
     {
         parent::__construct();
         $this->em = $doctrine->getManager();// siham_vhs by default;
         $this->sihamEm = $doctrine->getManager('siham');
         $this->logger = $logger;
+        $this->mailer = $mailer;
     }   
 
     protected function configure() {
@@ -63,6 +67,9 @@ class SyncAgentCommand extends Command
         $considerationDate->modify('+1 day'); // the sync is launched the evening
         $maxObservationDate = new \DateTime('2999-12-31'); // max date for SIHAM instead of empty or null when no end date ...
         $minObservationDate = new \DateTime('0001-01-01'); // an other date for SIHAM that mean empty or null when no end date ...
+
+        $emailSIContent = null;
+        $emailRHContent = null;
 
         $connSiham = $this->sihamEm->getConnection();
 
@@ -103,6 +110,12 @@ class SyncAgentCommand extends Command
                 } else {
                     $io->error('No response from WebService');
                 }
+                
+                $emailSIContent.= 'Le webservice <i>ListeAgentsWebService</i> avec la méthode <b>' . ($fromDate === 'all'? 'recupListeAgents' : 'recupAgentsModifies') . '</b> n\'a rien retourné'; 
+                $emailRHContent.= 'Aucun agent n\'a pu être récupéré';
+                if (!empty($emailSIContent)) $this->sendSIEmail($emailSIContent);
+                if (!empty($emailRHContent)) $this->sendRHEmail($emailRHContent);
+
                 return 0;
             }
 
@@ -178,6 +191,10 @@ class SyncAgentCommand extends Command
                     $this->logger->warning('Timeout exceeded 30s', ['ws' => 'DossierAgentWebService', 'method' => 'recupDonneesAdministratives', 'cause' => 'timeout', 'duration' => number_format($duration, 3) . 's']);
                     if ($try > 0) {
                         $this->logger->error('Sync agent interrupt', ['cause' => $try .' attempt(s) achieved']);
+
+                        if (!empty($emailSIContent)) $this->sendSIEmail($emailSIContent);
+                        if (!empty($emailRHContent)) $this->sendRHEmail($emailRHContent);
+
                         return 0;
                     }
                     $try++;
@@ -204,10 +221,15 @@ class SyncAgentCommand extends Command
                 $administrativeData = $dossierAgentWS->getAdministrativeData($agentSihamId, $startObservationDate->format('Y-m-d'), $maxObservationDate->format('Y-m-d'));
                 // exit if X timeout achieved
                 $duration = microtime(true) - $startTempo;
-                if ($duration > 30) {
+                if ($duration > .030) {
                     $this->logger->warning('Timeout exceeded 30s', ['ws' => 'DossierAgentWebService', 'method' => 'recupDonneesAdministratives', 'cause' => 'timeout', 'duration' => number_format($duration, 3) . 's']);
+                    $this->sendEmail('Timeout exceeded for <b>' . $agentSihamId . '</b> with the webservice <i>DossierAgentWebService</i> and the method <i>recupDonneesAdministratives</i>');
                     if ($try > 0) {
                         $this->logger->error('Sync agent interrupt', ['cause' => $try .' attempt(s) achieved']);
+
+                        if (!empty($emailSIContent)) $this->sendSIEmail($emailSIContent);
+                        if (!empty($emailRHContent)) $this->sendRHEmail($emailRHContent);
+
                         return 0;
                     }
                     $try++;
@@ -301,7 +323,30 @@ class SyncAgentCommand extends Command
             }
         }
         
+        if (!empty($emailSIContent)) $this->sendSIEmail($emailSIContent);
+        if (!empty($emailRHContent)) $this->sendRHEmail($emailRHContent);
         
         return 0;
+    }
+
+    public function sendSIEmail($content, $html = true) {
+        $cc = ['fabrice.monseigne@uca.fr'];
+        $subject = '[SIHAM] VHS - Rapport technique';
+        $this->sendEmail($cc, $subject, $content, $html);
+    }
+    public function sendRHEmail($content, $html = true) {
+        $cc = ['fabrice.monseigne@uca.fr'];
+        $subject = '[SIHAM] VHS - Rapport des anomalies';
+        $this->sendEmail($cc, $subject, $content, $html);
+    }
+    public function sendEmail($cc, $subject, $content, $html = true) {
+        $email = (new Email())
+            ->from('vhs-noreply@uca.fr')
+            ->cc(\implode(',', $cc))
+            ->subject($subject);
+        if ($html) $email->html( $content);
+        else $email->text($content);
+
+        $this->mailer->send($email);
     }
 }
