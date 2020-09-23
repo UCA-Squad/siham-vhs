@@ -60,11 +60,11 @@ class SyncAgentCommand extends Command
         $fromDate = $input->getOption('from-date');
         $matricules = $input->getOption('matricule');
         $startObservationDate = new \DateTime($fromDate!= 'all' ? $fromDate : null);
-        $endObservationDate = clone $startObservationDate;
-        $considerationDate = clone $startObservationDate;
-        $startObservationDate->modify('-1 day');
-        $endObservationDate->modify('+60 days'); // to include the future contracts
+        $startObservationDate->modify('-1 day');// to make a retrospective relaunch
+        $considerationDate = new \DateTime();
+        $endObservationDate = clone $considerationDate;
         $considerationDate->modify('+1 day'); // the sync is launched the evening
+        $endObservationDate->modify('+60 days'); // to include the future contracts
         $maxObservationDate = new \DateTime('2999-12-31'); // max date for SIHAM instead of empty or null when no end date ...
         $minObservationDate = new \DateTime('0001-01-01'); // an other date for SIHAM that mean empty or null when no end date ...
 
@@ -111,8 +111,8 @@ class SyncAgentCommand extends Command
                     $io->error('No response from WebService');
                 }
                 
-                $emailSIContent.= 'Le webservice <i>ListeAgentsWebService</i> avec la méthode <b>' . ($fromDate === 'all'? 'recupListeAgents' : 'recupAgentsModifies') . '</b> n\'a rien retourné'; 
-                $emailRHContent.= 'Aucun agent n\'a pu être récupéré';
+                $emailSIContent.= 'Le webservice <i>ListeAgentsWebService</i> avec la méthode <b>' . ($fromDate === 'all' ? 'recupListeAgents' : 'recupAgentsModifies') . '</b> n\'a rien retourné'; 
+                $emailRHContent.= 'Aucun agent ' . ($fromDate === 'all' ? null : ('modifié le ' . $fromDate)) . ' n\'a pu être récupéré';
                 if (!empty($emailSIContent)) $this->sendSIEmail($emailSIContent);
                 if (!empty($emailRHContent)) $this->sendRHEmail($emailRHContent);
 
@@ -166,8 +166,13 @@ class SyncAgentCommand extends Command
                 // starts and displays the progress bar
                 $progressBar->start();
             }
-            $counterTempo = 1;
-            $try = 0;
+            // $counterTempo = 1;
+            $try = 1;
+            $tryMax = 2;
+            $maxDuration = 30;    // seconds
+            $sleepTimeoutDuration = 60 * 5;// seconds
+            $sleepCounterDuration = 30; // seconds
+            $listProcessedAgents = [];
             foreach($listAgents as $agentSihamId) {
                 // retrieve agent
                 $agent = $this->em->getRepository(Agent::class)->findOneByMatricule($agentSihamId);
@@ -184,33 +189,39 @@ class SyncAgentCommand extends Command
 
                 #region Call SIHAM WS to get personal data
                 $startTempo = microtime(true);
-                $personalData = $dossierAgentWS->getPersonalData($agentSihamId, $startObservationDate->format('Y-m-d'), $endObservationDate->format('Y-m-d'));
+                $personalData = $dossierAgentWS->getPersonalData($agentSihamId, $considerationDate->format('Y-m-d'), $endObservationDate->format('Y-m-d'));
                 // exit if X timeout achieved
                 $duration = microtime(true) - $startTempo;
-                if ($duration > 30) {
-                    $this->logger->warning('Timeout exceeded 30s', ['ws' => 'DossierAgentWebService', 'method' => 'recupDonneesAdministratives', 'cause' => 'timeout', 'duration' => number_format($duration, 3) . 's']);
-                    if ($try > 0) {
-                        $this->logger->error('Sync agent interrupt', ['cause' => $try .' attempt(s) achieved']);
+                if ($duration > $maxDuration) {
+                    $this->logger->warning('Duration exceeded by ' . $maxDuration . 's', ['ws' => 'DossierAgentWebService', 'method' => 'recupDonneesPersonnelles', 'cause' => 'timeout', 'duration' => number_format($duration, 3) . 's']);
+                    if ($try > $tryMax) {
+                        $this->logger->error('Sync agent interrupt', ['cause' => $try .' timeout achieved']);
 
+                        $listUnprocessedAgents = \array_diff($listAgents, $listProcessedAgents);
+                        $emailSIContent.= 'La synchronisation des agents a été arrêté après <b>' . $try . '</b> tentatives de pause de <b>' . $sleepTimeoutDuration . 's</b> suite a des <i>timeout</i> ou des temps de récupération dépassant les <b>' . $maxDuration . 's</b>'; 
+                        $emailRHContent.= 'La synchronisation des agents s\'est arrêtée suite a des temps de réponse trop long des webservices.<br>';
+                        $emailRHContent.= '<b>' . count($listUnprocessedAgents) . '</b>/' . count($listAgents) . ' matricules n\'ont pas été traités:<br>';
+                        $emailRHContent.= \implode('<br>', $listUnprocessedAgents) . '<br>';
                         if (!empty($emailSIContent)) $this->sendSIEmail($emailSIContent);
                         if (!empty($emailRHContent)) $this->sendRHEmail($emailRHContent);
-
                         return 0;
                     }
+                    $this->logger->info('Have a break for ' . $sleepTimeoutDuration . 's ...', ['cause' => $try . ' attempts achieved']);
+                    \sleep($sleepTimeoutDuration);
                     $try++;
-                    \sleep(60 * 5);
-                }
-                // set data if returned
-                if (isset($personalData->return)) {
-                    $agent->addPersonalData($personalData->return);
-                    if ($loggerMode === 'file') {
-                        $this->logger->info('- receive personal data' . \str_repeat('&nbsp;', 6), ['duration' => number_format(microtime(true) - $startTempo, 3) . 's']);
-                    }
                 } else {
-                    if ($loggerMode === 'file') {
-                        $this->logger->warning('- no personal data' . \str_repeat('&nbsp;', 6), ['ws' => 'DossierAgentWebService', 'method' => 'recupDonneesPersonnelles', 'cause' => 'empty response']);
+                    // set data if returned
+                    if (isset($personalData->return)) {
+                        $agent->addPersonalData($personalData->return);
+                        if ($loggerMode === 'file') {
+                            $this->logger->info('- receive personal data' . \str_repeat('&nbsp;', 6), ['duration' => number_format(microtime(true) - $startTempo, 3) . 's']);
+                        }
                     } else {
-                        $io->warning('No personal data for ' . $agentSihamId);
+                        if ($loggerMode === 'file') {
+                            $this->logger->warning('- no personal data' . \str_repeat('&nbsp;', 6), ['ws' => 'DossierAgentWebService', 'method' => 'recupDonneesPersonnelles', 'cause' => 'empty response']);
+                        } else {
+                            $io->warning('No personal data for ' . $agentSihamId);
+                        }
                     }
                 }
                 #endregion
@@ -218,34 +229,39 @@ class SyncAgentCommand extends Command
 
                 #region Call SIHAM WS to get administrative data
                 $startTempo = microtime(true);
-                $administrativeData = $dossierAgentWS->getAdministrativeData($agentSihamId, $startObservationDate->format('Y-m-d'), $maxObservationDate->format('Y-m-d'));
+                $administrativeData = $dossierAgentWS->getAdministrativeData($agentSihamId, $considerationDate->format('Y-m-d'), $maxObservationDate->format('Y-m-d'));
                 // exit if X timeout achieved
                 $duration = microtime(true) - $startTempo;
-                if ($duration > .030) {
-                    $this->logger->warning('Timeout exceeded 30s', ['ws' => 'DossierAgentWebService', 'method' => 'recupDonneesAdministratives', 'cause' => 'timeout', 'duration' => number_format($duration, 3) . 's']);
-                    $this->sendEmail('Timeout exceeded for <b>' . $agentSihamId . '</b> with the webservice <i>DossierAgentWebService</i> and the method <i>recupDonneesAdministratives</i>');
-                    if ($try > 0) {
-                        $this->logger->error('Sync agent interrupt', ['cause' => $try .' attempt(s) achieved']);
+                if ($duration > $maxDuration) {
+                    $this->logger->warning('Duration exceeded by ' . $maxDuration . 's', ['ws' => 'DossierAgentWebService', 'method' => 'recupDonneesAdministratives', 'cause' => 'timeout', 'duration' => number_format($duration, 3) . 's']);
+                    if ($try > $tryMax) {
+                        $this->logger->error('Sync agent interrupt', ['cause' => $try .' timeout achieved']);
 
+                        $listUnprocessedAgents = \array_diff($listAgents, $listProcessedAgents);
+                        $emailSIContent.= 'La synchronisation des agents a été arrêté après <b>' . $try . '</b> tentatives de pause de <b>' . $sleepTimeoutDuration . 's</b> suite a des <i>timeout</i> ou des temps de récupération dépassant les <b>' . $maxDuration . 's</b>'; 
+                        $emailRHContent.= 'La synchronisation des agents s\'est arrêtée suite a des temps de réponse trop long des webservices.<br>';
+                        $emailRHContent.= '<b>' . count($listUnprocessedAgents) . '</b>/' . count($listAgents) . ' matricules n\'ont pas été traités:<br>';
+                        $emailRHContent.= \implode('<br>', $listUnprocessedAgents) . '<br>';
                         if (!empty($emailSIContent)) $this->sendSIEmail($emailSIContent);
                         if (!empty($emailRHContent)) $this->sendRHEmail($emailRHContent);
-
                         return 0;
                     }
+                    $this->logger->info('Have a break for ' . $sleepTimeoutDuration . 's ...', ['cause' => $try . ' attempts achieved']);
+                    \sleep($sleepTimeoutDuration);
                     $try++;
-                    \sleep(60 * 5);
-                }
-                // set data if returned
-                if (isset($administrativeData->return)) {
-                    $agent->addAdministrativeData($administrativeData->return, $considerationDate, $endObservationDate);
-                    if ($loggerMode === 'file') {
-                        $this->logger->info('- receive administrative data', ['duration' => number_format($duration, 3) . 's']);
-                    }
                 } else {
-                    if ($loggerMode === 'file') {
-                        $this->logger->warning('- no administrative data', ['ws' => 'DossierAgentWebService', 'method' => 'recupDonneesAdministratives', 'cause' => 'empty response']);
+                    // set data if returned
+                    if (isset($administrativeData->return)) {
+                        $agent->addAdministrativeData($administrativeData->return, $considerationDate, $endObservationDate);
+                        if ($loggerMode === 'file') {
+                            $this->logger->info('- receive administrative data', ['duration' => number_format($duration, 3) . 's']);
+                        }
                     } else {
-                        $io->warning('No administrative data for' . $agentSihamId);
+                        if ($loggerMode === 'file') {
+                            $this->logger->warning('- no administrative data', ['ws' => 'DossierAgentWebService', 'method' => 'recupDonneesAdministratives', 'cause' => 'empty response']);
+                        } else {
+                            $io->warning('No administrative data for' . $agentSihamId);
+                        }
                     }
                 }
                 #endregion
@@ -263,7 +279,7 @@ class SyncAgentCommand extends Command
                 ORDER BY DTEF00';
                 $stmtSihamPopulationType = $connSiham->prepare($sqlSihamPopulationType);
                 $stmtSihamPopulationType->bindValue('matricule', $agent->getMatricule());
-                $stmtSihamPopulationType->bindValue('startObservationDate', $startObservationDate->format('Y-m-d'));
+                $stmtSihamPopulationType->bindValue('startObservationDate', $considerationDate->format('Y-m-d'));
                 $stmtSihamPopulationType->bindValue('endObservationDate', $endObservationDate->format('Y-m-d'));
                 $stmtSihamPopulationType->execute();
                 $resPopulationTypes = $stmtSihamPopulationType->fetchAll();
@@ -294,6 +310,7 @@ class SyncAgentCommand extends Command
                 // Save it
                 $this->em->persist($agent);
                 $this->em->flush();
+                $listProcessedAgents[] = $agentSihamId;
     
                 if ($loggerMode !== 'file') {
                     // advances the progress bar 1 unit
@@ -302,8 +319,16 @@ class SyncAgentCommand extends Command
 
                 // Take a break for webservice :-( 
                 // Temporally disable since VM up memory to 6Go
-                if ($counterTempo++ % 250 == 0) \sleep(15);
-                if ($counterTempo++ % 1000 == 0) \sleep(30);
+                $counterTempo = count($listProcessedAgents);
+                if ($counterTempo % 200 == 0) {
+                    if ($counterTempo % 1000 == 0) {
+                        $this->logger->info('Have a break for ' . $sleepCounterDuration * 2 . 's ...', ['cause' => $counterTempo . ' agents achieved']);
+                        \sleep($sleepCounterDuration * 2);
+                    } else {
+                        $this->logger->info('Have a break for ' . $sleepCounterDuration . 's ...', ['cause' => $counterTempo . ' agents achieved']);
+                        \sleep($sleepCounterDuration);
+                    }
+                }
             }
 
             $duration = microtime(true) - $start;
