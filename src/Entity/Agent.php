@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Agent
  *
  * @ORM\Table(name="agent", uniqueConstraints={@ORM\UniqueConstraint(name="matricule_UNIQUE", columns={"matricule"})})
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\AgentRepository")
  * @ORM\HasLifecycleCallbacks()
  */
 class Agent {
