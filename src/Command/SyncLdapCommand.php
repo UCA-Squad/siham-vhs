@@ -23,16 +23,14 @@ class SyncLdapCommand extends Command
     private $logger;
     private $project_dir;
 
-    public function __construct(EntityManagerInterface $em, LoggerInterface $logger, $project_dir)
-    {
+    public function __construct(EntityManagerInterface $em, LoggerInterface $logger, $project_dir) {
         parent::__construct();
         $this->em = $em;
         $this->logger = $logger;
         $this->project_dir = $project_dir;
     }   
 
-    protected function configure()
-    {
+    protected function configure() {
         $this
         // configure an argument
         ->addOption('logger', null, InputOption::VALUE_OPTIONAL, 'The logger mode: "console" (by default) or "file".', 'console')
@@ -43,11 +41,10 @@ class SyncLdapCommand extends Command
         // the full command description shown when running the command with
         // the "--help" option
         ->setHelp('This command allows you to export users attributes to SIHAM...')
-    ;
+        ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
+    protected function execute(InputInterface $input, OutputInterface $output) {
         $start = time();
         ini_set('default_socket_timeout', 300);
 
@@ -91,21 +88,22 @@ class SyncLdapCommand extends Command
                 }
                 
                 // For each attribute set if different and call webservice to write
-                if ($agent->getBadge() != $detailAgent['badge']) {
+                if (trim($agent->getBadge()) != trim($detailAgent['badge'])) {
                     $agent->setBadge($detailAgent['badge']);
 
                     if ($loggerMode === 'file') $this->logger->info('- Update badge', ['badge' => $detailAgent['badge']]);
                 }
-                if ($agent->getUsername() != $detailAgent['username']) {
+                if (trim($agent->getUsername()) != trim($detailAgent['username'])) {
                     $agent->setUsername($detailAgent['username']);
 
                     if ($loggerMode === 'file') $this->logger->info('- Update username', ['username' => $detailAgent['username']]);
                 }
-                if ($agent->getTelephonePro() != $detailAgent['telephonePro']) {
+                if (trim($agent->getTelephonePro()) != trim($detailAgent['telephonePro'])) {
                     
                     $action = empty($detailAgent['telephonePro']) ? 'Remove' : (empty($agent->getTelephonePro()) ? 'Add' : 'Update');
                     if ($loggerMode === 'file') $this->logger->info('- ' . $action . ' (VHS and SIHAM) phone pro',  ['TPR' => $detailAgent['telephonePro']]);
                     
+                    $personalData = false;
                     if ($action == 'Remove')    $personalData = $dossierAgentWS->removePhonePro($detailAgent['matricule']);
                     else if ($action == 'Add')  $personalData = $dossierAgentWS->addPhonePro($detailAgent['matricule'], $detailAgent['telephonePro']);
                     else                        $personalData = $dossierAgentWS->updatePhonePro($detailAgent['matricule'], $detailAgent['telephonePro']);
@@ -116,11 +114,12 @@ class SyncLdapCommand extends Command
                         $this->logger->warning('Cannot be saved by WS',  ['ws' => 'DossierAgentWebService', 'method' => 'modifDonneesPersonnelles','cause' => 'no response OR failed update']);
                     }
                 }
-                if ($agent->getMailPro() != $detailAgent['mailPro']) {
+                if (trim($agent->getMailPro()) != trim($detailAgent['mailPro'])) {
                     
                     $action = empty($detailAgent['mailPro']) ? 'Remove' : (empty($agent->getMailPro()) ? 'Add' : 'Update');
                     if ($loggerMode === 'file') $this->logger->info('- ' . $action . ' (VHS and SIHAM) email pro',  ['MPR' => $detailAgent['mailPro']]);
                     
+                    $personalData = false;
                     if ($action == 'Remove')    $personalData = $dossierAgentWS->removeEmailPro($detailAgent['matricule']);
                     else if ($action == 'Add')  $personalData = $dossierAgentWS->addEmailPro($detailAgent['matricule'], $detailAgent['mailPro']);
                     else                        $personalData = $dossierAgentWS->updateEmailPro($detailAgent['matricule'], $detailAgent['mailPro']);
@@ -131,11 +130,12 @@ class SyncLdapCommand extends Command
                         $this->logger->warning('Cannot be saved by WS',  ['ws' => 'DossierAgentWebService', 'method' => 'modifDonneesPersonnelles','cause' => 'no response OR failed update']);
                     }
                 }
-                if ($agent->getMailPerso() != $detailAgent['mailPerso']) {
+                if (trim($agent->getMailPerso()) != trim($detailAgent['mailPerso'])) {
                     
                     $action = empty($detailAgent['mailPerso']) ? 'Remove' : (empty($agent->getMailPerso()) ? 'Add' : 'Update');
                     if ($loggerMode === 'file') $this->logger->info('- ' . $action . ' (VHS and SIHAM) email perso',  ['MPE' => $detailAgent['mailPerso']]);
                     
+                    $personalData = false;
                     if ($action == 'Remove')    $personalData = $dossierAgentWS->removeEmailPerso($detailAgent['matricule']);
                     else if ($action == 'Add')  $personalData = $dossierAgentWS->addEmailPerso($detailAgent['matricule'], $detailAgent['mailPerso']);
                     else                        $personalData = $dossierAgentWS->updateEmailPerso($detailAgent['matricule'], $detailAgent['mailPerso']);
