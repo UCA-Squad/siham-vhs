@@ -19,15 +19,13 @@ class CheckAnomalyCommand extends Command
     private $em;
     private $mailer;
 
-    public function __construct(EntityManagerInterface $em, MailerInterface $mailer)
-    {
+    public function __construct(EntityManagerInterface $em, MailerInterface $mailer) {
         parent::__construct();
         $this->em = $em;
         $this->mailer = $mailer;
     }   
 
-    protected function configure()
-    {
+    protected function configure() {
         $this
         // the short description shown while running "php bin/console list"
         ->setDescription('Anomy detections for many use cases.')
@@ -35,7 +33,7 @@ class CheckAnomalyCommand extends Command
         // the full command description shown when running the command with
         // the "--help" option
         ->setHelp('This command check if agent have HIE and not FUN, double HIE, FUN and not HIE, no ADR.')
-    ;
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -52,8 +50,9 @@ class CheckAnomalyCommand extends Command
         $io->writeln('== Agent(s) with double HIE ==');
         $agentsWithManyHIE = $this->em->getRepository(Agent::class)->findAllWithManyHIE();
         if ($agentsWithManyHIE) {
-            $io->writeln(\sprintf('<info>%s</info> agents found', count($agentsWithManyHIE)));
-            $emailContent.= '== Agent(s) avec plusieurs affectations HIE ==' . "\n";
+            $nbAgents = count($agentsWithManyHIE);
+            $io->writeln(\sprintf('<info>%s</info> agents found', $nbAgents));
+            $emailContent.= '== ' . $nbAgents . ' agent(s) avec plusieurs affectations HIE ==' . "\n";
             foreach ($agentsWithManyHIE as $agentWithManyHIE) {
                 $display = '- ' . $agentWithManyHIE->getMatricule() . ' - ' . $this->addSpaces($agentWithManyHIE->getNomPatronymique(), 20) . ' - ' . $this->addSpaces($agentWithManyHIE->getPrenom(), 20)
                     . ' - ' . $this->addSpaces($agentWithManyHIE->getCodeUOAffectationsHIE(), 25)
@@ -72,8 +71,9 @@ class CheckAnomalyCommand extends Command
         $io->writeln('== Agent(s) with HIE and no FUN ==');
         $agentsWithHIEAndNoFUN = $this->em->getRepository(Agent::class)->findAllWithHIEAndNoFUN();
         if ($agentsWithHIEAndNoFUN) {
-            $io->writeln(\sprintf('<info>%s</info> agents found', count($agentsWithHIEAndNoFUN)));
-            $emailContent.= '== Agent(s) avec une affectation HIE mais aucune affectation FUN ==' . "\n";
+            $nbAgents = count($agentsWithHIEAndNoFUN);
+            $io->writeln(\sprintf('<info>%s</info> agents found', $nbAgents));
+            $emailContent.= '== ' . $nbAgents . ' agent(s) avec une affectation HIE mais aucune affectation FUN ==' . "\n";
             foreach ($agentsWithHIEAndNoFUN as $agentWithHIEAndNoFUN) {
                 $display = '- ' . $agentWithHIEAndNoFUN->getMatricule() . ' - ' . $this->addSpaces($agentWithHIEAndNoFUN->getNomPatronymique(), 20) . ' - ' . $this->addSpaces($agentWithHIEAndNoFUN->getPrenom(), 20)
                     . ' - ' . $this->addSpaces($agentWithHIEAndNoFUN->getCodeUOAffectationsHIE(), 25)
@@ -93,8 +93,9 @@ class CheckAnomalyCommand extends Command
         $io->writeln('== Agent(s) with HIE and no ADR ==');
         $agentsWithHIEAndNoADR = $this->em->getRepository(Agent::class)->findAllWithHIEAndNoADR();
         if ($agentsWithHIEAndNoADR) {
-            $io->writeln(\sprintf('<info>%s</info> agents found', count($agentsWithHIEAndNoADR)));
-            $emailContent.= '== Agent(s) avec une affectation HIE mais aucune affectation ADR ==' . "\n";
+            $nbAgents = count($agentsWithHIEAndNoADR);
+            $io->writeln(\sprintf('<info>%s</info> agents found', $nbAgents));
+            $emailContent.= '== ' . $nbAgents . ' agent(s) avec une affectation HIE mais aucune affectation ADR (hors Hébergés et Extérieurs) ==' . "\n";
             foreach ($agentsWithHIEAndNoADR as $agentWithHIEAndNoADR) {
                 $display = '- ' . $agentWithHIEAndNoADR->getMatricule() . ' - ' . $this->addSpaces($agentWithHIEAndNoADR->getNomPatronymique(), 20) . ' - ' . $this->addSpaces($agentWithHIEAndNoADR->getPrenom(), 20)
                     . ' - ' . $this->addSpaces($agentWithHIEAndNoADR->getCodeUOAffectationsHIE(), 25)
@@ -114,8 +115,9 @@ class CheckAnomalyCommand extends Command
         $io->writeln('== Agent(s) with FUN and no HIE ==');
         $agentsWithFUNAndNoHIE = $this->em->getRepository(Agent::class)->findAllWithFUNAndNoHIE();
         if ($agentsWithFUNAndNoHIE) {
-            $io->writeln(\sprintf('<info>%s</info> agents found', count($agentsWithFUNAndNoHIE)));
-            $emailContent.= '== Agent(s) avec une affectation HIE mais aucune affectation FUN ==' . "\n";
+            $nbAgents = count($agentsWithFUNAndNoHIE);
+            $io->writeln(\sprintf('<info>%s</info> agents found', $nbAgents));
+            $emailContent.= '== ' . $nbAgents . ' agent(s) avec une affectation HIE mais aucune affectation FUN ==' . "\n";
             foreach ($agentsWithFUNAndNoHIE as $agentWithFUNAndNoHIE) {
                 $display = '- ' . $agentWithFUNAndNoHIE->getMatricule() . ' - ' . $this->addSpaces($agentWithFUNAndNoHIE->getNomPatronymique(), 20) . ' - ' . $this->addSpaces($agentWithFUNAndNoHIE->getPrenom(), 20)
                     . ' - ' . $this->addSpaces($agentWithFUNAndNoHIE->getCodeUOAffectationsHIE(), 25)
@@ -131,7 +133,30 @@ class CheckAnomalyCommand extends Command
         $io->newLine();
         #endregion
 
-        
+        #region Agent with generic values
+        $io->writeln('== Agent(s) with generic values ==');
+        $agentsWithGenericValues = $this->em->getRepository(Agent::class)->findAllWithGenericValues();
+        if ($agentsWithGenericValues) {
+            $nbAgents = count($agentsWithGenericValues);
+            $io->writeln(\sprintf('<info>%s</info> agents found', $nbAgents));
+            $emailContent.= '== ' . $nbAgents . ' agent(s) avec des valeurs génériques ==' . "\n";
+            foreach ($agentsWithGenericValues as $agentWithGenericValues) {
+                $display = '- ' . $agentWithGenericValues->getMatricule() . ' - ' . $this->addSpaces($agentWithGenericValues->getNomPatronymique(), 20) . ' - ' . $this->addSpaces($agentWithGenericValues->getPrenom(), 20)
+                    . ' - ' . $this->addSpaces($agentWithGenericValues->getCodeUOAffectationsHIE(), 25)
+                    . ' - ' . $this->addSpaces($agentWithGenericValues->getCodeUOAffectationsFUN(), 25)
+                    . ' - ' . $this->addSpaces($agentWithGenericValues->getCodePosteAffectation(), 10)
+                    . ' - ' . $this->addSpaces($agentWithGenericValues->getCodeEmploiAffectation(), 10)
+                    . ' - ' . $this->addSpaces($agentWithGenericValues->getCodePopulationType(), 5)
+                ;
+                $io->writeln($display);
+                $emailContent.= $display . "\n";
+            }
+            $emailContent.= "\n";
+        } else {
+            $io->writeln('no agent');
+        }
+        $io->newLine();
+        #endregion
 
     
                 
@@ -140,8 +165,9 @@ class CheckAnomalyCommand extends Command
         if (!empty($emailContent)) {
             $email = (new Email())
                 ->from('vhs-noreply@uca.fr')
-                ->cc(\implode(',', ['fabrice.monseigne@uca.fr']))
-                ->subject('[SIHAM] VHS - Rapport des anomalies')
+                ->to(...['sandrine.perrette@uca.fr'])
+                ->cc(...['fabrice.monseigne@uca.fr'])
+                ->subject('[SIHAM] VHS - Détection des anomalies')
                 ->text($emailContent);
     
             $this->mailer->send($email);

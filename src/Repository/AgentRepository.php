@@ -62,6 +62,8 @@ class AgentRepository extends ServiceEntityRepository
             FROM App\Entity\Agent a
             WHERE (a.codeUOAffectationsADR IS NULL OR a.codeUOAffectationsADR = \'\')
             AND a.codeUOAffectationsHIE IS NOT NULL AND a.codeUOAffectationsHIE != \'\'
+            AND a.codePIP NOT LIKE \'%HB%\'
+            AND a.codeCategoryPopulationType <> 5
             ORDER BY a.lastUpdate DESC, a.id'
         );
         
@@ -81,6 +83,28 @@ class AgentRepository extends ServiceEntityRepository
             FROM App\Entity\Agent a
             WHERE (a.codeUOAffectationsHIE IS NULL OR a.codeUOAffectationsHIE = \'\')
             AND a.codeUOAffectationsFUN IS NOT NULL AND a.codeUOAffectationsFUN != \'\'
+            ORDER BY a.lastUpdate DESC, a.id'
+        );
+
+        // returns an array of Product objects
+        return $query->getResult();
+    }
+
+    /**
+     * @return Agent[]
+     */
+    public function findAllWithGenericValues()
+    {
+        $entityManager = $this->getEntityManager();
+
+        $query = $entityManager->createQuery(
+            'SELECT a
+            FROM App\Entity\Agent a
+            WHERE a.codeUOAffectationsHIE LIKE \'%UO_REP%\'
+            OR a.codeUOAffectationsFUN LIKE \'%UO_REP%\'
+            OR a.codePosteAffectation LIKE \'%POSTE_REP%\'
+            OR a.codeEmploiAffectation LIKE \'%EMP_REP%\'
+            OR a.codePopulationType = \'00000\'
             ORDER BY a.lastUpdate DESC, a.id'
         );
 
