@@ -291,7 +291,8 @@ class SyncAgentCommand extends Command
                     foreach ($resPopulationTypes as $resPopulationType) {
                         $startPopulationTypeDate = new \DateTime(\substr($resPopulationType['DTEF00'],0,10));
                         $endPopulationTypeDate = new \DateTime(\substr($resPopulationType['DATXXX'],0,10));
-                        if ($considerationDate >= $startPopulationTypeDate && $considerationDate <= $endPopulationTypeDate) {
+                        if (($considerationDate >= $startPopulationTypeDate && $considerationDate <= $endPopulationTypeDate) 
+                        || (!empty($agent->getDateDebutAffectationsHIE()) && $agent->getDateDebutAffectationsHIE() >= $startPopulationTypeDate)) {
                             $codePopulationType = $resPopulationType['POPULA'];
                             $codeCategoryPopulationType = $resPopulationType['CATEGO'];
                             $codeSubPopulationType = $resPopulationType['SSCATE'];
