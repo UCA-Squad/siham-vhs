@@ -22,12 +22,14 @@ class SyncLdapCommand extends Command
     private $em;
     private $logger;
     private $project_dir;
+    private $dossierAgentWS;
 
     public function __construct(EntityManagerInterface $em, LoggerInterface $logger, $project_dir) {
         parent::__construct();
         $this->em = $em;
         $this->logger = $logger;
         $this->project_dir = $project_dir;
+        $this->dossierAgentWS = new DossierAgentWebService();
     }   
 
     protected function configure() {
@@ -72,8 +74,6 @@ class SyncLdapCommand extends Command
                 $progressBar->start();
             }
 
-            $dossierAgentWS = new DossierAgentWebService();
-
             $fields = ['matricule', 'telephonePro', 'uselessPhone', 'mailPro', 'username', 'status', 'badge', 'mailPerso', 'uselessEndLine'];
             foreach($rows as $row) {
                 $detailAgent = array_combine($fields, explode(';', $row));
@@ -98,54 +98,9 @@ class SyncLdapCommand extends Command
 
                     if ($loggerMode === 'file') $this->logger->info('- Update username', ['username' => $detailAgent['username']]);
                 }
-                if (trim($agent->getTelephonePro()) != trim($detailAgent['telephonePro'])) {
-                    
-                    $action = empty($detailAgent['telephonePro']) ? 'Remove' : (empty($agent->getTelephonePro()) ? 'Add' : 'Update');
-                    if ($loggerMode === 'file') $this->logger->info('- ' . $action . ' (VHS and SIHAM) phone pro',  ['TPR' => $detailAgent['telephonePro']]);
-                    
-                    $personalData = false;
-                    if ($action == 'Remove')    $personalData = $dossierAgentWS->removePhonePro($detailAgent['matricule']);
-                    else if ($action == 'Add')  $personalData = $dossierAgentWS->addPhonePro($detailAgent['matricule'], $detailAgent['telephonePro']);
-                    else                        $personalData = $dossierAgentWS->updatePhonePro($detailAgent['matricule'], $detailAgent['telephonePro']);
-                    
-                    if ($personalData) {
-                        $agent->setTelephonePro($detailAgent['telephonePro']);
-                    } else if ($loggerMode === 'file') {
-                        $this->logger->warning('Cannot be saved by WS',  ['ws' => 'DossierAgentWebService', 'method' => 'modifDonneesPersonnelles','cause' => 'no response OR failed update']);
-                    }
-                }
-                if (trim($agent->getMailPro()) != trim($detailAgent['mailPro'])) {
-                    
-                    $action = empty($detailAgent['mailPro']) ? 'Remove' : (empty($agent->getMailPro()) ? 'Add' : 'Update');
-                    if ($loggerMode === 'file') $this->logger->info('- ' . $action . ' (VHS and SIHAM) email pro',  ['MPR' => $detailAgent['mailPro']]);
-                    
-                    $personalData = false;
-                    if ($action == 'Remove')    $personalData = $dossierAgentWS->removeEmailPro($detailAgent['matricule']);
-                    else if ($action == 'Add')  $personalData = $dossierAgentWS->addEmailPro($detailAgent['matricule'], $detailAgent['mailPro']);
-                    else                        $personalData = $dossierAgentWS->updateEmailPro($detailAgent['matricule'], $detailAgent['mailPro']);
-                    
-                    if ($personalData) {
-                        $agent->setMailPro($detailAgent['mailPro']);
-                    } else if ($loggerMode === 'file') {
-                        $this->logger->warning('Cannot be saved by WS',  ['ws' => 'DossierAgentWebService', 'method' => 'modifDonneesPersonnelles','cause' => 'no response OR failed update']);
-                    }
-                }
-                if (trim($agent->getMailPerso()) != trim($detailAgent['mailPerso'])) {
-                    
-                    $action = empty($detailAgent['mailPerso']) ? 'Remove' : (empty($agent->getMailPerso()) ? 'Add' : 'Update');
-                    if ($loggerMode === 'file') $this->logger->info('- ' . $action . ' (VHS and SIHAM) email perso',  ['MPE' => $detailAgent['mailPerso']]);
-                    
-                    $personalData = false;
-                    if ($action == 'Remove')    $personalData = $dossierAgentWS->removeEmailPerso($detailAgent['matricule']);
-                    else if ($action == 'Add')  $personalData = $dossierAgentWS->addEmailPerso($detailAgent['matricule'], $detailAgent['mailPerso']);
-                    else                        $personalData = $dossierAgentWS->updateEmailPerso($detailAgent['matricule'], $detailAgent['mailPerso']);
-                    
-                    if ($personalData) {
-                        $agent->setMailPerso($detailAgent['mailPerso']);
-                    } else if ($loggerMode === 'file') {
-                        $this->logger->warning('Cannot be saved by WS',  ['ws' => 'DossierAgentWebService', 'method' => 'modifDonneesPersonnelles','cause' => 'no response OR failed update']);
-                    }
-                }
+                
+                // for TPR, MPR, MPE with WS in need 
+                $this->setPersonalDataWithWS($agent, $detailAgent, $loggerMode);
 
 
                 $this->em->persist($agent);
@@ -177,5 +132,46 @@ class SyncLdapCommand extends Command
         }                      
         
         return 0;
+    }
+
+    public function setPersonalDataWithWS($agent, $detailAgent, $loggerMode) {
+        $types = [
+            'telephonePro'  => 'phonePro',
+            'mailPro'       => 'emailPro',
+            'mailPerso'     => 'emailPerso'
+        ];
+
+        foreach ($types as $typeName => $typeMethod) {
+            
+            $getter = 'get' . \ucfirst($typeName);
+            $setter = 'set' . \ucfirst($typeName);
+            $newAction = false;
+
+            if (trim($agent->$getter()) != trim($detailAgent[$typeName])) { // trim to include null and empty values
+                    
+                $action = empty($detailAgent[$typeName]) ? 'remove' : (empty($agent->$getter()) ? 'add' : 'update');
+                if ($loggerMode === 'file') $this->logger->info('- ' . \ucfirst($action) . ' (VHS and SIHAM) ' . $typeName,  [$typeMethod => $detailAgent[$typeName]]);
+                
+                $actionMethod = $action . \ucfirst($typeMethod);
+                $personalData = $this->dossierAgentWS->$actionMethod($detailAgent['matricule'], $detailAgent[$typeName]);
+                if ($personalData == 'TYPTEL_NON_TROUVEE' || $personalData == 'TYPTEL_DEJA_PRESENT') {
+                    $newAction = $action == 'add' ? 'update' : ($action == 'update' ? 'add' : 'ignore');
+                    $this->logger->warning('Cannot ' . $action . ' by WS so ' . $newAction .' it',  ['ws' => 'DossierAgentWebService', 'method' => 'modifDonneesPersonnelles','cause' => 'no response OR failed ' . $action]);
+                    $newActionMethod = $newAction . \ucfirst($typeMethod);
+                    if (\method_exists($agent, $newActionMethod)) {
+                        $personalData = $this->dossierAgentWS->$newActionMethod($detailAgent['matricule'], $detailAgent[$typeName]);
+                    } else {
+                        $personalData = 1;
+                    }
+                }
+                
+                if ($personalData == 1) {
+                    $agent->$setter($detailAgent[$typeName]);
+                    $this->logger->info('- Done ' . ($newAction ?: $action) . ' by WS');
+                } else if ($loggerMode === 'file') {
+                    $this->logger->warning('Cannot be saved by WS',  ['ws' => 'DossierAgentWebService', 'method' => 'modifDonneesPersonnelles','cause' => 'no response OR failed ' . ($newAction ?: $action)]);
+                }
+            }
+        }
     }
 }
