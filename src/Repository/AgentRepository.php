@@ -63,7 +63,9 @@ class AgentRepository extends ServiceEntityRepository
             WHERE (a.codeUOAffectationsADR IS NULL OR a.codeUOAffectationsADR = \'\')
             AND a.codeUOAffectationsHIE IS NOT NULL AND a.codeUOAffectationsHIE != \'\'
             AND a.codePIP NOT LIKE \'%HB%\'
-            AND a.codeCategoryPopulationType <> 5
+            AND a.codeCategoryPopulationType != 5
+            AND a.codePosteAffectation != \'\' AND a.codePosteAffectation IS NOT NULL
+            AND a.codePositionStatutaire NOT IN (\'DE\', \'DI\')
             ORDER BY a.lastUpdate DESC, a.id'
         );
         

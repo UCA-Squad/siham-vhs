@@ -54,7 +54,7 @@ class CheckAnomalyCommand extends Command
             $io->writeln(\sprintf('<info>%s</info> agents found', $nbAgents));
             $emailContent.= '== ' . $nbAgents . ' agent(s) avec plusieurs affectations HIE ==' . "\n";
             foreach ($agentsWithManyHIE as $agentWithManyHIE) {
-                $display = '- ' . $agentWithManyHIE->getMatricule() . ' - ' . $this->addSpaces($agentWithManyHIE->getNomPatronymique(), 20) . ' - ' . $this->addSpaces($agentWithManyHIE->getPrenom(), 20)
+                $display = '- ' . $agentWithManyHIE->getMatricule() . ' - ' . $this->addSpaces($agentWithManyHIE->getNomUsuel(), 20) . ' - ' . $this->addSpaces($agentWithManyHIE->getPrenom(), 20)
                     . ' - ' . $this->addSpaces($agentWithManyHIE->getCodeUOAffectationsHIE(), 25)
                 ;
                 $io->writeln($display);
@@ -75,7 +75,7 @@ class CheckAnomalyCommand extends Command
             $io->writeln(\sprintf('<info>%s</info> agents found', $nbAgents));
             $emailContent.= '== ' . $nbAgents . ' agent(s) avec une affectation HIE mais aucune affectation FUN ==' . "\n";
             foreach ($agentsWithHIEAndNoFUN as $agentWithHIEAndNoFUN) {
-                $display = '- ' . $agentWithHIEAndNoFUN->getMatricule() . ' - ' . $this->addSpaces($agentWithHIEAndNoFUN->getNomPatronymique(), 20) . ' - ' . $this->addSpaces($agentWithHIEAndNoFUN->getPrenom(), 20)
+                $display = '- ' . $agentWithHIEAndNoFUN->getMatricule() . ' - ' . $this->addSpaces($agentWithHIEAndNoFUN->getNomUsuel(), 20) . ' - ' . $this->addSpaces($agentWithHIEAndNoFUN->getPrenom(), 20)
                     . ' - ' . $this->addSpaces($agentWithHIEAndNoFUN->getCodeUOAffectationsHIE(), 25)
                     . ' - ' . $this->addSpaces($agentWithHIEAndNoFUN->getCodeUOAffectationsFUN(), 25)
                 ;
@@ -97,7 +97,7 @@ class CheckAnomalyCommand extends Command
             $io->writeln(\sprintf('<info>%s</info> agents found', $nbAgents));
             $emailContent.= '== ' . $nbAgents . ' agent(s) avec une affectation HIE mais aucune affectation ADR (hors Hébergés et Extérieurs) ==' . "\n";
             foreach ($agentsWithHIEAndNoADR as $agentWithHIEAndNoADR) {
-                $display = '- ' . $agentWithHIEAndNoADR->getMatricule() . ' - ' . $this->addSpaces($agentWithHIEAndNoADR->getNomPatronymique(), 20) . ' - ' . $this->addSpaces($agentWithHIEAndNoADR->getPrenom(), 20)
+                $display = '- ' . $agentWithHIEAndNoADR->getMatricule() . ' - ' . $this->addSpaces($agentWithHIEAndNoADR->getNomUsuel(), 20) . ' - ' . $this->addSpaces($agentWithHIEAndNoADR->getPrenom(), 20)
                     . ' - ' . $this->addSpaces($agentWithHIEAndNoADR->getCodeUOAffectationsHIE(), 25)
                     . ' - ' . $this->addSpaces($agentWithHIEAndNoADR->getCodeUOAffectationsADR(), 25)
                 ;
@@ -119,7 +119,7 @@ class CheckAnomalyCommand extends Command
             $io->writeln(\sprintf('<info>%s</info> agents found', $nbAgents));
             $emailContent.= '== ' . $nbAgents . ' agent(s) avec une affectation HIE mais aucune affectation FUN ==' . "\n";
             foreach ($agentsWithFUNAndNoHIE as $agentWithFUNAndNoHIE) {
-                $display = '- ' . $agentWithFUNAndNoHIE->getMatricule() . ' - ' . $this->addSpaces($agentWithFUNAndNoHIE->getNomPatronymique(), 20) . ' - ' . $this->addSpaces($agentWithFUNAndNoHIE->getPrenom(), 20)
+                $display = '- ' . $agentWithFUNAndNoHIE->getMatricule() . ' - ' . $this->addSpaces($agentWithFUNAndNoHIE->getNomUsuel(), 20) . ' - ' . $this->addSpaces($agentWithFUNAndNoHIE->getPrenom(), 20)
                     . ' - ' . $this->addSpaces($agentWithFUNAndNoHIE->getCodeUOAffectationsHIE(), 25)
                     . ' - ' . $this->addSpaces($agentWithFUNAndNoHIE->getCodeUOAffectationsFUN(), 25)
                 ;
@@ -141,7 +141,7 @@ class CheckAnomalyCommand extends Command
             $io->writeln(\sprintf('<info>%s</info> agents found', $nbAgents));
             $emailContent.= '== ' . $nbAgents . ' agent(s) avec des valeurs génériques ==' . "\n";
             foreach ($agentsWithGenericValues as $agentWithGenericValues) {
-                $display = '- ' . $agentWithGenericValues->getMatricule() . ' - ' . $this->addSpaces($agentWithGenericValues->getNomPatronymique(), 20) . ' - ' . $this->addSpaces($agentWithGenericValues->getPrenom(), 20)
+                $display = '- ' . $agentWithGenericValues->getMatricule() . ' - ' . $this->addSpaces($agentWithGenericValues->getNomUsuel(), 20) . ' - ' . $this->addSpaces($agentWithGenericValues->getPrenom(), 20)
                     . ' - ' . $this->addSpaces($agentWithGenericValues->getCodeUOAffectationsHIE(), 25)
                     . ' - ' . $this->addSpaces($agentWithGenericValues->getCodeUOAffectationsFUN(), 25)
                     . ' - ' . $this->addSpaces($agentWithGenericValues->getCodePosteAffectation(), 10)
