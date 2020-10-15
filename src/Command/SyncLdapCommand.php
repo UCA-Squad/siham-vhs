@@ -136,9 +136,11 @@ class SyncLdapCommand extends Command
 
     public function setPersonalDataWithWS($agent, $detailAgent, $loggerMode) {
         $types = [
-            'telephonePro'  => 'phonePro',
-            'mailPro'       => 'emailPro',
-            'mailPerso'     => 'emailPerso'
+            'telephonePro'  => 'phoneProfessional',
+            // 'portablePro'   => 'mobileProfessional',
+            // 'portablePerso' => 'mobilePersonal',
+            'mailPro'       => 'emailProfessional',
+            'mailPerso'     => 'emailPersonal'
         ];
 
         foreach ($types as $typeName => $typeMethod) {
@@ -156,7 +158,7 @@ class SyncLdapCommand extends Command
                 $personalData = $this->dossierAgentWS->$actionMethod($detailAgent['matricule'], $detailAgent[$typeName]);
                 if ($personalData == 'TYPTEL_NON_TROUVEE' || $personalData == 'TYPTEL_DEJA_PRESENT') {
                     $newAction = $action == 'add' ? 'update' : ($action == 'update' ? 'add' : 'ignore');
-                    $this->logger->warning('Cannot ' . $action . ' by WS so ' . $newAction .' it',  ['ws' => 'DossierAgentWebService', 'method' => 'modifDonneesPersonnelles','cause' => 'no response OR failed ' . $action]);
+                    if ($loggerMode === 'file') $this->logger->warning('Cannot ' . $action . ' by WS so ' . $newAction .' it',  ['ws' => 'DossierAgentWebService', 'method' => 'modifDonneesPersonnelles','cause' => 'no response OR failed ' . $action]);
                     $newActionMethod = $newAction . \ucfirst($typeMethod);
                     if (\method_exists($agent, $newActionMethod)) {
                         $personalData = $this->dossierAgentWS->$newActionMethod($detailAgent['matricule'], $detailAgent[$typeName]);
@@ -167,9 +169,9 @@ class SyncLdapCommand extends Command
                 
                 if ($personalData == 1) {
                     $agent->$setter($detailAgent[$typeName]);
-                    $this->logger->info('- Done ' . ($newAction ?: $action) . ' by WS');
-                } else if ($loggerMode === 'file') {
-                    $this->logger->warning('Cannot be saved by WS',  ['ws' => 'DossierAgentWebService', 'method' => 'modifDonneesPersonnelles','cause' => 'no response OR failed ' . ($newAction ?: $action)]);
+                    if ($loggerMode === 'file') $this->logger->info('- Done ' . ($newAction ?: $action) . ' by WS');
+                } else {
+                    if ($loggerMode === 'file') $this->logger->warning('Cannot be saved by WS',  ['ws' => 'DossierAgentWebService', 'method' => 'modifDonneesPersonnelles','cause' => 'no response OR failed ' . ($newAction ?: $action)]);
                 }
             }
         }

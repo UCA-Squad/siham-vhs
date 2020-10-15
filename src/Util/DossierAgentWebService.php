@@ -54,43 +54,53 @@ class DossierAgentWebService
         }
         return isset($responsePersonalData->return) && isset($responsePersonalData->return->statutMAJ) ? $responsePersonalData->return->statutMAJ : false;
     }
-    public function addPhonePro($matricule, $phoneNumber) {
+    public function addPhoneProfessional($matricule, $phoneNumber) {
         return $this->setPersonalData($matricule, 'TPR', $phoneNumber, 'A');
     }
-    public function updatePhonePro($matricule, $phoneNumber) {
+    public function updatePhoneProfessional($matricule, $phoneNumber) {
         return $this->setPersonalData($matricule, 'TPR', $phoneNumber, 'M');
     }
-    public function removePhonePro($matricule, $forGenericCalls = '') {
+    public function removePhoneProfessional($matricule, $forGenericCalls = '') {
         return $this->setPersonalData($matricule, 'TPR', $forGenericCalls, 'S');
     }
 
-    public function addMobilePerso($matricule, $phoneNumber) {
+    public function addMobileProfessional($matricule, $phoneNumber) {
+        return $this->setPersonalData($matricule, 'PPR', $phoneNumber, 'A');
+    }
+    public function updateMobileProfessional($matricule, $phoneNumber) {
+        return $this->setPersonalData($matricule, 'PPR', $phoneNumber, 'M');
+    }
+    public function removeMobileProfessional($matricule, $forGenericCalls = '') {
+        return $this->setPersonalData($matricule, 'PPR', $forGenericCalls, 'S');
+    }
+
+    public function addMobilePersonal($matricule, $phoneNumber) {
         return $this->setPersonalData($matricule, 'PPE', $phoneNumber, 'A');
     }
-    public function updateMobilePerso($matricule, $phoneNumber) {
+    public function updateMobilePersonal($matricule, $phoneNumber) {
         return $this->setPersonalData($matricule, 'PPE', $phoneNumber, 'M');
     }
-    public function removeMobilePerso($matricule, $forGenericCalls = '') {
+    public function removeMobilePersonal($matricule, $forGenericCalls = '') {
         return $this->setPersonalData($matricule, 'PPE', $forGenericCalls, 'S');
     }
 
-    public function addEmailPro($matricule, $email) {
+    public function addEmailProfessional($matricule, $email) {
         return $this->setPersonalData($matricule, 'MPR', $email, 'A');
     }
-    public function updateEmailPro($matricule, $email) {
+    public function updateEmailProfessional($matricule, $email) {
         return $this->setPersonalData($matricule, 'MPR', $email, 'M');
     }
-    public function removeEmailPro($matricule, $forGenericCalls = '') {
+    public function removeEmailProfessional($matricule, $forGenericCalls = '') {
         return $this->setPersonalData($matricule, 'MPR', $forGenericCalls, 'S');
     }
 
-    public function addEmailPerso($matricule, $email) {
+    public function addEmailPersonal($matricule, $email) {
         return $this->setPersonalData($matricule, 'MPE', $email, 'A');
     }
-    public function updateEmailPerso($matricule, $email) {
+    public function updateEmailPersonal($matricule, $email) {
         return $this->setPersonalData($matricule, 'MPE', $email, 'M');
     }
-    public function removeEmailPerso($matricule, $forGenericCalls = '') {
+    public function removeEmailPersonal($matricule, $forGenericCalls = '') {
         return $this->setPersonalData($matricule, 'MPE', $forGenericCalls, 'S');
     }
     //endregion
