@@ -51,8 +51,7 @@ class SyncAgentCommand extends Command
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
+    protected function execute(InputInterface $input, OutputInterface $output) {
         $start = microtime(true);
         ini_set('default_socket_timeout', 600);
 
@@ -166,7 +165,7 @@ class SyncAgentCommand extends Command
                 // starts and displays the progress bar
                 $progressBar->start();
             }
-            // $counterTempo = 1;
+
             $try = 1;
             $tryMax = 2;
             $maxDuration = 30;    // seconds

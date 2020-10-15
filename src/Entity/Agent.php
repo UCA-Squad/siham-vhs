@@ -983,10 +983,16 @@ class Agent {
         if (isset($personalData->listeNumerosMails)) {
             $listeNumerosMails = \is_object($personalData->listeNumerosMails) ? [$personalData->listeNumerosMails] : $personalData->listeNumerosMails;
             foreach($listeNumerosMails as $numeroMail) {
-                if ($numeroMail->codeTypologieNumeroMail == 'MPE')
-                    $this->mailPerso = $numeroMail->numeroMail;
+                if ($numeroMail->codeTypologieNumeroMail == 'TPR')
+                    $this->telephonePro = $numeroMail->numeroMail;
+                else if ($numeroMail->codeTypologieNumeroMail == 'PPR')
+                    $this->portablePro = $numeroMail->numeroMail;
                 else if ($numeroMail->codeTypologieNumeroMail == 'PPE')
-                	$this->portablePerso = $numeroMail->numeroMail;
+                    $this->portablePerso = $numeroMail->numeroMail;
+                if ($numeroMail->codeTypologieNumeroMail == 'MPR')
+                    $this->mailPro = $numeroMail->numeroMail;
+                else if ($numeroMail->codeTypologieNumeroMail == 'MPE')
+                    $this->mailPerso = $numeroMail->numeroMail;
             }
         }
 
