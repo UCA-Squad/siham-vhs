@@ -36,8 +36,7 @@ class CheckAnomalyCommand extends Command
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
+    protected function execute(InputInterface $input, OutputInterface $output) {
         $start = microtime(true);
         $emailContent = null;
         
@@ -166,7 +165,7 @@ class CheckAnomalyCommand extends Command
             $email = (new Email())
                 ->from('vhs-noreply@uca.fr')
                 ->to(...['sandrine.perrette@uca.fr'])
-                ->cc(...['fabrice.monseigne@uca.fr'])
+                ->cc(...['fabrice.monseigne@uca.fr', 'sirh.drh@uca.fr'])
                 ->subject('[SIHAM] VHS - Détection des anomalies')
                 ->text($emailContent);
     
