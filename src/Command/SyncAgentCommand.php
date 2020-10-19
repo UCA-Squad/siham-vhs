@@ -10,6 +10,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Routing\RouterInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 use App\Util\ListeAgentsWebService;
@@ -25,14 +26,16 @@ class SyncAgentCommand extends Command
     private $sihamEm;
     private $logger;
     private $mailer;
+    private $router;
 
-    public function __construct(ManagerRegistry $doctrine, LoggerInterface $logger, MailerInterface $mailer)
+    public function __construct(ManagerRegistry $doctrine, LoggerInterface $logger, MailerInterface $mailer, RouterInterface $router)
     {
         parent::__construct();
         $this->em = $doctrine->getManager();// siham_vhs by default;
         $this->sihamEm = $doctrine->getManager('siham');
         $this->logger = $logger;
         $this->mailer = $mailer;
+        $this->router = $router;
     }   
 
     protected function configure() {
@@ -355,23 +358,35 @@ class SyncAgentCommand extends Command
     }
 
     public function sendSIEmail($content, $html = true) {
-        $cc = ['fabrice.monseigne@uca.fr'];
-        $subject = '[SIHAM] VHS - Rapport technique';
-        $this->sendEmail($cc, $subject, $content, $html);
+        $to = ['fabrice.monseigne@uca.fr'];
+        $cc = ['alexis.ozwald@uca.fr', 'isabelle.laurencot@uca.fr', 'eric.touraille@uca.fr'];
+        $subject = '[SIHAM] VHS - Rapport d\'erreur technique de Sync:Agent';
+        $this->sendEmail($to, $cc, $subject, $content, $html);
     }
     public function sendRHEmail($content, $html = true) {
-        $cc = ['fabrice.monseigne@uca.fr'];
-        $subject = '[SIHAM] VHS - Rapport des anomalies';
-        $this->sendEmail($cc, $subject, $content, $html);
+        $to = ['sandrine.perrette@uca.fr'];
+        $cc = ['sirh.drh@uca.fr', 'fabrice.monseigne@uca.fr'];
+        $subject = '[SIHAM] VHS - Rapport d\'erreur de Sync:Agent';
+        $this->sendEmail($to, $cc, $subject, $content, $html);
     }
-    public function sendEmail($cc, $subject, $content, $html = true) {
+    public function sendEmail($to, $cc, $subject, $content, $html = true) {
         $email = (new Email())
             ->from('vhs-noreply@uca.fr')
-            ->cc(\implode(',', $cc))
             ->subject($subject);
-        if ($html) $email->html( $content);
-        else $email->text($content);
-
+        if (!empty($to)) $email->to(...$to);
+        if (!empty($cc)) $email->cc(...$cc);
+        
+        $url = $_ENV['APP_HOST'] . $this->router->generate('sync_result', [
+            'env' => $_ENV['APP_ENV'] , 
+            'fileName' => $_ENV['APP_ENV'] . '.sync.agent-' . date('Y-m-d') . '.log'
+        ]);
+        if ($html) {
+            $content.= '<br><br><a href="' . $url . '">Consulter le fichier de log</a>';
+            $email->html($content);
+        } else {
+            $content.= "\n\n" . 'Consulter le fichier de log sur ' . $url;
+            $email->text($content);
+        }
         $this->mailer->send($email);
     }
 }

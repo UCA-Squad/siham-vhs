@@ -165,7 +165,7 @@ class CheckAnomalyCommand extends Command
             $email = (new Email())
                 ->from('vhs-noreply@uca.fr')
                 ->to(...['sandrine.perrette@uca.fr'])
-                ->cc(...['fabrice.monseigne@uca.fr', 'sirh.drh@uca.fr'])
+                ->cc(...['sirh.drh@uca.fr', 'fabrice.monseigne@uca.fr'])
                 ->subject('[SIHAM] VHS - Détection des anomalies')
                 ->text($emailContent);
     
