@@ -171,9 +171,9 @@ class SyncAgentCommand extends Command
 
             $try = 1;
             $tryMax = 2;
-            $maxDuration = 30;    // seconds
-            $sleepTimeoutDuration = 60 * 5;// seconds
-            $sleepCounterDuration = 30; // seconds
+            $maxDuration = 45;    // seconds
+            $sleepTimeoutDuration = 60 * 10;// seconds
+            $sleepCounterDuration = 60; // seconds
             $listProcessedAgents = [];
             foreach($listAgents as $agentSihamId) {
                 // retrieve agent
