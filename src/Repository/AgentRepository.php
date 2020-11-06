@@ -65,7 +65,7 @@ class AgentRepository extends ServiceEntityRepository
             AND a.codePIP NOT LIKE \'%HB%\'
             AND a.codeCategoryPopulationType != 5
             AND a.codePosteAffectation != \'\' AND a.codePosteAffectation IS NOT NULL
-            AND a.codePositionStatutaire NOT IN (\'DE\', \'DI\')
+            AND a.codePositionStatutaire = \'AC\'
             ORDER BY a.lastUpdate DESC, a.id'
         );
         
