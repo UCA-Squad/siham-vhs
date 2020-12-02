@@ -40,13 +40,13 @@ class DossierAgentWebServiceTest extends TestCase
 
         $dossierAgentWebService = new DossierAgentWebService();
 
-        $responseDossierAgent = $dossierAgentWebService->addPhonePro($_ENV['SIHAM_WS_MATRICULE_TEST'], '0102030405');
+        $responseDossierAgent = $dossierAgentWebService->addPhoneProfessional($_ENV['SIHAM_WS_MATRICULE_TEST'], '0102030405');
         $this->assertEquals(1, $responseDossierAgent);
 
-        $responseDossierAgent = $dossierAgentWebService->updatePhonePro($_ENV['SIHAM_WS_MATRICULE_TEST'], '0102030400');
+        $responseDossierAgent = $dossierAgentWebService->updatePhoneProfessional($_ENV['SIHAM_WS_MATRICULE_TEST'], '0102030400');
         $this->assertEquals(1, $responseDossierAgent);
 
-        $responseDossierAgent = $dossierAgentWebService->removePhonePro($_ENV['SIHAM_WS_MATRICULE_TEST']);
+        $responseDossierAgent = $dossierAgentWebService->removePhoneProfessional($_ENV['SIHAM_WS_MATRICULE_TEST']);
         $this->assertEquals(1, $responseDossierAgent);
     }
     
