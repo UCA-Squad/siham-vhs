@@ -137,8 +137,8 @@ class SyncLdapCommand extends Command
     public function setPersonalDataWithWS($agent, $detailAgent, $loggerMode) {
         $types = [
             'telephonePro'  => 'phoneProfessional',
-            // 'portablePro'   => 'mobileProfessional',
-            // 'portablePerso' => 'mobilePersonal',
+            // 'portablePro'   => 'mobileProfessional', // not in ldap file
+            // 'portablePerso' => 'mobilePersonal', // not in ldap file
             'mailPro'       => 'emailProfessional',
             'mailPerso'     => 'emailPersonal'
         ];
