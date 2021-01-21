@@ -9,7 +9,7 @@ class DossierParametrageWebService
 {
     private $WSDL = '/DossierParametrageWebService/DossierParametrageWebService?wsdl';
 
-    public function getStructures($codeUO = '') {
+    public function getStructures($startObservationDate, $codeUO = '') {
 
         $soapClientDossierAgent = SoapClients::getInstance($this->WSDL);
         
@@ -19,7 +19,7 @@ class DossierParametrageWebService
                 $structures = $soapClientDossierAgent->recupStructures([
                     'ParamStructure' => [
                         'codeAdministration' => '',
-                        'dateObservation' => '',
+                        'dateObservation' => $startObservationDate,
                         'listeUO' => [
                             'codeUO' => $codeUO,
                             'structureUO' => '',

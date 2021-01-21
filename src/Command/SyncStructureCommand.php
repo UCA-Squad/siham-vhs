@@ -33,7 +33,8 @@ class SyncStructureCommand extends Command
         $this
         // configure an argument
         ->addOption('logger', null, InputOption::VALUE_OPTIONAL, 'The logger mode: "console" (by default) or "file".', 'console')
-        
+        ->addOption('from-date', null, InputOption::VALUE_OPTIONAL, '"all" or date in "Y-m-d" format (date of the day by default)', date('Y-m-d'))
+       
         // the short description shown while running "php bin/console list"
         ->setDescription('Sync all structures from SIHAM...')
 
@@ -49,6 +50,9 @@ class SyncStructureCommand extends Command
         ini_set('default_socket_timeout', 300);
 
         $loggerMode = $input->getOption('logger');
+        $fromDate = $input->getOption('from-date');
+        $startObservationDate = new \DateTime($fromDate!= 'all' ? $fromDate : null);
+        $startObservationDate->modify('+1 day'); // the sync is launched the evening
 
         if ($loggerMode === 'file') {
             $this->logger->info('Start sync structures...');
@@ -58,7 +62,7 @@ class SyncStructureCommand extends Command
             $io->write('Start sync structures... ');
         }
         $dossierParametrageWS = new DossierParametrageWebService();
-        $structures = $dossierParametrageWS->getStructures();
+        $structures = $dossierParametrageWS->getStructures($startObservationDate->format('Y-m-d'));
         if (isset($structures->return)) {
 
             $numberOfStructures = count($structures->return);
