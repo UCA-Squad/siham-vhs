@@ -102,11 +102,12 @@ class AgentRepository extends ServiceEntityRepository
         $query = $entityManager->createQuery(
             'SELECT a
             FROM App\Entity\Agent a
-            WHERE a.codeUOAffectationsHIE LIKE \'%UO_REP%\'
+            WHERE (a.codeUOAffectationsHIE LIKE \'%UO_REP%\'
             OR a.codeUOAffectationsFUN LIKE \'%UO_REP%\'
             OR a.codePosteAffectation LIKE \'%POSTE_REP%\'
             OR a.codeEmploiAffectation LIKE \'%EMP_REP%\'
             OR a.codePopulationType = \'00000\'
+            ) AND a.codePositionStatutaire != \'NS\'
             ORDER BY a.lastUpdate DESC, a.id'
         );
 
