@@ -71,7 +71,7 @@ class SyncGeishaCommand extends Command
         $stmtGeisha = $connGeisha->prepare($sqlGeishaAgreements);
         $dateObservation = new \DateTime();
         $stmtGeisha->bindValue('dateDebutObservation', $dateObservation->format('Y-m-d'));
-        $stmtGeisha->bindValue('dateFinObservation', $dateObservation->modify('+60 days')->format('Y-m-d'));
+        $stmtGeisha->bindValue('dateFinObservation', $dateObservation->modify('+' . (int) $_ENV['DAYS_OBSERVATION_END_DATE'] . '  days')->format('Y-m-d'));
         $stmtGeisha->execute();
         $agreements = $stmtGeisha->fetchAll();
         if (!empty($agreements)) {

@@ -62,13 +62,13 @@ class SyncAgentCommand extends Command
         $fromDate = $input->getOption('from-date');
         $matricules = $input->getOption('matricule');
         $startObservationDate = new \DateTime($fromDate!= 'all' ? $fromDate : null);
-        $startObservationDate->modify('-1 day');// to make a retrospective relaunch
+        $startObservationDate->modify('-' . (int) $_ENV['DAYS_OBSERVATION_RETROSPECTIVE_DATE'] . ' days');// to make a retrospective relaunch
         $considerationDate = new \DateTime();
         $endObservationDate = clone $considerationDate;
-        $considerationDate->modify('+1 day'); // the sync is launched the evening
-        $endObservationDate->modify('+60 days'); // to include the future contracts
-        $maxObservationDate = new \DateTime('2999-12-31'); // max date for SIHAM instead of empty or null when no end date ...
-        $minObservationDate = new \DateTime('0001-01-01'); // an other date for SIHAM that mean empty or null when no end date ...
+        $considerationDate->modify('+' . (int) $_ENV['DAYS_OBSERVATION_START_DATE'] . ' days'); // the sync is launched the evening
+        $endObservationDate->modify('+' . (int) $_ENV['DAYS_OBSERVATION_END_DATE'] . '  days'); // to include the future contracts
+        $maxObservationDate = new \DateTime($_ENV['SIHAM_WS_DATE_MAX']); // max date for SIHAM instead of empty or null when no end date ...
+        $minObservationDate = new \DateTime($_ENV['SIHAM_WS_DATE_NULL']); // an other date for SIHAM that mean empty or null when no end date ...
 
         $emailSIContent = null;
         $emailRHContent = null;
@@ -169,11 +169,15 @@ class SyncAgentCommand extends Command
                 $progressBar->start();
             }
 
-            $try = 1;
-            $tryMax = 3;
-            $maxDuration = 90;    // seconds
-            $sleepTimeoutDuration = 60 * 5;// seconds
-            $sleepCounterDuration = 60; // seconds
+            $timeoutCounter = 1;
+            define('TIMEOUT_MAX_COUNTER',       (int) $_ENV['TIMEOUT_MAX_COUNTER']);
+            define('TIMEOUT_MAX_DURATION',      (int) $_ENV['TIMEOUT_MAX_DURATION']);
+            define('TIMEOUT_PAUSE_DURATION',    (int) $_ENV['TIMEOUT_PAUSE_DURATION']);
+            define('BREAK_PAUSE_COUNTER',       (int) $_ENV['BREAK_PAUSE_COUNTER']);
+            define('BREAK_PAUSE_DURATION',      (int) $_ENV['BREAK_PAUSE_DURATION']);
+            define('BREAK_LONG_PAUSE_COUNTER',  (int) $_ENV['BREAK_LONG_PAUSE_COUNTER']);
+            define('BREAK_LONG_PAUSE_DURATION', (int) $_ENV['BREAK_LONG_PAUSE_DURATION']);
+
             $listProcessedAgents = [];
             foreach($listAgents as $agentSihamId) {
                 // retrieve agent
@@ -194,13 +198,22 @@ class SyncAgentCommand extends Command
                 $personalData = $dossierAgentWS->getPersonalData($agentSihamId, $considerationDate->format('Y-m-d'), $endObservationDate->format('Y-m-d'));
                 // exit if X timeout achieved
                 $duration = microtime(true) - $startTempo;
-                if ($duration > $maxDuration) {
-                    $this->logger->warning('Duration exceeded by ' . $maxDuration . 's', ['ws' => 'DossierAgentWebService', 'method' => 'recupDonneesPersonnelles', 'cause' => 'timeout', 'duration' => number_format($duration, 3) . 's']);
-                    if ($try > $tryMax) {
-                        $this->logger->error('Sync agent interrupt', ['cause' => $try .' timeout achieved']);
+                if ($duration > TIMEOUT_MAX_DURATION) {
+                    if ($loggerMode === 'file') {
+                        $this->logger->warning('Duration exceeded by ' . TIMEOUT_MAX_DURATION . 's', ['ws' => 'DossierAgentWebService', 'method' => 'recupDonneesPersonnelles', 'cause' => 'timeout', 'duration' => number_format($duration, 3) . 's']);
+                    } else {
+                        $io->warning('Duration ' . number_format($duration, 3) . 's exceeded by ' . TIMEOUT_MAX_DURATION . 's for recupDonneesPersonnelles');
+                    }
+                    
+                    if ($timeoutCounter > TIMEOUT_MAX_COUNTER) {
+                        if ($loggerMode === 'file') {
+                            $this->logger->error('Sync agent interrupt', ['cause' => $timeoutCounter . ' timeout achieved']);
+                        } else {
+                            $io->error('Sync agent interrupt, ' . $timeoutCounter . ' timeout achieved');
+                        }
 
                         $listUnprocessedAgents = \array_diff($listAgents, $listProcessedAgents);
-                        $emailSIContent.= 'La synchronisation des agents a été arrêté après <b>' . $try . '</b> tentatives de pause de <b>' . $sleepTimeoutDuration . 's</b> suite a des <i>timeout</i> ou des temps de récupération dépassant les <b>' . $maxDuration . 's</b>'; 
+                        $emailSIContent.= 'La synchronisation des agents a été arrêté après <b>' . $timeoutCounter . '</b> tentatives de pause de <b>' . TIMEOUT_PAUSE_DURATION . 's</b> suite a des <i>timeout</i> ou des temps de récupération dépassant les <b>' . TIMEOUT_MAX_DURATION . 's</b>'; 
                         $emailRHContent.= 'La synchronisation des agents s\'est arrêtée suite a des temps de réponse trop long des webservices.<br>';
                         $emailRHContent.= '<b>' . count($listUnprocessedAgents) . '</b>/' . count($listAgents) . ' matricules n\'ont pas été traités:<br>';
                         $emailRHContent.= \implode('<br>', $listUnprocessedAgents) . '<br>';
@@ -208,9 +221,9 @@ class SyncAgentCommand extends Command
                         if (!empty($emailRHContent)) $this->sendRHEmail($emailRHContent);
                         return 0;
                     }
-                    $this->logger->info('Have a break for ' . $sleepTimeoutDuration . 's ...', ['cause' => $try . ' attempts achieved']);
-                    \sleep($sleepTimeoutDuration);
-                    $try++;
+                    $this->logger->info('Have a break for ' . TIMEOUT_PAUSE_DURATION . 's ...', ['cause' => $timeoutCounter . ' attempts achieved']);
+                    \sleep(TIMEOUT_PAUSE_DURATION);
+                    $timeoutCounter++;
                 } else {
                     // set data if returned
                     if (isset($personalData->return)) {
@@ -234,13 +247,21 @@ class SyncAgentCommand extends Command
                 $administrativeData = $dossierAgentWS->getAdministrativeData($agentSihamId, $considerationDate->format('Y-m-d'), $maxObservationDate->format('Y-m-d'));
                 // exit if X timeout achieved
                 $duration = microtime(true) - $startTempo;
-                if ($duration > $maxDuration) {
-                    $this->logger->warning('Duration exceeded by ' . $maxDuration . 's', ['ws' => 'DossierAgentWebService', 'method' => 'recupDonneesAdministratives', 'cause' => 'timeout', 'duration' => number_format($duration, 3) . 's']);
-                    if ($try > $tryMax) {
-                        $this->logger->error('Sync agent interrupt', ['cause' => $try .' timeout achieved']);
+                if ($duration > TIMEOUT_MAX_DURATION) {
+                    if ($loggerMode === 'file') {
+                        $this->logger->warning('Duration exceeded by ' . TIMEOUT_MAX_DURATION . 's', ['ws' => 'DossierAgentWebService', 'method' => 'recupDonneesAdministratives', 'cause' => 'timeout', 'duration' => number_format($duration, 3) . 's']);
+                    } else {
+                        $io->warning('Duration ' . number_format($duration, 3) . 's exceeded by ' . TIMEOUT_MAX_DURATION . 's for recupDonneesAdministratives');
+                    }
+                    if ($timeoutCounter > TIMEOUT_MAX_COUNTER) {
+                        if ($loggerMode === 'file') {
+                            $this->logger->error('Sync agent interrupt', ['cause' => $timeoutCounter . ' timeout achieved']);
+                        } else {
+                            $io->error('Sync agent interrupt, ' . $timeoutCounter . ' timeout achieved');
+                        }
 
                         $listUnprocessedAgents = \array_diff($listAgents, $listProcessedAgents);
-                        $emailSIContent.= 'La synchronisation des agents a été arrêté après <b>' . $try . '</b> tentatives de pause de <b>' . $sleepTimeoutDuration . 's</b> suite a des <i>timeout</i> ou des temps de récupération dépassant les <b>' . $maxDuration . 's</b>'; 
+                        $emailSIContent.= 'La synchronisation des agents a été arrêté après <b>' . $timeoutCounter . '</b> tentatives de pause de <b>' . TIMEOUT_PAUSE_DURATION . 's</b> suite a des <i>timeout</i> ou des temps de récupération dépassant les <b>' . TIMEOUT_MAX_DURATION . 's</b>'; 
                         $emailRHContent.= 'La synchronisation des agents s\'est arrêtée suite a des temps de réponse trop long des webservices.<br>';
                         $emailRHContent.= '<b>' . count($listUnprocessedAgents) . '</b>/' . count($listAgents) . ' matricules n\'ont pas été traités:<br>';
                         $emailRHContent.= \implode('<br>', $listUnprocessedAgents) . '<br>';
@@ -248,9 +269,9 @@ class SyncAgentCommand extends Command
                         if (!empty($emailRHContent)) $this->sendRHEmail($emailRHContent);
                         return 0;
                     }
-                    $this->logger->info('Have a break for ' . $sleepTimeoutDuration . 's ...', ['cause' => $try . ' attempts achieved']);
-                    \sleep($sleepTimeoutDuration);
-                    $try++;
+                    $this->logger->info('Have a break for ' . TIMEOUT_PAUSE_DURATION . 's ...', ['cause' => $timeoutCounter . ' attempts achieved']);
+                    \sleep(TIMEOUT_PAUSE_DURATION);
+                    $timeoutCounter++;
                 } else {
                     // set data if returned
                     if (isset($administrativeData->return)) {
@@ -322,14 +343,19 @@ class SyncAgentCommand extends Command
 
                 // Take a break for webservice :-( 
                 // Temporally disable since VM up memory to 6Go
+                // Re-used ...
                 $counterTempo = count($listProcessedAgents);
-                if ($counterTempo % 200 == 0) {
-                    if ($counterTempo % 1000 == 0) {
-                        $this->logger->info('Have a break for ' . $sleepCounterDuration * 2 . 's ...', ['cause' => $counterTempo . ' agents achieved']);
-                        \sleep($sleepCounterDuration * 2);
+                if ($counterTempo % BREAK_PAUSE_COUNTER == 0) {
+                    if ($counterTempo % BREAK_LONG_PAUSE_COUNTER == 0) {
+                        if ($loggerMode === 'file') {
+                            $this->logger->info('Have a break for ' . BREAK_LONG_PAUSE_DURATION . 's ...', ['cause' => $counterTempo . ' agents achieved']);
+                        }
+                        \sleep(BREAK_LONG_PAUSE_DURATION);
                     } else {
-                        $this->logger->info('Have a break for ' . $sleepCounterDuration . 's ...', ['cause' => $counterTempo . ' agents achieved']);
-                        \sleep($sleepCounterDuration);
+                        if ($loggerMode === 'file') {
+                            $this->logger->info('Have a break for ' . BREAK_PAUSE_DURATION . 's ...', ['cause' => $counterTempo . ' agents achieved']);
+                        }
+                        \sleep(BREAK_PAUSE_DURATION);
                     }
                 }
             }
@@ -358,20 +384,20 @@ class SyncAgentCommand extends Command
     }
 
     public function sendSIEmail($content, $html = true) {
-        $to = ['fabrice.monseigne@uca.fr'];
-        $cc = ['alexis.ozwald@uca.fr', 'isabelle.laurencot@uca.fr', 'eric.touraille@uca.fr'];
+        $to = \explode(',', $_ENV['MAIL_TO_SI']);
+        $cc = \explode(',', $_ENV['MAIL_CC_SI']);
         $subject = '[SIHAM] VHS - Rapport d\'erreur technique de Sync:Agent';
         $this->sendEmail($to, $cc, $subject, $content, $html);
     }
     public function sendRHEmail($content, $html = true) {
-        $to = ['sandrine.perrette@uca.fr'];
-        $cc = ['sirh.drh@uca.fr', 'fabrice.monseigne@uca.fr'];
+        $to = \explode(',', $_ENV['MAIL_TO_RH']);
+        $cc = \explode(',', $_ENV['MAIL_CC_RH']);
         $subject = '[SIHAM] VHS - Rapport d\'erreur de Sync:Agent';
         $this->sendEmail($to, $cc, $subject, $content, $html);
     }
     public function sendEmail($to, $cc, $subject, $content, $html = true) {
         $email = (new Email())
-            ->from('vhs-noreply@uca.fr')
+            ->from($_ENV['MAIL_FROM'])
             ->subject($subject);
         if (!empty($to)) $email->to(...$to);
         if (!empty($cc)) $email->cc(...$cc);

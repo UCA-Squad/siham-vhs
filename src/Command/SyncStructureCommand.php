@@ -52,7 +52,7 @@ class SyncStructureCommand extends Command
         $loggerMode = $input->getOption('logger');
         $fromDate = $input->getOption('from-date');
         $startObservationDate = new \DateTime($fromDate!= 'all' ? $fromDate : null);
-        $startObservationDate->modify('+1 day'); // the sync is launched the evening
+        $startObservationDate->modify('+' . (int) $_ENV['DAYS_OBSERVATION_START_DATE'] . '  day'); // the sync is launched the evening
 
         if ($loggerMode === 'file') {
             $this->logger->info('Start sync structures...');

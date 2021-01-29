@@ -1025,8 +1025,8 @@ class Agent {
             $startObservationDate = new \DateTime();
         if (empty($endObservationDate))
             $endObservationDate = new \DateTime();
-        $maxSihamDate = new \DateTime('2999-12-31');
-        $endSihamDate = new \DateTime('0001-01-01');
+        $maxSihamDate = new \DateTime($_ENV['SIHAM_WS_DATE_MAX']);
+        $endSihamDate = new \DateTime($_ENV['SIHAM_WS_DATE_NULL']);
 
         #region AFFECTATION
         // Simplify and common data in order to reduce the tests
