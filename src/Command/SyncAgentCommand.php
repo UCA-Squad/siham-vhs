@@ -443,20 +443,23 @@ class SyncAgentCommand extends Command
         $email = (new Email())
             ->from($_ENV['MAIL_FROM'])
             ->subject($subject);
-        if (!empty($to)) $email->to(...$to);
-        if (!empty($cc)) $email->cc(...$cc);
+        if (!empty($to)) {
+            $email->to(...$to);
+            if (!empty($cc)) $email->cc(...$cc);
+
+            $url = $_ENV['APP_HOST'] . $this->router->generate('sync_result', [
+                'env' => $_ENV['APP_ENV'] , 
+                'fileName' => $_ENV['APP_ENV'] . '.sync.agent-' . date('Y-m-d') . '.log'
+            ]);
+            if ($html) {
+                $content.= '<br><br><a href="' . $url . '">Consulter le fichier de log</a>';
+                $email->html($content);
+            } else {
+                $content.= "\n\n" . 'Consulter le fichier de log sur ' . $url;
+                $email->text($content);
+            }
+            $this->mailer->send($email);
+        } 
         
-        $url = $_ENV['APP_HOST'] . $this->router->generate('sync_result', [
-            'env' => $_ENV['APP_ENV'] , 
-            'fileName' => $_ENV['APP_ENV'] . '.sync.agent-' . date('Y-m-d') . '.log'
-        ]);
-        if ($html) {
-            $content.= '<br><br><a href="' . $url . '">Consulter le fichier de log</a>';
-            $email->html($content);
-        } else {
-            $content.= "\n\n" . 'Consulter le fichier de log sur ' . $url;
-            $email->text($content);
-        }
-        $this->mailer->send($email);
     }
 }

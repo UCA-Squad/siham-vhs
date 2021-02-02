@@ -161,17 +161,19 @@ class CheckAnomalyCommand extends Command
                 
         $io->success('Done in ' . number_format((microtime(true) - $start), 3) . 's');
 
-        $to = \explode(',', $_ENV['MAIL_TO_RH']);
-        $cc = \explode(',', $_ENV['MAIL_CC_RH']);
+        $to = empty($_ENV['MAIL_TO_RH']) ? null : \explode(',', $_ENV['MAIL_TO_RH']);
+        $cc = empty($_ENV['MAIL_CC_RH']) ? null : \explode(',', $_ENV['MAIL_CC_RH']);
         if (!empty($emailContent)) {
             $email = (new Email())
                 ->from($_ENV['MAIL_FROM'])
-                ->to(...$to)
-                ->cc(...$cc)
                 ->subject('[SIHAM] VHS - Détection des anomalies')
                 ->text($emailContent);
-    
-            $this->mailer->send($email);
+
+            if (!empty($to)) {
+                $email->to(...$to);
+                if (!empty($cc)) $email->cc(...$cc);
+                $this->mailer->send($email);
+            }
         }
         
         return 0;
