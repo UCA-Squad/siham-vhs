@@ -208,23 +208,21 @@ class SyncAgentCommand extends Command
                     } else {
                         $io->warning('Duration ' . number_format($duration, 3) . 's exceeded by ' . TIMEOUT_MAX_DURATION . 's for recupDonneesPersonnelles');
                     }
-                    
                     if ($timeoutCounter > TIMEOUT_MAX_COUNTER) {
-                        if ($loggerMode === 'file') {
-                            $this->logger->error('Sync agent interrupt', ['cause' => $timeoutCounter . ' timeout achieved']);
-                        } else {
-                            $io->error('Sync agent interrupt, ' . $timeoutCounter . ' timeout achieved');
-                        }
-
                         if ($this->restartWS()) {
                             if ($loggerMode === 'file') {
                                 $this->logger->warning('WS restarted', ['ws' => 'DossierAgentWebService', 'method' => 'recupDonneesPersonnelles', 'cause' => $timeoutCounter . ' timeout achieved']);
                             } else {
                                 $io->warning('WS restarted , ' . $timeoutCounter . ' timeout achieved');
                             }
-                            $emailSIContent.= 'Le WS <b>DossierAgentWebService</b> a été redémarré car ' . $timeoutCounter . ' timeout jusqu\'à <b>recupDonneesAdministratives</b> pour l\'agent ' . $agentSihamId . ' (réinitialisation du compteur à 1).<br>';
+                            $emailSIContent.= 'Le WS <b>DossierAgentWebService</b> a été redémarré car ' . $timeoutCounter . ' timeout jusqu\'à <b>recupDonneesPersonnelles</b> pour l\'agent ' . $agentSihamId . ' (réinitialisation du compteur à 1).<br>';
                             $timeoutCounter = 1;
                         } else {
+                            if ($loggerMode === 'file') {
+                                $this->logger->error('Sync agent interrupt', ['cause' => $timeoutCounter . ' timeout achieved']);
+                            } else {
+                                $io->error('Sync agent interrupt, ' . $timeoutCounter . ' timeout achieved');
+                            }
                             $listUnprocessedAgents = \array_diff($listAgents, $listProcessedAgents);
                             $emailSIContent.= 'La synchronisation des agents a été arrêté après <b>' . $timeoutCounter . '</b> tentatives de pause de <b>' . TIMEOUT_PAUSE_DURATION . 's</b> suite a des <i>timeout</i> ou des temps de récupération dépassant les <b>' . TIMEOUT_MAX_DURATION . 's</b>'; 
                             $emailRHContent.= 'La synchronisation des agents s\'est arrêtée suite a des temps de réponse trop long des webservices.<br>';
@@ -269,12 +267,6 @@ class SyncAgentCommand extends Command
                         $io->warning('Duration ' . number_format($duration, 3) . 's exceeded by ' . TIMEOUT_MAX_DURATION . 's for recupDonneesAdministratives');
                     }
                     if ($timeoutCounter > TIMEOUT_MAX_COUNTER) {
-                        if ($loggerMode === 'file') {
-                            $this->logger->error('Sync agent interrupt', ['cause' => $timeoutCounter . ' timeout achieved']);
-                        } else {
-                            $io->error('Sync agent interrupt, ' . $timeoutCounter . ' timeout achieved');
-                        }
-
                         if ($this->restartWS()) {
                             if ($loggerMode === 'file') {
                                 $this->logger->warning('WS restarted', ['ws' => 'DossierAgentWebService', 'method' => 'recupDonneesAdministratives', 'cause' => $timeoutCounter . ' timeout achieved']);
@@ -284,6 +276,11 @@ class SyncAgentCommand extends Command
                             $emailSIContent.= 'Le WS <b>DossierAgentWebService</br> a été redémarré car ' . $timeoutCounter . ' timeout jusqu\'à <b>recupDonneesAdministratives</b> pour l\'agent ' . $agentSihamId . ' (réinitialisation du compteur à 1).<br>';
                             $timeoutCounter = 1;
                         } else {
+                            if ($loggerMode === 'file') {
+                                $this->logger->error('Sync agent interrupt', ['cause' => $timeoutCounter . ' timeout achieved']);
+                            } else {
+                                $io->error('Sync agent interrupt, ' . $timeoutCounter . ' timeout achieved');
+                            }
                             $listUnprocessedAgents = \array_diff($listAgents, $listProcessedAgents);
                             $emailSIContent.= 'La synchronisation des agents a été arrêté après <b>' . $timeoutCounter . '</b> tentatives de pause de <b>' . TIMEOUT_PAUSE_DURATION . 's</b> suite a des <i>timeout</i> ou des temps de récupération dépassant les <b>' . TIMEOUT_MAX_DURATION . 's</b>'; 
                             $emailRHContent.= 'La synchronisation des agents s\'est arrêtée suite a des temps de réponse trop long des webservices.<br>';
@@ -411,16 +408,29 @@ class SyncAgentCommand extends Command
 
     public function restartWS() {
         // check already sent
-        if ($this->wsRestartCounter < SIHAM_WS_RESTART_MAX)
+        if ($this->wsRestartCounter > SIHAM_WS_RESTART_MAX)
             return false;
         
         $this->wsRestartCounter++;    
         
         // exec command
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
+        curl_setopt($ch, CURLOPT_URL, $_ENV['SIHAM_WS_URL'] . '/manager/text/reload?path=/DossierAgentWebService');
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT_MS, 500);
+        curl_setopt($ch, CURLOPT_TIMEOUT, SIHAM_WS_RESTART_DURATION);
+        curl_setopt($ch, CURLOPT_USERPWD, $_ENV['SIHAM_TOMCAT_USERNAME'] . ':' . $_ENV['SIHAM_TOMCAT_PASSWORD']);
+        $result = curl_exec($ch);
 
-        // sleep to wait
-        \sleep(SIHAM_WS_RESTART_DURATION);
+        // timeout or any error
+        if (!empty(curl_error($ch)))
+            return false;
+
+        curl_close($ch);
+
+        if (strripos($result, 'OK') === false)
+            return false;
 
         // ws is relaunched
         return true;

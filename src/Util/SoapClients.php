@@ -17,7 +17,7 @@ class SoapClients {
             try {
                 self::$soapInstances[$wsdl] = new \SoapClient($_ENV['SIHAM_WS_URL'] . $wsdl, [
                     'cache_wsdl' => WSDL_CACHE_NONE,
-                    'login' => $_ENV['SIHAM_WS_LOGIN'],
+                    'login' => $_ENV['SIHAM_WS_USERNAME'],
                     'password' => $_ENV['SIHAM_WS_PASSWORD'],
                     'trace' => true,
                 ]);
