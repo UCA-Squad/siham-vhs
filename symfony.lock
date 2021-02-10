@@ -32,6 +32,12 @@
             "config/packages/dev/debug.yaml"
         ]
     },
+    "symfony/deprecation-contracts": {
+        "version": "v2.2.0"
+    },
+    "symfony/http-client-contracts": {
+        "version": "v2.3.1"
+    },
     "symfony/mailer": {
         "version": "4.3",
         "recipe": {
@@ -61,11 +67,17 @@
             "config/packages/test/monolog.yaml"
         ]
     },
+    "symfony/polyfill-intl-grapheme": {
+        "version": "v1.22.0"
+    },
     "symfony/polyfill-intl-normalizer": {
         "version": "v1.18.1"
     },
     "symfony/polyfill-php80": {
         "version": "v1.18.1"
+    },
+    "symfony/string": {
+        "version": "v5.2.3"
     },
     "symfony/twig-pack": {
         "version": "v1.0.0"
