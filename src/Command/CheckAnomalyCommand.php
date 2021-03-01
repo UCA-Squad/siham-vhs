@@ -164,6 +164,7 @@ class CheckAnomalyCommand extends Command
         $to = empty($_ENV['MAIL_TO_RH']) ? null : \explode(',', $_ENV['MAIL_TO_RH']);
         $cc = empty($_ENV['MAIL_CC_RH']) ? null : \explode(',', $_ENV['MAIL_CC_RH']);
         if (!empty($emailContent)) {
+            $emailContent.= "\n\n" . 'Environnement ' . $_ENV['APP_ENV'];
             $email = (new Email())
                 ->from($_ENV['MAIL_FROM'])
                 ->subject('[SIHAM] VHS - Détection des anomalies')
