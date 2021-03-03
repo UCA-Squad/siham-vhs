@@ -467,7 +467,7 @@ class SyncAgentCommand extends Command
                 $email->html($content);
             } else {
                 $content.= "\n\n" . 'Consulter le fichier de log sur ' . $url;
-                $content.= "\n\n" . 'Environnement' . $_ENV['APP_ENV'];
+                $content.= "\n\n" . 'Environnement ' . $_ENV['APP_ENV'];
                 $email->text($content);
             }
             $this->mailer->send($email);
