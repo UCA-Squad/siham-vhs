@@ -273,7 +273,7 @@ class SyncAgentCommand extends Command
                             } else {
                                 $io->warning('WS restarted , ' . $timeoutCounter . ' timeout achieved');
                             }
-                            $emailSIContent.= 'Le WS <b>DossierAgentWebService</br> a été redémarré car ' . $timeoutCounter . ' timeout jusqu\'à <b>recupDonneesAdministratives</b> pour l\'agent ' . $agentSihamId . ' (réinitialisation du compteur à 1).<br>';
+                            $emailSIContent.= 'Le WS <b>DossierAgentWebService</b> a été redémarré car ' . $timeoutCounter . ' timeout jusqu\'à <b>recupDonneesAdministratives</b> pour l\'agent ' . $agentSihamId . ' (réinitialisation du compteur à 1).<br>';
                             $timeoutCounter = 1;
                         } else {
                             if ($loggerMode === 'file') {
