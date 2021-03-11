@@ -17,9 +17,18 @@ class DossierParametrageWebServiceTest extends TestCase
         $this->assertObjectHasAttribute('return', $responseDossierParametrage);
     }
 
-    /**
-     * @TODO
-     * - ? list of attributes to fill database
-     * 
-     */
+    public function testRestartWS() {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_URL, $_ENV['SIHAM_WS_URL'] . '/manager/text/reload?path=/DossierParametrageWebService');
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT_MS, 500);
+        curl_setopt($ch, CURLOPT_TIMEOUT, (int) $_ENV['SIHAM_WS_RESTART_DURATION']);
+        $headers = ['Authorization: Basic '. base64_encode($_ENV['SIHAM_TOMCAT_USERNAME'] . ':' . $_ENV['SIHAM_TOMCAT_PASSWORD'])];
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+        $result = curl_exec($ch);
+        curl_close($ch);
+
+        $this->assertEquals(true, strripos($result, 'OK') !== false);
+    }
 }

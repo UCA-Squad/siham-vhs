@@ -420,7 +420,9 @@ class SyncAgentCommand extends Command
         curl_setopt($ch, CURLOPT_URL, $_ENV['SIHAM_WS_URL'] . '/manager/text/reload?path=/DossierAgentWebService');
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT_MS, 500);
         curl_setopt($ch, CURLOPT_TIMEOUT, SIHAM_WS_RESTART_DURATION);
-        curl_setopt($ch, CURLOPT_USERPWD, $_ENV['SIHAM_TOMCAT_USERNAME'] . ':' . $_ENV['SIHAM_TOMCAT_PASSWORD']);
+        $headers = ['Authorization: Basic '. base64_encode($_ENV['SIHAM_TOMCAT_USERNAME'] . ':' . $_ENV['SIHAM_TOMCAT_PASSWORD'])];
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
         $result = curl_exec($ch);
 
         // timeout or any error
