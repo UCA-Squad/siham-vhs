@@ -17,7 +17,7 @@ class DossierParametrageWebServiceTest extends TestCase
         $this->assertObjectHasAttribute('return', $responseDossierParametrage);
     }
 
-    public function testRestartWS() {
+    public function testRestartWebservice() {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_URL, $_ENV['SIHAM_WS_URL'] . '/manager/text/reload?path=/DossierParametrageWebService');
