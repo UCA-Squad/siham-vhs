@@ -116,10 +116,10 @@ class CheckAnomalyCommand extends Command
         if ($agentsWithFUNAndNoHIE) {
             $nbAgents = count($agentsWithFUNAndNoHIE);
             $io->writeln(\sprintf('<info>%s</info> agents found', $nbAgents));
-            $emailContent.= '== ' . $nbAgents . ' agent(s) avec une affectation HIE mais aucune affectation FUN ==' . "\n";
+            $emailContent.= '== ' . $nbAgents . ' agent(s) avec une affectation FUN mais aucune affectation HIE ==' . "\n";
             foreach ($agentsWithFUNAndNoHIE as $agentWithFUNAndNoHIE) {
                 $display = '- ' . $agentWithFUNAndNoHIE->getMatricule() . ' - ' . $this->addSpaces($agentWithFUNAndNoHIE->getNomUsuel(), 15) . ' - ' . $this->addSpaces($agentWithFUNAndNoHIE->getPrenom(), 15)
-                    . ' - ' . $this->addSpaces($agentWithFUNAndNoHIE->getCodeUOAffectationsHIE(), 25)
+                    // . ' - ' . $this->addSpaces($agentWithFUNAndNoHIE->getCodeUOAffectationsHIE(), 25)
                     . ' - ' . $this->addSpaces($agentWithFUNAndNoHIE->getCodeUOAffectationsFUN(), 25)
                 ;
                 $io->writeln($display);
