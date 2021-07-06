@@ -1044,9 +1044,9 @@ class Agent {
                 $type = $listeAffectation->codeTypeRattachement;
                 if (!empty($when)) {
                 
-                    $codeUOAffectations [$type][$when][] = $listeAffectation->codeUOAffectation;
-                    $nameAffectations   [$type][$when][] = $listeAffectation->libLongCodeUOAffectation;
-                    $quotiteAffectations[$type][$when][] = $listeAffectation->quotiteAffectation;
+                    if (!isset($codeUOAffectations[$type][$when]) || !in_array($listeAffectation->codeUOAffectation, $codeUOAffectations[$type][$when])) $codeUOAffectations[$type][$when][] = $listeAffectation->codeUOAffectation;
+                    if (!isset($nameAffectations[$type][$when]) || !in_array($listeAffectation->libLongCodeUOAffectation, $nameAffectations[$type][$when])) $nameAffectations[$type][$when][] = $listeAffectation->libLongCodeUOAffectation;
+                    if (!isset($quotiteAffectations[$type][$when]) || \array_sum($quotiteAffectations[$type][$when]) < 100) $quotiteAffectations[$type][$when][] = $listeAffectation->quotiteAffectation;
                     
                     $dateDebutAffectations[$type][$when][] = $dateDebutAffectationsCurrent;
                     

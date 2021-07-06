@@ -305,7 +305,7 @@ class SyncAgentCommand extends Command
                         if ($loggerMode === 'file') {
                             $this->logger->warning('- no administrative data', ['ws' => 'DossierAgentWebService', 'method' => 'recupDonneesAdministratives', 'cause' => 'empty response']);
                         } else {
-                            $io->warning('No administrative data for' . $agentSihamId);
+                            $io->warning('No administrative data for ' . $agentSihamId);
                         }
                         $emailSIContent.= 'recupDonneesPersonnelles vide pour l\'agent ' . $agentSihamId . '.<br>';
                     }
@@ -465,7 +465,7 @@ class SyncAgentCommand extends Command
             ]);
             if ($html) {
                 $content.= '<br><br><a href="' . $url . '">Consulter le fichier de log</a>';
-                $content.= '<br><br><i>Environnement' . $_ENV['APP_ENV'] . '</i>';
+                $content.= '<br><br><i>Environnement ' . $_ENV['APP_ENV'] . '</i>';
                 $email->html($content);
             } else {
                 $content.= "\n\n" . 'Consulter le fichier de log sur ' . $url;
