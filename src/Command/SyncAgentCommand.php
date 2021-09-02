@@ -341,7 +341,7 @@ class SyncAgentCommand extends Command
                         || (!empty($agent->getDateDebutAffectationsHIE()) && $agent->getDateDebutAffectationsHIE() >= $startPopulationTypeDate)) {
                             $codePopulationType = $resPopulationType['POPULA'];
                             $codeCategoryPopulationType = $resPopulationType['CATEGO'];
-                            $codeSubPopulationType = $resPopulationType['SSCATE'];
+                            $codeSubCategoryPopulationType = $resPopulationType['SSCATE'];
                         }
                     }
                 } else {
