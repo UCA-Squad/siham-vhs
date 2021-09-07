@@ -61,11 +61,11 @@ class SyncLdapCommand extends Command
         }
 
         // Read extract file from LDAP
-        $rows = @file($this->project_dir . '/var/ldap/' . $_ENV['SIHAM_WS_LDAP_EXTRACT']);
+        $rows = @file($this->project_dir . '/var/ext/' . $_ENV['SIHAM_WS_LDAP_EXTRACT']);
         if ($rows !== false && ($numberOfUsers = count($rows)) > 0) {
             
             if ($loggerMode === 'file') {
-                $this->logger->info($numberOfUsers . ' agents found');
+                $this->logger->info($numberOfUsers . ' users found');
             } else {
                 $io->writeln(\sprintf('<info>%s</info> users found', $numberOfUsers));
                 // creates a new progress bar (50 units)
@@ -120,7 +120,7 @@ class SyncLdapCommand extends Command
                 // ensures that the progress bar is at 100%
                 $progressBar->finish();
                 
-                $io->success('Sync the users to SIHAM was successfully done.');
+                $io->success('Sync the users from LDAP was successfully done.');
             }
 
         } else {

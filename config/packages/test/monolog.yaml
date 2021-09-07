@@ -1,6 +1,6 @@
 monolog:
     # Add new channel to log the synch commands
-    channels: ['sync_agent', 'sync_geisha', 'sync_structure', 'sync_ldap']
+    channels: ['sync_agent', 'sync_geisha', 'sync_structure', 'sync_ldap', 'sync_inp']
     
     handlers:
         # Define handler to log in a different file
@@ -14,33 +14,33 @@ monolog:
             channels: ["sync_agent"]
         sync_geisha:
             type: rotating_file
-            # default path means templates directory
-            # in order to read log into twig render
             path: "%twig.default_path%/sync/%kernel.environment%.sync.geisha.log"
             level: debug
             max_files: 6
             channels: ["sync_geisha"]
         sync_structure:
             type: rotating_file
-            # default path means templates directory
-            # in order to read log into twig render
             path: "%twig.default_path%/sync/%kernel.environment%.sync.structure.log"
             level: debug
             max_files: 6
             channels: ["sync_structure"]
         sync_ldap:
             type: rotating_file
-            # default path means templates directory
-            # in order to read log into twig render
             path: "%twig.default_path%/sync/%kernel.environment%.sync.ldap.log"
             level: debug
             max_files: 6
             channels: ["sync_ldap"]
+        sync_inp:
+            type: rotating_file
+            path: "%twig.default_path%/sync/%kernel.environment%.sync.inp.log"
+            level: debug
+            max_files: 6
+            channels: ["sync_inp"]
         main:
             type: stream
             path: "%kernel.logs_dir%/%kernel.environment%.log"
             level: debug
-            channels: ["!event", '!sync_agent', '!sync_geisha', '!sync_structure', '!sync_ldap']
+            channels: ["!event", '!sync_agent', '!sync_geisha', '!sync_structure', '!sync_ldap', '!sync_inp']
         # uncomment to get logging in your browser
         # you may have to allow bigger header sizes in your Web server configuration
         #firephp:

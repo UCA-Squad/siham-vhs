@@ -7,7 +7,10 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Agent
  *
- * @ORM\Table(name="agent", uniqueConstraints={@ORM\UniqueConstraint(name="matricule_UNIQUE", columns={"matricule"})})
+ * @ORM\Table(name="agent", 
+ *      uniqueConstraints={@ORM\UniqueConstraint(name="matricule_UNIQUE", columns={"matricule"})}, 
+ *      indexes={@ORM\Index(columns={"aurion"})}
+ * )
  * @ORM\Entity(repositoryClass="App\Repository\AgentRepository")
  * @ORM\HasLifecycleCallbacks()
  */
@@ -434,6 +437,13 @@ class Agent {
      * @ORM\Column(name="nameAbsence", type="text", nullable=true)
      */
     private $nameAbsence;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="aurion", type="string", length=12)
+     */
+    private $aurion;
 
     #endregion
 
@@ -945,6 +955,15 @@ class Agent {
     }
     public function setNameAbsence(?string $nameAbsence): self {
         $this->nameAbsence = $nameAbsence;
+
+        return $this;
+    }
+
+    public function getAurion(): ?string {
+        return $this->aurion;
+    }
+    public function setAurion(?string $aurion): self {
+        $this->aurion = $aurion;
 
         return $this;
     }
