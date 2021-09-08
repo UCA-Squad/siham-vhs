@@ -441,7 +441,7 @@ class Agent {
     /**
      * @var string|null
      *
-     * @ORM\Column(name="aurion", type="string", length=12)
+     * @ORM\Column(name="aurion", type="string", length=12, nullable=true)
      */
     private $aurion;
 
