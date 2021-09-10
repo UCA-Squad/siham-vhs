@@ -98,6 +98,13 @@ class Agent {
     private $numDossierHarpege;
 
     /**
+     * @var string|null
+     *
+     * @ORM\Column(name="numen", type="string", length=13, nullable=true)
+     */
+    private $numen;
+
+    /**
      * @var \DateTime|null
      *
      * @ORM\Column(name="lastUpdate", type="datetime", nullable=true)
@@ -531,6 +538,14 @@ class Agent {
     }
     public function setNumDossierHarpege(?int $numDossierHarpege): self {
         $this->numDossierHarpege = $numDossierHarpege;
+
+        return $this;
+    }
+    public function getNumen(): ?string {
+        return $this->numen;
+    }
+    public function setNumen(?string $numen): self {
+        $this->numen = $numen;
 
         return $this;
     }
