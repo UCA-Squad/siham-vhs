@@ -94,6 +94,10 @@ class SyncInpCommand extends Command
                         $agent->setMatricule('INP' . str_pad($detailAgent['IdAurion'], 9, 0, STR_PAD_LEFT));
                         $agent->setAurion($detailAgent['IdAurion']);
                     }
+                    if ($agent->getCodePositionStatutaire() != 'AC') {
+                        $agent->setCodePositionStatutaire('AC');
+                        $updatedFields['position statutaire'] = 'AC';
+                    }
                     
                     // For each attribute set if different and call webservice to write
                     $updatedFields = [];
