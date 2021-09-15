@@ -40,15 +40,21 @@ class DossierAgentWebServiceTest extends TestCase
 
         $dossierAgentWebService = new DossierAgentWebService();
 
-        $responseDossierAgent = $dossierAgentWebService->addPhoneProfessional($_ENV['SIHAM_WS_MATRICULE_TEST'], '0102030405');
-        $this->assertEquals(1, $responseDossierAgent);
+        $responseDossierAgentAddPD = $dossierAgentWebService->addPhoneProfessional($_ENV['SIHAM_WS_MATRICULE_TEST'], '0102030405');
+        $this->assertEquals(1, $responseDossierAgentAddPD);
 
-        $responseDossierAgent = $dossierAgentWebService->updatePhoneProfessional($_ENV['SIHAM_WS_MATRICULE_TEST'], '0102030400');
-        $this->assertEquals(1, $responseDossierAgent);
+        $responseDossierAgentUpdatePD = $dossierAgentWebService->updatePhoneProfessional($_ENV['SIHAM_WS_MATRICULE_TEST'], '0102030400');
+        $this->assertEquals(1, $responseDossierAgentUpdatePD);
 
-        $responseDossierAgent = $dossierAgentWebService->removePhoneProfessional($_ENV['SIHAM_WS_MATRICULE_TEST']);
-        $this->assertEquals(1, $responseDossierAgent);
+        $responseDossierAgentRemovePD = $dossierAgentWebService->removePhoneProfessional($_ENV['SIHAM_WS_MATRICULE_TEST']);
+        $this->assertEquals(1, $responseDossierAgentRemovePD);
     }
     
+    public function testGetEchelon() {
+        $dossierAgentWebService = new DossierAgentWebService();
+
+        $responseDossierGetEchelon = $dossierAgentWebService->getEchelon($_ENV['SIHAM_WS_MATRICULE_TEST']);
+        $this->assertObjectHasAttribute('return', $responseDossierGetEchelon);
+    }
 
  }

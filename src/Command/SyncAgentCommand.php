@@ -312,6 +312,62 @@ class SyncAgentCommand extends Command
                 }
                 #endregion
 
+                #region Call SIHAM WS to get echelon
+                $startTempo = microtime(true);
+                $echelon = $dossierAgentWS->getEchelon($agentSihamId);
+                // restart WS or exit if X timeout achieved
+                $duration = microtime(true) - $startTempo;
+                if ($duration > TIMEOUT_MAX_DURATION) {
+                    if ($loggerMode === 'file') {
+                        $this->logger->warning('Duration exceeded by ' . TIMEOUT_MAX_DURATION . 's', ['ws' => 'DossierAgentWebService', 'method' => 'recupProchainEchelon', 'cause' => 'timeout', 'duration' => number_format($duration, 3) . 's']);
+                    } else {
+                        $io->warning('Duration ' . number_format($duration, 3) . 's exceeded by ' . TIMEOUT_MAX_DURATION . 's for recupProchainEchelon');
+                    }
+                    if ($timeoutCounter > TIMEOUT_MAX_COUNTER) {
+                        if ($this->restartWS()) {
+                            if ($loggerMode === 'file') {
+                                $this->logger->warning('WS restarted', ['ws' => 'DossierAgentWebService', 'method' => 'recupProchainEchelon', 'cause' => $timeoutCounter . ' timeout achieved']);
+                            } else {
+                                $io->warning('WS restarted , ' . $timeoutCounter . ' timeout achieved');
+                            }
+                            $emailSIContent.= 'Le WS <b>DossierAgentWebService</b> a été redémarré car ' . $timeoutCounter . ' timeout jusqu\'à <b>recupProchainEchelon</b> pour l\'agent ' . $agentSihamId . ' (réinitialisation du compteur à 1).<br>';
+                            $timeoutCounter = 1;
+                        } else {
+                            if ($loggerMode === 'file') {
+                                $this->logger->error('Sync agent interrupt', ['cause' => $timeoutCounter . ' timeout achieved']);
+                            } else {
+                                $io->error('Sync agent interrupt, ' . $timeoutCounter . ' timeout achieved');
+                            }
+                            $listUnprocessedAgents = \array_diff($listAgents, $listProcessedAgents);
+                            $emailSIContent.= 'La synchronisation des agents a été arrêté après <b>' . $timeoutCounter . '</b> tentatives de pause de <b>' . TIMEOUT_PAUSE_DURATION . 's</b> suite a des <i>timeout</i> ou des temps de récupération dépassant les <b>' . TIMEOUT_MAX_DURATION . 's</b>'; 
+                            $emailRHContent.= 'La synchronisation des agents s\'est arrêtée suite a des temps de réponse trop long des webservices.<br>';
+                            $emailRHContent.= '<b>' . count($listUnprocessedAgents) . '</b>/' . count($listAgents) . ' matricules n\'ont pas été traités:<br>';
+                            $emailRHContent.= \implode('<br>', $listUnprocessedAgents) . '<br>';
+                            if (!empty($emailSIContent)) $this->sendSIEmail($emailSIContent);
+                            if (!empty($emailRHContent)) $this->sendRHEmail($emailRHContent);
+                            return 0;
+                        }
+                    }
+                    $this->logger->info('Have a break for ' . TIMEOUT_PAUSE_DURATION . 's ...', ['cause' => $timeoutCounter . ' attempts achieved']);
+                    \sleep(TIMEOUT_PAUSE_DURATION);
+                    $timeoutCounter++;
+                } else {
+                    // set data if returned
+                    if (isset($echelon->return)) {
+                        $agent->addEchelons($echelon->return);
+                        if ($loggerMode === 'file') {
+                            $this->logger->info('- receive echelon' . \str_repeat('&nbsp;', 6), ['duration' => number_format(microtime(true) - $startTempo, 3) . 's']);
+                        }
+                    } else {
+                        if ($loggerMode === 'file') {
+                            $this->logger->warning('- no echelon' . \str_repeat('&nbsp;', 6), ['ws' => 'DossierAgentWebService', 'method' => 'recupProchainEchelon', 'cause' => 'empty response']);
+                        } else {
+                            $io->warning('No echelon for ' . $agentSihamId);
+                        }
+                        $emailSIContent.= 'recupProchainEchelon vide pour l\'agent ' . $agentSihamId . '.<br>';
+                    }
+                }
+                #endregion
 
                 #region Call SIHAM db to get population type*
                 $startTempo = microtime(true);

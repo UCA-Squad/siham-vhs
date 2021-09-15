@@ -200,6 +200,18 @@ class Agent {
      * @ORM\Column(name="codeEchelon", type="string", length=2, nullable=true)
      */
     private $codeEchelon;
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="codeProchainEchelon", type="string", length=2, nullable=true)
+     */
+    private $codeProchainEchelon;
+    /**
+     * @var \DateTime|null
+     *
+     * @ORM\Column(name="dateProchainEchelon", type="date", nullable=true)
+     */
+    private $dateProchainEchelon;
 
     /**
      * @var int|null
@@ -207,6 +219,12 @@ class Agent {
      * @ORM\Column(name="indiceMajore", type="integer", nullable=true)
      */
     private $indiceMajore;
+    /**
+     * @var int|null
+     *
+     * @ORM\Column(name="prochainIndiceMajore", type="integer", nullable=true)
+     */
+    private $prochainIndiceMajore;
 
     /**
      * @var string|null
@@ -666,11 +684,35 @@ class Agent {
 
         return $this;
     }
+    public function getCodeProchainEchelon(): ?string {
+        return $this->codeProchainEchelon;
+    }
+    public function setCodeProchainEchelon(?string $codeProchainEchelon): self {
+        $this->codeProchainEchelon = $codeProchainEchelon;
+
+        return $this;
+    }
+    public function getDateProchainEchelon(): ?\DateTimeInterface {
+        return $this->dateProchainEchelon;
+    }
+    public function setDateProchainEchelon(?\DateTimeInterface $dateProchainEchelon): self {
+        $this->dateProchainEchelon = $dateProchainEchelon;
+
+        return $this;
+    }
     public function getIndiceMajore(): ?int {
         return $this->indiceMajore;
     }
     public function setIndiceMajore(?int $indiceMajore): self {
         $this->indiceMajore = $indiceMajore;
+
+        return $this;
+    }
+    public function getProchainIndiceMajore(): ?int {
+        return $this->prochainIndiceMajore;
+    }
+    public function setProchainIndiceMajore(?int $prochainIndiceMajore): self {
+        $this->prochainIndiceMajore = $prochainIndiceMajore;
 
         return $this;
     }
@@ -1269,6 +1311,12 @@ class Agent {
         $this->dateFinModaliteService   = isset($dateFinModaliteService['current'])  ? $dateFinModaliteService['current']   : (isset($dateFinModaliteService['next'])   ? $dateFinModaliteService['next']   : null);
         #endregion
 
+    }
+
+    public function addEchelons($echelons) {
+        if (isset($echelons->codeEchelonPrevisionnel)) $this->setCodeProchainEchelon($echelons->codeEchelonPrevisionnel);
+        if (isset($echelons->datePrevisionnelleAvancEchelon)) $this->setDateProchainEchelon(new \DateTime(\substr($echelons->datePrevisionnelleAvancEchelon, 0, 10)));
+        if (isset($echelons->indiceMajorePrevisionnel)) $this->setProchainIndiceMajore($echelons->indiceMajorePrevisionnel); 
     }
 
 }

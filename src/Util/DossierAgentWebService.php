@@ -128,6 +128,28 @@ class DossierAgentWebService
         return $administrativeData;
     }
 
+    public function getEchelon($matricule) {
+        $soapClientDossierAgent = SoapClients::getInstance($this->WSDL);
+
+        $echelon = new \StdClass(); // Response expected
+        if ($soapClientDossierAgent) {
+            try {
+                $echelon = $soapClientDossierAgent->recupProchainEchelon([
+                    'ParamListAgent' => [
+                        'dateObservation' => '',
+                        'dateFinObservation' =>  '',
+                        'codeEtablissement' => '',
+                        'listeMatricules' => [
+                            'matricule' => $matricule
+                        ]
+                    ]
+                ]);
+            } catch (\SoapFault $fault) {
+                // ... log it ?
+            }
+        }
+        return $echelon;
+    }
 
     
 }
