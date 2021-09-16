@@ -106,10 +106,10 @@ class SyncInpCommand extends Command
                         $agent->setNomUsuel($detailAgent['NomPatronymique']);
                         $updatedFields['nom patronymique'] = $detailAgent['NomPatronymique'];
                     }
-                    if (trim($agent->getNomUsuel()) != trim($detailAgent['NomUsuel'])) {
-                        $agent->setNomUsuel($detailAgent['NomUsuel']);
-                        $updatedFields['nom usuel'] = $detailAgent['NomUsuel'];
-                    }
+                    // if (trim($agent->getNomUsuel()) != trim($detailAgent['NomUsuel'])) {
+                    //     $agent->setNomUsuel($detailAgent['NomUsuel']);
+                    //     $updatedFields['nom usuel'] = $detailAgent['NomUsuel'];
+                    // }
                     if (trim($agent->getPrenom()) != trim($detailAgent['Prenom'])) {
                         $agent->setPrenom($detailAgent['Prenom']);
                         $updatedFields['prenom'] = $detailAgent['Prenom'];
@@ -134,6 +134,11 @@ class SyncInpCommand extends Command
                         $agent->setMailPro($detailAgent['MailSigma']);
                         $updatedFields['mail pro'] = $detailAgent['MailSigma'];
                     }
+
+                    if ($agent->getQuotiteAffectationsHIE() != '100') {
+                        $agent->setQuotiteAffectationsHIE('100');
+                        $updatedFields['position statutaire'] = '100';
+                    }
                     if (is_null($agent->getDateDebutAffectationsHIE()) || trim($agent->getDateDebutAffectationsHIE()->format('d/m/Y')) != trim($detailAgent['DateDebut'])) {
                         $date = \DateTime::createFromFormat('d/m/Y', $detailAgent['DateDebut']);
                         if ($date !== false) {
@@ -148,6 +153,7 @@ class SyncInpCommand extends Command
                         }
                         $updatedFields['date fin HIE'] = $date;
                     }
+
                     if (\array_key_exists($detailAgent['EntiteAffectation'], $matchCodeUOAffectations) && $agent->getCodeUOAffectationsHIE() != $matchCodeUOAffectations[$detailAgent['EntiteAffectation']]) {
                         $affectation = isset($matchCodeUOAffectations[$detailAgent['EntiteAffectation']]) ? $matchCodeUOAffectations[$detailAgent['EntiteAffectation']] : $matchCodeUOAffectations['SIGMA_CLERMONT'];
                         $agent->setCodeUOAffectationsHIE($affectation);
