@@ -103,6 +103,7 @@ class SyncInpCommand extends Command
                     $updatedFields = [];
                     if (trim($agent->getNomPatronymique()) != trim($detailAgent['NomPatronymique'])) {
                         $agent->setNomPatronymique($detailAgent['NomPatronymique']);
+                        $agent->setNomUsuel($detailAgent['NomPatronymique']);
                         $updatedFields['nom patronymique'] = $detailAgent['NomPatronymique'];
                     }
                     if (trim($agent->getNomUsuel()) != trim($detailAgent['NomUsuel'])) {
