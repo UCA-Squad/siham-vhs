@@ -313,7 +313,7 @@ class SyncAgentCommand extends Command
                 #endregion
 
                 #region Call SIHAM WS to get echelon
-                if ($agent->getCodeQualiteStatutaire() == 'T') {
+                if ($agent->getCodePIP() == 'TITU1') {
 
                     $startTempo = microtime(true);
                     $echelon = $dossierAgentWS->getEchelon($agentSihamId);
