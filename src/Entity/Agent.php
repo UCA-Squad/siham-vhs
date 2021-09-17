@@ -156,6 +156,13 @@ class Agent {
     /**
      * @var string|null
      *
+     * @ORM\Column(name="libLongPIP", type="string", length=45, nullable=true)
+     */
+    private $libLongPIP;
+
+    /**
+     * @var string|null
+     *
      * @ORM\Column(name="codeQualiteStatutaire", type="string", length=1, nullable=true)
      */
     private $codeQualiteStatutaire;
@@ -626,6 +633,15 @@ class Agent {
 
         return $this;
     }
+    public function getLibLongPIP(): ?string {
+        return $this->libLongPIP;
+    }
+    public function setLibLongPIP(?string $libLongPIP): self {
+        $this->libLongPIP = $libLongPIP;
+
+        return $this;
+    }
+
 
     public function getCodeQualiteStatutaire(): ?string {
         return $this->codeQualiteStatutaire;
@@ -1220,6 +1236,7 @@ class Agent {
 
         #region PIP
         $codePIP = [];
+        $libLongPIP = [];
         if (isset($administrativeData->listePIP)) {
             $listePIPs = \is_object($administrativeData->listePIP) ? [$administrativeData->listePIP] : $administrativeData->listePIP;
             foreach($listePIPs as $listePIP) {
@@ -1230,10 +1247,12 @@ class Agent {
                 $when = $dateDebutPIPCurrent <= $startObservationDate ? 'current' : ($dateDebutPIPCurrent <= $endObservationDate ? 'next' : null);
                 if (!empty($when)) {
                     if (isset($listePIP->codePIP)) $codePIP[$when] = $listePIP->codePIP;
+                    if (isset($listePIP->libLongPIP)) $libLongPIP[$when] = $listePIP->libLongPIP;
                 }
             }
         }
         $this->codePIP = isset($codePIP['current']) ? $codePIP['current'] : (isset($codePIP['next']) ? $codePIP['next'] : null);
+        $this->libLongPIP = isset($libLongPIP['current']) ? $libLongPIP['current'] : (isset($libLongPIP['next']) ? $libLongPIP['next'] : null);
         #endregion
 
         #region POSITION ADMINISTRATIVE
@@ -1313,6 +1332,10 @@ class Agent {
 
     }
 
+    /**
+     * Set attributes from response of webservice dossierAgent
+     * @param echelons object response of webservice 
+     */
     public function addEchelons($echelons) {
         if (isset($echelons->codeEchelonPrevisionnel)) $this->setCodeProchainEchelon($echelons->codeEchelonPrevisionnel);
         if (isset($echelons->datePrevisionnelleAvancEchelon)) $this->setDateProchainEchelon(new \DateTime(\substr($echelons->datePrevisionnelleAvancEchelon, 0, 10)));
