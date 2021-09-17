@@ -101,17 +101,19 @@ class SyncInpCommand extends Command
                     
                     // For each attribute set if different and call webservice to write
                     $updatedFields = [];
-                    if (trim($agent->getNomPatronymique()) != trim($detailAgent['NomPatronymique'])) {
-                        $agent->setNomPatronymique($detailAgent['NomPatronymique']);
-                        $updatedFields['nom patronymique'] = $detailAgent['NomPatronymique'];
+                    $nomPatronymique = \strtoupper(trim($detailAgent['NomPatronymique']));
+                    if (trim($agent->getNomPatronymique()) != $nomPatronymique) {
+                        $agent->setNomPatronymique($nomPatronymique);
+                        $updatedFields['nom patronymique'] = $nomPatronymique;
                     }
-                    if (trim($agent->getNomUsuel()) != trim($detailAgent['NomPatronymique'])) {
-                        $agent->setNomUsuel($detailAgent['NomPatronymique']);
-                        $updatedFields['nom usuel'] = $detailAgent['NomPatronymique'];
+                    if (trim($agent->getNomUsuel()) != $nomPatronymique) {
+                        $agent->setNomUsuel($nomPatronymique);
+                        $updatedFields['nom usuel'] = $nomPatronymique;
                     }
-                    if (trim($agent->getPrenom()) != trim($detailAgent['Prenom'])) {
-                        $agent->setPrenom($detailAgent['Prenom']);
-                        $updatedFields['prenom'] = $detailAgent['Prenom'];
+                    $prenom = \strtoupper(trim($detailAgent['Prenom']));
+                    if (trim($agent->getPrenom()) != $prenom) {
+                        $agent->setPrenom($prenom);
+                        $updatedFields['prenom'] = $prenom;
                     }
                     if (is_null($agent->getDateNaissance()) || trim($agent->getDateNaissance()->format('d/m/Y')) != trim($detailAgent['DateDeNaissance'])) {
                         $date = \DateTime::createFromFormat('d/m/Y', $detailAgent['DateDeNaissance']);
