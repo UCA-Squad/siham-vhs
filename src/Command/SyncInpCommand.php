@@ -138,7 +138,11 @@ class SyncInpCommand extends Command
 
                     if ($agent->getQuotiteAffectationsHIE() != '100') {
                         $agent->setQuotiteAffectationsHIE('100');
-                        $updatedFields['quotite'] = '100';
+                        $updatedFields['quotite HIE'] = '100';
+                    }
+                    if ($agent->getQuotiteAffectationsFUN() != '100') {
+                        $agent->setQuotiteAffectationsFUN('100');
+                        $updatedFields['quotite FUN'] = '100';
                     }
                     if (is_null($agent->getDateDebutAffectationsHIE()) || trim($agent->getDateDebutAffectationsHIE()->format('d/m/Y')) != trim($detailAgent['DateDebut'])) {
                         $date = \DateTime::createFromFormat('d/m/Y', $detailAgent['DateDebut']);
