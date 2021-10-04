@@ -149,6 +149,13 @@ class Agent {
     /**
      * @var string|null
      *
+     * @ORM\Column(name="adressePerso", type="string", nullable=true)
+     */
+    private $adressePerso;
+
+    /**
+     * @var string|null
+     *
      * @ORM\Column(name="codePIP", type="string", length=8, nullable=true)
      */
     private $codePIP;
@@ -624,6 +631,14 @@ class Agent {
 
         return $this;
     }
+    public function getAdressePerso(): ?string {
+        return $this->adressePerso;
+    }
+    public function setAdressePerso(?string $adressePerso): self {
+        $this->adressePerso = $adressePerso;
+
+        return $this;
+    }
 
     public function getCodePIP(): ?string {
         return $this->codePIP;
@@ -1090,6 +1105,15 @@ class Agent {
                 if (isset($typesNumerosMails[$numeroMail->codeTypologieNumeroMail])) {
                     $attributeNumerosMails = $typesNumerosMails[$numeroMail->codeTypologieNumeroMail];
                     $this->$attributeNumerosMails = $numeroMail->numeroMail;
+                }
+            }
+        }
+        // Personal address
+        if (isset($personalData->listeAdresses)) {
+            $listAddresses = \is_object($personalData->listeAdresses) ? [$personalData->listeAdresses] : $personalData->listeAdresses;
+            foreach($listAddresses as $address) {
+                if ($address->temAdressePrincipale == 1) {
+                    $this->adressePerso = ucwords(strtolower($address->ligneAdresseVoie . ', ' . $address->ligneAdresseDestination));
                 }
             }
         }
