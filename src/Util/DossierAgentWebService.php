@@ -9,7 +9,7 @@ class DossierAgentWebService
 {
     private $WSDL = '/DossierAgentWebService/DossierAgentWebService?wsdl';
 
-    public function getPersonalData($matricule, $startObservationDate = null, $endObservationDate = null) {
+    public function getPersonalData($matricule, $startObservationDate = null, $endObservationDate = null, $universityCode = '') {
 
         $soapClientDossierAgent = SoapClients::getInstance($this->WSDL);
         
@@ -18,6 +18,7 @@ class DossierAgentWebService
             try {
                 $personalData = $soapClientDossierAgent->recupDonneesPersonnelles([
                     'ParamListAgent' => [
+                        'codeEtablissement' => $universityCode,
                         'dateObservation' => $startObservationDate ?? date('Y-m-d'),
                         'dateFinObservation' => $endObservationDate ?? '',
                         'listeMatricules' => [
@@ -105,7 +106,7 @@ class DossierAgentWebService
     }
     //endregion
 
-    public function getAdministrativeData($matricule, $startObservationDate = null, $endObservationDate = null) {
+    public function getAdministrativeData($matricule, $startObservationDate = null, $endObservationDate = null, $universityCode = '') {
 
         $soapClientDossierAgent = SoapClients::getInstance($this->WSDL);
         
@@ -114,6 +115,7 @@ class DossierAgentWebService
             try {
                 $administrativeData = $soapClientDossierAgent->recupDonneesAdministratives([
                     'ParamListAgent' => [
+                        'codeEtablissement' => $universityCode,
                         'dateObservation' => $startObservationDate ?? date('Y-m-d'),
                         'dateFinObservation' => $endObservationDate ?? '',
                         'listeMatricules' => [
