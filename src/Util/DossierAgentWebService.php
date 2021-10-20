@@ -128,7 +128,7 @@ class DossierAgentWebService
         return $administrativeData;
     }
 
-    public function getEchelon($matricule) {
+    public function getEchelon($matricule, $universityCode = '') {
         $soapClientDossierAgent = SoapClients::getInstance($this->WSDL);
 
         $echelon = new \StdClass(); // Response expected
@@ -138,7 +138,7 @@ class DossierAgentWebService
                     'ParamListAgent' => [
                         'dateObservation' => '',
                         'dateFinObservation' =>  '',
-                        'codeEtablissement' => '',
+                        'codeEtablissement' => $universityCode,
                         'listeMatricules' => [
                             'matricule' => $matricule
                         ]

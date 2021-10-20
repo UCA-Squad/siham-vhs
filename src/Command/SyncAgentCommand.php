@@ -92,7 +92,7 @@ class SyncAgentCommand extends Command
         if (empty($matricules)) {
             if ($fromDate === 'all') {
                 $startTempo = microtime(true);
-                $listAgents = $listAgentsWS->getListAgentsByName('%');
+                $listAgents = $listAgentsWS->getListAgentsByName('%', $_ENV['SIHAM_WS_UNIVERSITY_CODE']);
                 if ($loggerMode === 'file') {
                     $this->logger->info('with all agents', ['ws' => 'ListeAgentsWebService', 'method' => 'recupListeAgents', 'duration' => number_format(microtime(true) - $startTempo, 3) . 's']);
                 } else {
@@ -253,7 +253,6 @@ class SyncAgentCommand extends Command
                     }
                 }
                 #endregion
-        
 
                 #region Call SIHAM WS to get administrative data
                 $startTempo = microtime(true);
@@ -316,7 +315,7 @@ class SyncAgentCommand extends Command
                 if ($agent->getCodePIP() == 'TITU1' && $agent->getCodePositionStatutaire() == 'AC') {
 
                     $startTempo = microtime(true);
-                    $echelon = $dossierAgentWS->getEchelon($agentSihamId);
+                    $echelon = $dossierAgentWS->getEchelon($agentSihamId, $_ENV['SIHAM_WS_UNIVERSITY_CODE']);
                     // restart WS or exit if X timeout achieved
                     $duration = microtime(true) - $startTempo;
                     if ($duration > TIMEOUT_MAX_DURATION) {

@@ -13,7 +13,7 @@ class ListeAgentsWebService
      * Get a list of agents filter by name
      * @param $name string, add the character % for inclusive research
      */
-    public function getListAgentsByName($name) {
+    public function getListAgentsByName($name, $universityCode = '') {
 
         $soapClientListAgent = SoapClients::getInstance($this->WSDL);
         
@@ -22,7 +22,8 @@ class ListeAgentsWebService
             try {
                 $listAgents = $soapClientListAgent->recupListeAgents([
                     'ParamRecupListeAgents' => [
-                        'nomPatronymique' => $name
+                        'nomPatronymique' => $name,
+                        'codeEtablissement' => $universityCode
                     ]
                 ]);
             } catch (\SoapFault $fault) {
