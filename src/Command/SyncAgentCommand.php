@@ -92,7 +92,7 @@ class SyncAgentCommand extends Command
         if (empty($matricules)) {
             if ($fromDate === 'all') {
                 $startTempo = microtime(true);
-                $listAgents = $listAgentsWS->getListAgentsByName('%', $_ENV['SIHAM_WS_UNIVERSITY_CODE']);
+                $listAgents = $listAgentsWS->getListAgentsByName('%');
                 if ($loggerMode === 'file') {
                     $this->logger->info('with all agents', ['ws' => 'ListeAgentsWebService', 'method' => 'recupListeAgents', 'duration' => number_format(microtime(true) - $startTempo, 3) . 's']);
                 } else {
