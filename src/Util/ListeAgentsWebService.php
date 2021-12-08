@@ -23,7 +23,9 @@ class ListeAgentsWebService
                 $listAgents = $soapClientListAgent->recupListeAgents([
                     'ParamRecupListeAgents' => [
                         'nomPatronymique' => $name,
-                        'codeEtablissement' => $universityCode
+                        'codeEtablissement' => $universityCode,
+                        'temoinValide' => '',
+                        'listeTypeContrat' => ['codeTypeContrat' => '', 'modeGest' => '']
                     ]
                 ]);
             } catch (\SoapFault $fault) {
