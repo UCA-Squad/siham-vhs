@@ -365,7 +365,7 @@ class SyncAgentCommand extends Command
                             } else {
                                 $io->warning('No echelon for ' . $agentSihamId);
                             }
-                            $emailSIContent.= 'recupProchainEchelon vide pour l\'agent ' . $agentSihamId . '.<br>';
+                            // $emailSIContent.= 'recupProchainEchelon vide pour l\'agent ' . $agentSihamId . '.<br>';
                         }
                     }
                 }
