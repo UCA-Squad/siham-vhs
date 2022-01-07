@@ -306,7 +306,7 @@ class SyncAgentCommand extends Command
                         } else {
                             $io->warning('No administrative data for ' . $agentSihamId);
                         }
-                        $emailSIContent.= 'recupDonneesPersonnelles vide pour l\'agent ' . $agentSihamId . '.<br>';
+                        $emailSIContent.= 'recupDonneesAdministratives vide pour l\'agent ' . $agentSihamId . '.<br>';
                     }
                 }
                 #endregion
