@@ -357,11 +357,11 @@ class SyncAgentCommand extends Command
                         if (isset($echelon->return)) {
                             $agent->addEchelons($echelon->return);
                             if ($loggerMode === 'file') {
-                                $this->logger->info('- receive echelon' . \str_repeat('&nbsp;', 6), ['duration' => number_format(microtime(true) - $startTempo, 3) . 's']);
+                                $this->logger->info('- receive echelon' . \str_repeat('&nbsp;', 12), ['duration' => number_format(microtime(true) - $startTempo, 3) . 's']);
                             }
                         } else {
                             if ($loggerMode === 'file') {
-                                $this->logger->warning('- no echelon' . \str_repeat('&nbsp;', 6), ['ws' => 'DossierAgentWebService', 'method' => 'recupProchainEchelon', 'cause' => 'empty response']);
+                                $this->logger->warning('- no echelon' . \str_repeat('&nbsp;', 8), ['ws' => 'DossierAgentWebService', 'method' => 'recupProchainEchelon', 'cause' => 'empty response']);
                             } else {
                                 $io->warning('No echelon for ' . $agentSihamId);
                             }
