@@ -1113,7 +1113,7 @@ class Agent {
             $listAddresses = \is_object($personalData->listeAdresses) ? [$personalData->listeAdresses] : $personalData->listeAdresses;
             foreach($listAddresses as $address) {
                 if ($address->temAdressePrincipale == 1) {
-                    $this->adressePerso = ucwords(strtolower($address->ligneAdresseVoie . ', ' . $address->ligneAdresseDestination));
+                    $this->adressePerso = ucwords(strtolower($address->ligneAdresseVoieText . ', ' . $address->ligneAdresseDestination));
                 }
             }
         }
