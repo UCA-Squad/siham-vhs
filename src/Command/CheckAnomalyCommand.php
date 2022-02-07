@@ -146,6 +146,7 @@ class CheckAnomalyCommand extends Command
                     . ' - ' . $this->addSpaces($agentWithGenericValues->getCodePosteAffectation(), 10)
                     . ' - ' . $this->addSpaces($agentWithGenericValues->getCodeEmploiAffectation(), 10)
                     . ' - ' . $this->addSpaces($agentWithGenericValues->getCodePopulationType(), 5)
+                    . ' - ' . $this->addSpaces($agentWithGenericValues->getCodePIP(), 8)
                 ;
                 $io->writeln($display);
                 $emailContent.= $display . "\n";
