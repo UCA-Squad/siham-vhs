@@ -371,6 +371,27 @@ class SyncAgentCommand extends Command
                 }
                 #endregion
 
+                #region Call SIHAM db to get INM
+                $startTempo = microtime(true);
+                $indiceMajore = NULL;
+                $sqlSihamINM = 'SELECT INDMAJ FROM HR.ZYGS z WHERE NUDOSS IN (SELECT NUDOSS FROM HR.ZY00 WHERE MATCLE=:matricule) AND SYSDATE BETWEEN DATEFF AND DATXXX';
+                $stmtSihamINM = $connSiham->prepare($sqlSihamINM);
+                $stmtSihamINM->bindValue('matricule', $agent->getMatricule());
+                $stmtSihamINM->execute();
+                $resSihamINM = $stmtSihamINM->fetch();
+                if (!empty($resSihamINM)) {
+                    if ($loggerMode === 'file') {
+                        $this->logger->info('- receive INM' . \str_repeat('&nbsp;', 16), ['duration' => number_format(microtime(true) - $startTempo, 3) . 's']);
+                    }
+                    $indiceMajore = $resSihamINM['INDMAJ'];
+                } else {
+                    if ($loggerMode === 'file') {
+                        $this->logger->info('- no INM' . \str_repeat('&nbsp;', 19), ['ws' => 'no', 'db' => 'SIHAM']);
+                    }
+                }
+                $agent->setIndiceMajore($indiceMajore);
+                #endregion
+
                 #region Call SIHAM db to get population type*
                 $startTempo = microtime(true);
                 $codePopulationType = NULL;

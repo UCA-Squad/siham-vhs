@@ -1250,7 +1250,7 @@ class Agent {
         $this->codeGroupeHierarchique   = isset($codeGroupeHierarchique['current']) ? $codeGroupeHierarchique['current']: (isset($codeGroupeHierarchique['next'])   ? $codeGroupeHierarchique['next']   : null);
         $this->codeCategory             = isset($codeCategory['current'])           ? $codeCategory['current']          : (isset($codeCategory['next'])             ? $codeCategory['next']             : null);
         $this->codeEchelon              = isset($codeEchelon['current'])            ? $codeEchelon['current']           : (isset($codeEchelon['next'])              ? $codeEchelon['next']              : null);
-        $this->indiceMajore             = isset($indiceMajore['current'])           ? $indiceMajore['current']          : (isset($indiceMajore['next'])             ? $indiceMajore['next']             : null);
+        // $this->indiceMajore             = isset($indiceMajore['current'])           ? $indiceMajore['current']          : (isset($indiceMajore['next'])             ? $indiceMajore['next']             : null);
         $this->codeCorps                = isset($codeCorps['current'])              ? $codeCorps['current']             : (isset($codeCorps['next'])                ? $codeCorps['next']                : null);
         $this->codeGrade                = isset($codeGrade['current'])              ? $codeGrade['current']             : (isset($codeGrade['next'])                ? $codeGrade['next']                : null);
         $this->libLongGrade             = isset($libLongGrade['current'])           ? $libLongGrade['current']          : (isset($libLongGrade['next'])             ? $libLongGrade['next']             : null);
