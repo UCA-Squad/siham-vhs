@@ -24,8 +24,6 @@ class ListeAgentsWebService
                     'ParamRecupListeAgents' => [
                         'nomPatronymique' => $name,
                         'codeEtablissement' => $universityCode,
-                        'temoinValide' => '',
-                        'listeTypeContrat' => ['codeTypeContrat' => '', 'modeGest' => '']
                     ]
                 ]);
             } catch (\SoapFault $fault) {
