@@ -1255,7 +1255,7 @@ class Agent {
         $this->codeGrade                = isset($codeGrade['current'])              ? $codeGrade['current']             : (isset($codeGrade['next'])                ? $codeGrade['next']                : null);
         $this->libLongGrade             = isset($libLongGrade['current'])           ? $libLongGrade['current']          : (isset($libLongGrade['next'])             ? $libLongGrade['next']             : null);
         $this->temEnseignantChercheur   = isset($temEnseignantChercheur['current']) ? $temEnseignantChercheur['current']: (isset($temEnseignantChercheur['next'])   ? $temEnseignantChercheur['next']   : null);
-        $this->organismePrincipal       = isset($organismePrincipal['current'])     ? $organismePrincipal['current']    : (isset($organismePrincipal['next'])       ? $organismePrincipal['next']       : null);
+        $this->organismePrincipal       = \str_replace(["\r\n", "\n", "\r"], ' - ', (isset($organismePrincipal['current']) ? $organismePrincipal['current'] : (isset($organismePrincipal['next']) ? $organismePrincipal['next'] : null)));
         #endregion
 
         #region PIP
