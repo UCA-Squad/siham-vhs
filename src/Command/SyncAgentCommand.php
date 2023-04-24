@@ -38,7 +38,7 @@ class SyncAgentCommand extends Command
         $this->logger = $logger;
         $this->mailer = $mailer;
         $this->router = $router;
-    }   
+    }
 
     protected function configure() {
         $this
@@ -114,19 +114,19 @@ class SyncAgentCommand extends Command
                 } else {
                     $io->error('No response from WebService');
                 }
-                
-                $emailSIContent.= 'Le webservice <i>ListeAgentsWebService</i> avec la méthode <b>' . ($fromDate === 'all' ? 'recupListeAgents' : 'recupAgentsModifies') . '</b> n\'a rien retourné'; 
-                $emailRHContent.= 'Aucun agent ' . ($fromDate === 'all' ? null : ('modifié le ' . $fromDate)) . ' n\'a pu être récupéré';
-                if (!empty($emailSIContent)) $this->sendSIEmail($emailSIContent);
-                if (!empty($emailRHContent)) $this->sendRHEmail($emailRHContent);
 
-                return 0;
+                $emailSIContent.= 'Le webservice <i>ListeAgentsWebService</i> avec la méthode <b>' . ($fromDate === 'all' ? 'recupListeAgents' : 'recupAgentsModifies') . '</b> n\'a rien retourné<br>';
+                $emailRHContent.= 'Aucun agent ' . ($fromDate === 'all' ? null : ('modifié le ' . $fromDate)) . ' n\'a pu être récupéré<br>';
+                // if (!empty($emailSIContent)) $this->sendSIEmail($emailSIContent);
+                // if (!empty($emailRHContent)) $this->sendRHEmail($emailRHContent);
+
+                // return 0;
             }
 
             // Keep matricules, no more need other data
             $listAgents = is_array($listAgents->return) ? $listAgents->return : [$listAgents->return];
             $listAgents = \array_column($listAgents, 'matricule');
-    
+
             #region Call SIHAM WS to retrieve due term agents
             $startTempo = microtime(true);
             $dueTermAgents = $listAgentsWS->getListAgentsDueTerm($startObservationDate->format('Y-m-d'), $endObservationDate->format('Y-m-d'));
@@ -146,6 +146,12 @@ class SyncAgentCommand extends Command
                 } else {
                     $io->warning('No agent with due terms');
                 }
+                $emailSIContent.= 'Le webservice <i>ListeAgentsWebService</i> avec la méthode <b>recupAgentsEcheance</b> n\'a rien retourné<br>';
+                $emailRHContent.= 'Aucun agent avec une date dans cette échéance n\'a pu être récupéré<br>';
+                if (!empty($emailSIContent)) $this->sendSIEmail($emailSIContent);
+                if (!empty($emailRHContent)) $this->sendRHEmail($emailRHContent);
+
+                return 0;
             }
             #endregion
         } else {
@@ -157,7 +163,7 @@ class SyncAgentCommand extends Command
             }
         }
         #endregion
-        
+
 
         if (!empty($listAgents)) {
             $numberOfUsers = count($listAgents);
@@ -224,7 +230,7 @@ class SyncAgentCommand extends Command
                                 $io->error('Sync agent interrupt, ' . $timeoutCounter . ' timeout achieved');
                             }
                             $listUnprocessedAgents = \array_diff($listAgents, $listProcessedAgents);
-                            $emailSIContent.= 'La synchronisation des agents a été arrêté après <b>' . $timeoutCounter . '</b> tentatives de pause de <b>' . TIMEOUT_PAUSE_DURATION . 's</b> suite a des <i>timeout</i> ou des temps de récupération dépassant les <b>' . TIMEOUT_MAX_DURATION . 's</b>'; 
+                            $emailSIContent.= 'La synchronisation des agents a été arrêté après <b>' . $timeoutCounter . '</b> tentatives de pause de <b>' . TIMEOUT_PAUSE_DURATION . 's</b> suite a des <i>timeout</i> ou des temps de récupération dépassant les <b>' . TIMEOUT_MAX_DURATION . 's</b>';
                             $emailRHContent.= 'La synchronisation des agents s\'est arrêtée suite a des temps de réponse trop long des webservices.<br>';
                             $emailRHContent.= '<b>' . count($listUnprocessedAgents) . '</b>/' . count($listAgents) . ' matricules n\'ont pas été traités:<br>';
                             $emailRHContent.= \implode('<br>', $listUnprocessedAgents) . '<br>';
@@ -281,7 +287,7 @@ class SyncAgentCommand extends Command
                                 $io->error('Sync agent interrupt, ' . $timeoutCounter . ' timeout achieved');
                             }
                             $listUnprocessedAgents = \array_diff($listAgents, $listProcessedAgents);
-                            $emailSIContent.= 'La synchronisation des agents a été arrêté après <b>' . $timeoutCounter . '</b> tentatives de pause de <b>' . TIMEOUT_PAUSE_DURATION . 's</b> suite a des <i>timeout</i> ou des temps de récupération dépassant les <b>' . TIMEOUT_MAX_DURATION . 's</b>'; 
+                            $emailSIContent.= 'La synchronisation des agents a été arrêté après <b>' . $timeoutCounter . '</b> tentatives de pause de <b>' . TIMEOUT_PAUSE_DURATION . 's</b> suite a des <i>timeout</i> ou des temps de récupération dépassant les <b>' . TIMEOUT_MAX_DURATION . 's</b>';
                             $emailRHContent.= 'La synchronisation des agents s\'est arrêtée suite a des temps de réponse trop long des webservices.<br>';
                             $emailRHContent.= '<b>' . count($listUnprocessedAgents) . '</b>/' . count($listAgents) . ' matricules n\'ont pas été traités:<br>';
                             $emailRHContent.= \implode('<br>', $listUnprocessedAgents) . '<br>';
@@ -340,7 +346,7 @@ class SyncAgentCommand extends Command
                                     $io->error('Sync agent interrupt, ' . $timeoutCounter . ' timeout achieved');
                                 }
                                 $listUnprocessedAgents = \array_diff($listAgents, $listProcessedAgents);
-                                $emailSIContent.= 'La synchronisation des agents a été arrêté après <b>' . $timeoutCounter . '</b> tentatives de pause de <b>' . TIMEOUT_PAUSE_DURATION . 's</b> suite a des <i>timeout</i> ou des temps de récupération dépassant les <b>' . TIMEOUT_MAX_DURATION . 's</b>'; 
+                                $emailSIContent.= 'La synchronisation des agents a été arrêté après <b>' . $timeoutCounter . '</b> tentatives de pause de <b>' . TIMEOUT_PAUSE_DURATION . 's</b> suite a des <i>timeout</i> ou des temps de récupération dépassant les <b>' . TIMEOUT_MAX_DURATION . 's</b>';
                                 $emailRHContent.= 'La synchronisation des agents s\'est arrêtée suite a des temps de réponse trop long des webservices.<br>';
                                 $emailRHContent.= '<b>' . count($listUnprocessedAgents) . '</b>/' . count($listAgents) . ' matricules n\'ont pas été traités:<br>';
                                 $emailRHContent.= \implode('<br>', $listUnprocessedAgents) . '<br>';
@@ -397,10 +403,10 @@ class SyncAgentCommand extends Command
                 $codePopulationType = NULL;
                 $codeCategoryPopulationType = NULL;
                 $codeSubCategoryPopulationType = NULL;
-                $sqlSihamPopulationType = 'SELECT CATEGO, SSCATE, POPULA, TO_CHAR(DTEF00, \'YYYY-MM-DD\') AS DTEF00, TO_CHAR(DATXXX, \'YYYY-MM-DD\') AS DATXXX FROM HR.ZYYP 
+                $sqlSihamPopulationType = 'SELECT CATEGO, SSCATE, POPULA, TO_CHAR(DTEF00, \'YYYY-MM-DD\') AS DTEF00, TO_CHAR(DATXXX, \'YYYY-MM-DD\') AS DATXXX FROM HR.ZYYP
                 WHERE NUDOSS IN (SELECT NUDOSS FROM HR.ZY00 WHERE matcle = :matricule)
                 AND TO_DATE(:endObservationDate, \'YYYY-MM-DD\') >= DTEF00
-                AND TO_DATE(:startObservationDate, \'YYYY-MM-DD\') < DATXXX 
+                AND TO_DATE(:startObservationDate, \'YYYY-MM-DD\') < DATXXX
                 ORDER BY DTEF00';
                 $stmtSihamPopulationType = $connSiham->prepare($sqlSihamPopulationType);
                 $stmtSihamPopulationType->bindValue('matricule', $agent->getMatricule());
@@ -416,7 +422,7 @@ class SyncAgentCommand extends Command
                     foreach ($resPopulationTypes as $resPopulationType) {
                         $startPopulationTypeDate = new \DateTime(\substr($resPopulationType['DTEF00'],0,10));
                         $endPopulationTypeDate = new \DateTime(\substr($resPopulationType['DATXXX'],0,10));
-                        if (($considerationDate >= $startPopulationTypeDate && $considerationDate <= $endPopulationTypeDate) 
+                        if (($considerationDate >= $startPopulationTypeDate && $considerationDate <= $endPopulationTypeDate)
                         || (!empty($agent->getDateDebutAffectationsHIE()) && $agent->getDateDebutAffectationsHIE() >= $startPopulationTypeDate)) {
                             $codePopulationType = $resPopulationType['POPULA'];
                             $codeCategoryPopulationType = $resPopulationType['CATEGO'];
@@ -437,13 +443,13 @@ class SyncAgentCommand extends Command
                 $this->em->persist($agent);
                 $this->em->flush();
                 $listProcessedAgents[] = $agentSihamId;
-    
+
                 if ($loggerMode !== 'file') {
                     // advances the progress bar 1 unit
                     $progressBar->advance();
                 }
 
-                // Take a break for webservice :-( 
+                // Take a break for webservice :-(
                 // Temporally disable since VM up memory to 6Go
                 // Re-used ...
                 $counterTempo = count($listProcessedAgents);
@@ -478,10 +484,10 @@ class SyncAgentCommand extends Command
                 $io->error('No response from WebService');
             }
         }
-        
+
         if (!empty($emailSIContent)) $this->sendSIEmail($emailSIContent);
         if (!empty($emailRHContent)) $this->sendRHEmail($emailRHContent);
-        
+
         return 0;
     }
 
@@ -489,9 +495,9 @@ class SyncAgentCommand extends Command
         // check already sent
         if ($this->wsRestartCounter > SIHAM_WS_RESTART_MAX)
             return false;
-        
-        $this->wsRestartCounter++;    
-        
+
+        $this->wsRestartCounter++;
+
         // exec command
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -539,7 +545,7 @@ class SyncAgentCommand extends Command
             if (!empty($cc)) $email->cc(...$cc);
 
             $url = $_ENV['APP_HOST'] . $this->router->generate('sync_result', [
-                'env' => $_ENV['APP_ENV'] , 
+                'env' => $_ENV['APP_ENV'] ,
                 'fileName' => $_ENV['APP_ENV'] . '.sync.agent-' . date('Y-m-d') . '.log'
             ]);
             if ($html) {
@@ -552,7 +558,7 @@ class SyncAgentCommand extends Command
                 $email->text($content);
             }
             $this->mailer->send($email);
-        } 
-        
+        }
+
     }
 }
