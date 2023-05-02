@@ -23,7 +23,7 @@ class CheckAnomalyCommand extends Command
         parent::__construct();
         $this->em = $em;
         $this->mailer = $mailer;
-    }   
+    }
 
     protected function configure() {
         $this
@@ -39,19 +39,20 @@ class CheckAnomalyCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output) {
         $start = microtime(true);
         $emailContent = null;
-        
+
         $io = new SymfonyStyle($input, $output);
         $io->newLine();
         $io->writeln('Start anomaly detections... ');
         $io->newLine();
-    
+
         #region Agent with double HIE
         $io->writeln('== Agent(s) with double HIE ==');
         $agentsWithManyHIE = $this->em->getRepository(Agent::class)->findAllWithManyHIE();
         if ($agentsWithManyHIE) {
             $nbAgents = count($agentsWithManyHIE);
             $io->writeln(\sprintf('<info>%s</info> agents found', $nbAgents));
-            $emailContent.= '== ' . $nbAgents . ' agent(s) avec plusieurs affectations HIE ==' . "\n";
+            $emailContent.= '== ' . $nbAgents . ' agent(s) avec plusieurs affectations HIE ==' . "\n\n";
+            $emailContent.= '-  MATRICULES  -       NOM       -     PRENOM      -    CODE HIE   ' . "\n". \str_repeat('-', 70) . "\n";
             foreach ($agentsWithManyHIE as $agentWithManyHIE) {
                 $display = '- ' . $agentWithManyHIE->getMatricule() . ' - ' . $this->addSpaces($agentWithManyHIE->getNomUsuel(), 15) . ' - ' . $this->addSpaces($agentWithManyHIE->getPrenom(), 15)
                     . ' - ' . $this->addSpaces($agentWithManyHIE->getCodeUOAffectationsHIE(), 25)
@@ -72,7 +73,8 @@ class CheckAnomalyCommand extends Command
         if ($agentsWithHIEAndNoFUN) {
             $nbAgents = count($agentsWithHIEAndNoFUN);
             $io->writeln(\sprintf('<info>%s</info> agents found', $nbAgents));
-            $emailContent.= '== ' . $nbAgents . ' agent(s) avec une affectation HIE mais aucune affectation FUN ==' . "\n";
+            $emailContent.= '== ' . $nbAgents . ' agent(s) avec une affectation HIE mais aucune affectation FUN ==' . "\n\n";
+            $emailContent.= '-  MATRICULES  -       NOM       -     PRENOM      -    CODE HIE   ' . "\n". \str_repeat('-', 70) . "\n";
             foreach ($agentsWithHIEAndNoFUN as $agentWithHIEAndNoFUN) {
                 $display = '- ' . $agentWithHIEAndNoFUN->getMatricule() . ' - ' . $this->addSpaces($agentWithHIEAndNoFUN->getNomUsuel(), 15) . ' - ' . $this->addSpaces($agentWithHIEAndNoFUN->getPrenom(), 15)
                     . ' - ' . $this->addSpaces($agentWithHIEAndNoFUN->getCodeUOAffectationsHIE(), 25)
@@ -94,7 +96,8 @@ class CheckAnomalyCommand extends Command
         if ($agentsWithHIEAndNoADR) {
             $nbAgents = count($agentsWithHIEAndNoADR);
             $io->writeln(\sprintf('<info>%s</info> agents found', $nbAgents));
-            $emailContent.= '== ' . $nbAgents . ' agent(s) avec une affectation HIE mais aucune affectation ADR (hors Hébergés et Extérieurs) ==' . "\n";
+            $emailContent.= '== ' . $nbAgents . ' agent(s) avec une affectation HIE mais aucune affectation ADR (hors Hébergés et Extérieurs) ==' . "\n\n";
+            $emailContent.= '-  MATRICULES  -       NOM       -     PRENOM      -    CODE HIE   ' . "\n". \str_repeat('-', 70) . "\n";
             foreach ($agentsWithHIEAndNoADR as $agentWithHIEAndNoADR) {
                 $display = '- ' . $agentWithHIEAndNoADR->getMatricule() . ' - ' . $this->addSpaces($agentWithHIEAndNoADR->getNomUsuel(), 15) . ' - ' . $this->addSpaces($agentWithHIEAndNoADR->getPrenom(), 15)
                     . ' - ' . $this->addSpaces($agentWithHIEAndNoADR->getCodeUOAffectationsHIE(), 25)
@@ -116,7 +119,8 @@ class CheckAnomalyCommand extends Command
         if ($agentsWithFUNAndNoHIE) {
             $nbAgents = count($agentsWithFUNAndNoHIE);
             $io->writeln(\sprintf('<info>%s</info> agents found', $nbAgents));
-            $emailContent.= '== ' . $nbAgents . ' agent(s) avec une affectation FUN mais aucune affectation HIE ==' . "\n";
+            $emailContent.= '== ' . $nbAgents . ' agent(s) avec une affectation FUN mais aucune affectation HIE ==' . "\n\n";
+            $emailContent.= '-  MATRICULES  -       NOM       -     PRENOM      -    CODE FUN   ' . "\n". \str_repeat('-', 70) . "\n";
             foreach ($agentsWithFUNAndNoHIE as $agentWithFUNAndNoHIE) {
                 $display = '- ' . $agentWithFUNAndNoHIE->getMatricule() . ' - ' . $this->addSpaces($agentWithFUNAndNoHIE->getNomUsuel(), 15) . ' - ' . $this->addSpaces($agentWithFUNAndNoHIE->getPrenom(), 15)
                     // . ' - ' . $this->addSpaces($agentWithFUNAndNoHIE->getCodeUOAffectationsHIE(), 25)
@@ -138,7 +142,8 @@ class CheckAnomalyCommand extends Command
         if ($agentsWithGenericValues) {
             $nbAgents = count($agentsWithGenericValues);
             $io->writeln(\sprintf('<info>%s</info> agents found', $nbAgents));
-            $emailContent.= '== ' . $nbAgents . ' agent(s) avec des valeurs génériques ==' . "\n";
+            $emailContent.= '== ' . $nbAgents . ' agent(s) avec des valeurs génériques ==' . "\n\n";
+            $emailContent.= '-  MATRICULES  -       NOM       -     PRENOM      -     HIE    -     FUN    -   POSTE    -   EMPLOI   - PTYPE - PIP' . "\n". \str_repeat('-', 118) . "\n";
             foreach ($agentsWithGenericValues as $agentWithGenericValues) {
                 $display = '- ' . $agentWithGenericValues->getMatricule() . ' - ' . $this->addSpaces($agentWithGenericValues->getNomUsuel(), 15) . ' - ' . $this->addSpaces($agentWithGenericValues->getPrenom(), 15)
                     . ' - ' . $this->addSpaces($agentWithGenericValues->getCodeUOAffectationsHIE(), 10)
@@ -158,8 +163,8 @@ class CheckAnomalyCommand extends Command
         $io->newLine();
         #endregion
 
-    
-                
+
+
         $io->success('Done in ' . number_format((microtime(true) - $start), 3) . 's');
 
         $to = empty($_ENV['MAIL_TO_RH']) ? null : \explode(',', $_ENV['MAIL_TO_RH']);
@@ -177,12 +182,12 @@ class CheckAnomalyCommand extends Command
                 $this->mailer->send($email);
             }
         }
-        
+
         return 0;
     }
 
     public function addSpaces($str, $length, $html = false) {
-        
+
         $str = str_pad($str, $length, ' ');
         // $str = str_replace('*', ($html ? '&nbsp;' : ' '), $str);
 
