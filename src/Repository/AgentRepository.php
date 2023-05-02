@@ -30,14 +30,14 @@ class AgentRepository extends ServiceEntityRepository
         return $query->getResult();
     }
 
-    
+
     /**
      * @return Agent[]
      */
     public function findAllWithHIEAndNoFUN()
     {
         $entityManager = $this->getEntityManager();
-        
+
         $query = $entityManager->createQuery(
             'SELECT a
             FROM App\Entity\Agent a
@@ -45,7 +45,7 @@ class AgentRepository extends ServiceEntityRepository
             AND a.codeUOAffectationsHIE IS NOT NULL AND a.codeUOAffectationsHIE != \'\'
             ORDER BY a.lastUpdate DESC, a.id'
         );
-        
+
         // returns an array of Product objects
         return $query->getResult();
     }
@@ -56,23 +56,23 @@ class AgentRepository extends ServiceEntityRepository
     public function findAllWithHIEAndNoADR()
     {
         $entityManager = $this->getEntityManager();
-        
+
         $query = $entityManager->createQuery(
             'SELECT a
             FROM App\Entity\Agent a
             WHERE (a.codeUOAffectationsADR IS NULL OR a.codeUOAffectationsADR = \'\')
-            AND a.codeUOAffectationsHIE IS NOT NULL AND a.codeUOAffectationsHIE != \'\'
+            AND a.codeUOAffectationsHIE IS NOT NULL AND a.codeUOAffectationsHIE != \'\' AND a.codeUOAffectationsHIE != \'U0A000000L\'
             AND a.codePIP NOT LIKE \'%HB%\'
             AND a.codeCategoryPopulationType != 5
             AND a.codePosteAffectation != \'\' AND a.codePosteAffectation IS NOT NULL
             AND a.codePositionStatutaire = \'AC\'
             ORDER BY a.lastUpdate DESC, a.id'
         );
-        
+
         // returns an array of Product objects
         return $query->getResult();
     }
-    
+
     /**
      * @return Agent[]
      */
