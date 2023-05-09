@@ -108,7 +108,7 @@ class SyncAgentCommand extends Command
                 }
             }
             // Warning or bad response from SIHAM webservices
-            if (!isset($listAgents->return)) {
+            if (!isset($listAgents->return) && date('N') != 7) { // disable for sunday
                 if ($loggerMode === 'file') {
                     $this->logger->error('No response from WebService OR no agent', ['ws' => 'ListeAgentsWebService', 'cause' => 'empty response']);
                 } else {
