@@ -35,5 +35,5 @@ class ListeAgentsWebServiceTest extends TestCase
         $this->assertObjectHasAttribute('return', $responseListAgents);
     }
 
-    
+
 }

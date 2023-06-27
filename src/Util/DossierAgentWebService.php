@@ -9,16 +9,16 @@ class DossierAgentWebService
 {
     private $WSDL = '/DossierAgentWebService/DossierAgentWebService?wsdl';
 
-    public function getPersonalData($matricule, $startObservationDate = null, $endObservationDate = null, $universityCode = '') {
+    public function getPersonalData($matricule, $startObservationDate = null, $endObservationDate = null) {
 
         $soapClientDossierAgent = SoapClients::getInstance($this->WSDL);
-        
+
         $personalData = new \StdClass(); // Response expected
         if ($soapClientDossierAgent) {
             try {
                 $personalData = $soapClientDossierAgent->recupDonneesPersonnelles([
                     'ParamListAgent' => [
-                        'codeEtablissement' => $universityCode,
+                        'codeEtablissement' => $_ENV['SIHAM_WS_UNIVERSITY_CODE'],
                         'dateObservation' => $startObservationDate ?? date('Y-m-d'),
                         'dateFinObservation' => $endObservationDate ?? '',
                         'listeMatricules' => [
@@ -37,7 +37,7 @@ class DossierAgentWebService
     public function setPersonalData($matricule, $typeNumero, $numero, $typeAction) {
 
         $soapClientDossierAgent = SoapClients::getInstance($this->WSDL);
-        
+
         $responsePersonalData = new \StdClass(); // Response expected
         if ($soapClientDossierAgent) {
             try {
@@ -106,16 +106,16 @@ class DossierAgentWebService
     }
     //endregion
 
-    public function getAdministrativeData($matricule, $startObservationDate = null, $endObservationDate = null, $universityCode = '') {
+    public function getAdministrativeData($matricule, $startObservationDate = null, $endObservationDate = null) {
 
         $soapClientDossierAgent = SoapClients::getInstance($this->WSDL);
-        
+
         $administrativeData = new \StdClass(); // Response expected
         if ($soapClientDossierAgent) {
             try {
                 $administrativeData = $soapClientDossierAgent->recupDonneesAdministratives([
                     'ParamListAgent' => [
-                        'codeEtablissement' => $universityCode,
+                        'codeEtablissement' => $_ENV['SIHAM_WS_UNIVERSITY_CODE'],
                         'dateObservation' => $startObservationDate ?? date('Y-m-d'),
                         'dateFinObservation' => $endObservationDate ?? '',
                         'listeMatricules' => [
@@ -130,7 +130,7 @@ class DossierAgentWebService
         return $administrativeData;
     }
 
-    public function getEchelon($matricule, $universityCode = '') {
+    public function getEchelon($matricule) {
         $soapClientDossierAgent = SoapClients::getInstance($this->WSDL);
 
         $echelon = new \StdClass(); // Response expected
@@ -140,7 +140,7 @@ class DossierAgentWebService
                     'ParamListAgent' => [
                         'dateObservation' => '',
                         'dateFinObservation' =>  '',
-                        'codeEtablissement' => $universityCode,
+                        'codeEtablissement' => $_ENV['SIHAM_WS_UNIVERSITY_CODE'],
                         'listeMatricules' => [
                             'matricule' => $matricule
                         ]
@@ -153,5 +153,5 @@ class DossierAgentWebService
         return $echelon;
     }
 
-    
+
 }

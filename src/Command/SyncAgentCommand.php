@@ -321,7 +321,7 @@ class SyncAgentCommand extends Command
                 if ($agent->getCodePIP() == 'TITU1' && $agent->getCodePositionStatutaire() == 'AC') {
 
                     $startTempo = microtime(true);
-                    $echelon = $dossierAgentWS->getEchelon($agentSihamId, $_ENV['SIHAM_WS_UNIVERSITY_CODE']);
+                    $echelon = $dossierAgentWS->getEchelon($agentSihamId);
                     // restart WS or exit if X timeout achieved
                     $duration = microtime(true) - $startTempo;
                     if ($duration > TIMEOUT_MAX_DURATION) {

@@ -25,7 +25,7 @@ class DossierAgentWebServiceTest extends TestCase
     public function testGetAdministrativeData(){
 
         $dossierAgentWebService = new DossierAgentWebService();
-        
+
         $responseDossierAgentGetAD = $dossierAgentWebService->getAdministrativeData($_ENV['SIHAM_WS_MATRICULE_TEST']);
         $this->assertObjectHasAttribute('return', $responseDossierAgentGetAD);
 
@@ -49,7 +49,7 @@ class DossierAgentWebServiceTest extends TestCase
         $responseDossierAgentRemovePD = $dossierAgentWebService->removePhoneProfessional($_ENV['SIHAM_WS_MATRICULE_TEST']);
         $this->assertEquals(1, $responseDossierAgentRemovePD);
     }
-    
+
     public function testGetEchelon() {
         $dossierAgentWebService = new DossierAgentWebService();
 

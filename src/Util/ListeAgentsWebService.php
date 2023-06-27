@@ -8,22 +8,22 @@ use App\Util\SoapClients;
 class ListeAgentsWebService
 {
     private $WSDL = '/ListeAgentsWebService/ListeAgentsWebService?wsdl';
-    
+
     /**
      * Get a list of agents filter by name
      * @param $name string, add the character % for inclusive research
      */
-    public function getListAgentsByName($name, $universityCode = '') {
+    public function getListAgentsByName($name) {
 
         $soapClientListAgent = SoapClients::getInstance($this->WSDL);
-        
+
         $listAgents = new \StdClass(); // Response expected
         if ($soapClientListAgent) {
             try {
                 $listAgents = $soapClientListAgent->recupListeAgents([
                     'ParamRecupListeAgents' => [
                         'nomPatronymique' => $name,
-                        'codeEtablissement' => $universityCode,
+                        'codeEtablissement' => $_ENV['SIHAM_WS_UNIVERSITY_CODE'],
                     ]
                 ]);
             } catch (\SoapFault $fault) {
@@ -41,7 +41,7 @@ class ListeAgentsWebService
     public function getListAgentsUpdated($dateObservation) {
 
         $soapClientListAgent = SoapClients::getInstance($this->WSDL);
-        
+
         $listAgents = new \StdClass(); // Response expected
         if ($soapClientListAgent) {
             try {
@@ -64,7 +64,7 @@ class ListeAgentsWebService
     public function getListAgentsDueTerm($startObservationDate, $endObservationDate) {
 
         $soapClientListAgent = SoapClients::getInstance($this->WSDL);
-        
+
         $listAgents = new \StdClass(); // Response expected
         if ($soapClientListAgent) {
             try {
