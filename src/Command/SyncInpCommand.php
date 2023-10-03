@@ -26,7 +26,7 @@ class SyncInpCommand extends Command
         $this->em = $em;
         $this->logger = $logger;
         $this->project_dir = $project_dir;
-    }   
+    }
 
     protected function configure() {
         $this
@@ -59,7 +59,7 @@ class SyncInpCommand extends Command
         // Read extract file from INP
         $rows = @file($this->project_dir . '/var/ext/' . $_ENV['INP_USERS_FILE']);
         if ($rows !== false && ($numberOfUsers = count($rows) - 1) > 0) { // headers on file
-            
+
             if ($loggerMode === 'file') {
                 $this->logger->info($numberOfUsers . ' users found');
             } else {
@@ -78,7 +78,7 @@ class SyncInpCommand extends Command
                 'ISIMA' => 'UIQ000000C',
             ];
             $matchCivilite = ['M' => 1, 'MME' => 2];
-            $fields = ['IdAurion','NomPatronymique','NomUsuel','Prenom','DateDeNaissance','Civilite','TelephonePersonnel','MailPersonnel','LoginSigma','MailSigma','BadgeSigma','DateDebut','DateFin','TypePopulation','CodeFormation','EntiteAffectation','SupannCodeINE'];
+            $fields = ['IdAurion','NomPatronymique','NomUsuel','Prenom','DateDeNaissance','Civilite','TelephoneProLong','TelephonePersonnel','MailPersonnel','LoginSigma','MailSigma','BadgeSigma','DateDebut','DateFin','TypePopulation','CodeFormation','EntiteAffectation','SupannCodeINE'];
             foreach($rows as $row) {
                 $detailAgent = array_combine($fields, explode(';', $row));
 
@@ -98,7 +98,7 @@ class SyncInpCommand extends Command
                         $agent->setCodePositionStatutaire('AC');
                         $updatedFields['position statutaire'] = 'AC';
                     }
-                    
+
                     // For each attribute set if different and call webservice to write
                     $updatedFields = [];
                     $nomPatronymique = \strtoupper(trim($detailAgent['NomPatronymique']));
@@ -165,19 +165,19 @@ class SyncInpCommand extends Command
                         $agent->setCodeUOAffectationsFUN($affectation);
                         $updatedFields['affectation'] = $affectation;
                     }
-                    
+
                     if ($loggerMode === 'file' && !empty($updatedFields))
                         $this->logger->info('- Update ' . $detailAgent['IdAurion'], $updatedFields);
-    
-    
+
+
                     $this->em->persist($agent);
                     $this->em->flush();
-        
+
                     if ($loggerMode !== 'file') {
                         // advances the progress bar 1 unit
                         $progressBar->advance();
                     }
-    
+
                     $numberOfUsers++;
                 }
             }
@@ -187,7 +187,7 @@ class SyncInpCommand extends Command
             } else {
                 // ensures that the progress bar is at 100%
                 $progressBar->finish();
-                
+
                 $io->success('Sync the users from INP was successfully done.');
             }
 
@@ -197,8 +197,8 @@ class SyncInpCommand extends Command
             } else {
                 $io->error('Empty or no file');
             }
-        }                      
-        
+        }
+
         return 0;
     }
 
