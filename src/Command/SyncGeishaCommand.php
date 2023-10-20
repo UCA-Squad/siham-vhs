@@ -31,7 +31,7 @@ class SyncGeishaCommand extends Command
         $this->em = $doctrine->getManager();// siham_vhs by default
         $this->geishaEm = $doctrine->getManager('geisha');
         $this->logger = $logger;
-    }   
+    }
 
     protected function configure()
     {
@@ -53,7 +53,7 @@ class SyncGeishaCommand extends Command
         $start = time();
 
         $loggerMode = $input->getOption('logger');
-        
+
         if ($loggerMode === 'file') {
             $this->logger->info('Start sync agreements from GEISHA ...');
         } else {
@@ -63,9 +63,9 @@ class SyncGeishaCommand extends Command
         }
 
         $connGeisha = $this->geishaEm->getConnection();
-        $sqlGeishaAgreements = 'SELECT I.MATCLE, A.C_STRUCTURE, TO_CHAR(A.D_DEB_VAL, \'YYYY-MM-DD\') AS D_DEB_VAL, TO_CHAR(A.D_FIN_VAL, \'YYYY-MM-DD\') AS D_FIN_VAL 
+        $sqlGeishaAgreements = 'SELECT I.MATCLE, A.C_STRUCTURE, TO_CHAR(A.D_DEB_VAL, \'YYYY-MM-DD\') AS D_DEB_VAL, TO_CHAR(A.D_FIN_VAL, \'YYYY-MM-DD\') AS D_FIN_VAL
             FROM GEI_ADM.AGREMENT A
-            LEFT JOIN GEI_ADM.INDIVIDU2 I ON I.NO_INDIVIDU = A.NO_INDIVIDU 
+            LEFT JOIN GEI_ADM.INDIVIDU2 I ON I.NO_INDIVIDU = A.NO_INDIVIDU
             WHERE A.D_DEB_VAL <= TO_DATE(:dateFinObservation, \'YYYY-MM-DD\') AND A.D_FIN_VAL >= TO_DATE(:dateDebutObservation, \'YYYY-MM-DD\')
             ORDER BY I.MATCLE, A.C_STRUCTURE, A.D_DEB_VAL';
         $stmtGeisha = $connGeisha->prepare($sqlGeishaAgreements);
@@ -75,7 +75,7 @@ class SyncGeishaCommand extends Command
         $stmtGeisha->execute();
         $agreements = $stmtGeisha->fetchAll();
         if (!empty($agreements)) {
-            
+
             // Agreements exist or GEISHA response
             // REMOVE all AGR fields
             $sqlRemoveAgreements = 'UPDATE `agent` SET `codeUOAffectationsAGR` = NULL, `dateDebutAffectationsAGR` = NULL, `dateFinAffectationsAGR` = NULL';
@@ -83,7 +83,7 @@ class SyncGeishaCommand extends Command
             $stmt = $conn->prepare($sqlRemoveAgreements);
             $stmt->execute();
             $numberOfAgreementsUpdated = $stmt->rowCount();
-            
+
             $numberOfAgreementsGeisha = count($agreements);
             if ($loggerMode === 'file') {
                 $this->logger->info($numberOfAgreementsUpdated . ' agents with reset agreements', ['db' => 'VHS']);
@@ -105,7 +105,7 @@ class SyncGeishaCommand extends Command
                     $codeUOAffectationsAGR      = explode('|', $agent->getCodeUOAffectationsAGR());
                     $dateDebutAffectationsAGR   = $agent->getDateDebutAffectationsAGR();
                     $dateFinAffectationsAGR     = $agent->getDateFinAffectationsAGR();
-                    
+
                     $codeUOAffectationAGR = $agreement['C_STRUCTURE'];
                     $structure = $this->em->getRepository(Structure::class)->findOneInCodeHarpege($agreement['C_STRUCTURE']);
                     if ($structure) {
@@ -120,10 +120,10 @@ class SyncGeishaCommand extends Command
                     $codeUOAffectationsAGR[]    = $codeUOAffectationAGR;
                     // Keep the smallest and the biggest date
                     $dateDebutAffectationsAGRCurrent = new \DateTime(\substr($agreement['D_DEB_VAL'],0,10));
-                    if (empty($this->dateDebutAffectationsAGR) || $this->dateDebutAffectationsAGR > $dateDebutAffectationsAGRCurrent)
+                    if (empty($dateDebutAffectationsAGR) || $dateDebutAffectationsAGR > $dateDebutAffectationsAGRCurrent)
                         $dateDebutAffectationsAGR = $dateDebutAffectationsAGRCurrent;
                     $dateFinAffectationsAGRCurrent = new \DateTime(\substr($agreement['D_FIN_VAL'],0,10));
-                    if (empty($this->dateFinAffectationsAGR) || $this->dateFinAffectationsAGR < $dateFinAffectationsAGRCurrent)
+                    if (empty($dateFinAffectationsAGR) || $dateFinAffectationsAGR < $dateFinAffectationsAGRCurrent)
                         $dateFinAffectationsAGR = $dateFinAffectationsAGRCurrent;
 
                     // Save them
@@ -132,9 +132,9 @@ class SyncGeishaCommand extends Command
                     $agent->setDateFinAffectationsAGR($dateFinAffectationsAGR);
                     $this->em->persist($agent);
                     $this->em->flush();
-                    
+
                 }
-                
+
                 if ($loggerMode !== 'file') {
                     // advances the progress bar 1 unit
                     $progressBar->advance();
@@ -147,9 +147,9 @@ class SyncGeishaCommand extends Command
                 $io->error('No agreement');
             }
         }
-    
 
-        
+
+
 
 
         if ($loggerMode === 'file') {
@@ -157,10 +157,10 @@ class SyncGeishaCommand extends Command
         } else {
             // ensures that the progress bar is at 100%
             $progressBar->finish();
-            
+
             $io->success('Sync the agreements from GEISHA was successfully done in ' . (time() - $start) . 's');
-        }        
-        
+        }
+
         return 0;
     }
 }
