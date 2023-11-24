@@ -63,11 +63,10 @@ class SyncGeishaCommand extends Command
         }
 
         $connGeisha = $this->geishaEm->getConnection();
-        $sqlGeishaAgreements = 'SELECT I.MATCLE, A.C_STRUCTURE, TO_CHAR(A.D_DEB_VAL, \'YYYY-MM-DD\') AS D_DEB_VAL, TO_CHAR(A.D_FIN_VAL, \'YYYY-MM-DD\') AS D_FIN_VAL
-            FROM GEI_ADM.AGREMENT A
-            LEFT JOIN GEI_ADM.INDIVIDU2 I ON I.NO_INDIVIDU = A.NO_INDIVIDU
-            WHERE A.D_DEB_VAL <= TO_DATE(:dateFinObservation, \'YYYY-MM-DD\') AND A.D_FIN_VAL >= TO_DATE(:dateDebutObservation, \'YYYY-MM-DD\')
-            ORDER BY I.MATCLE, A.C_STRUCTURE, A.D_DEB_VAL';
+        $sqlGeishaAgreements = 'SELECT vva.MATCLE, VVA.C_STRUCTURE, TO_CHAR(vva.D_DEB_VAL, \'YYYY-MM-DD\') AS D_DEB_VAL, TO_CHAR(vva.D_FIN_VAL, \'YYYY-MM-DD\') AS D_FIN_VAL
+        FROM GEI_ADM.V_VHS_AGREMENT vva
+        WHERE vva.D_DEB_VAL <= TO_DATE(:dateFinObservation, \'YYYY-MM-DD\') AND vva.D_FIN_VAL >= TO_DATE(:dateDebutObservation, \'YYYY-MM-DD\')
+        ORDER BY vva.MATCLE, vva.C_STRUCTURE, vva.D_DEB_VAL';
         $stmtGeisha = $connGeisha->prepare($sqlGeishaAgreements);
         $dateObservation = new \DateTime();
         $stmtGeisha->bindValue('dateDebutObservation', $dateObservation->format('Y-m-d'));
