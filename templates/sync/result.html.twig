@@ -4,23 +4,24 @@
 
 {% block body %}
 
-<div class="log-title">{{ title }}</div>
+<div class="fs-5 p-4">{{ title }}</div>
 
 {% if fileToDisplay %}
-<div class="log-columns">
-    
-    <div class="log-column log-list">
-        {% set logType = '' %}
+<div class="d-flex p-4 gap-4">
+    <div class="sticky-top" style="min-width: 300px;">
+        <ul class="list-group">
+
         {% for logType, logTypeFiles in files %}
-        <div class="log-type">{{ logType }}</div>
+        <li class="list-group-item list-group-item-light">{{ logType }}</li>
         {% for logTypeFile in logTypeFiles %}
-        
-        <a href="{{ path('sync_result', {'env': env, 'fileName': logTypeFile.filename}) }}">{{ logTypeFile.filename }}</a>
+
+        <a class="list-group-item list-group-item-action {{ logTypeFile.filename in app.request.pathinfo ? 'fw-bold' }}" href="{{ path('sync_result', {'env': env, 'fileName': logTypeFile.filename}) }}">{{ logTypeFile.filename }}</a>
         {% endfor %}
         {% endfor %}
+        </ul>
     </div>
-    
-    <div class="log-column log-content">
+
+    <div class="font-monospace" style="font-size: .8rem; white-space: pre;">
         {% include "sync/" ~ fileToDisplay.filename ignore missing %}
     </div>
 </div>

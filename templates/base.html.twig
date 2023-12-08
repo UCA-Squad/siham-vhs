@@ -5,8 +5,7 @@
 
         <title>{% block title %}SIHAM VHS{% endblock %}</title>
 
-        
-        <link rel="stylesheet" type="text/css" href="{{ asset('css/main.min.css') }}">
+        <link rel="stylesheet" href="https://cdn.uca.fr/v2/css/uca.min.css">
         {% block stylesheets %}
         {% endblock %}
 
@@ -15,6 +14,7 @@
         {% include "menu.html.twig" %}
 
         {% block body %}{% endblock %}
+
         {% block javascripts %}{% endblock %}
 
     </body>

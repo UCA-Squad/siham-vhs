@@ -1,6 +1,6 @@
-<div class="menu">
-    <a href="{{ path('test_result', {'env': environment}) }}">{{ environment|upper }} - Test results</a>
-    <a href="{{ path('sync_result', {'env': environment}) }}">{{ environment|upper }} - Sync results</a>
-    <a href="{{ path('test_result', {'env': 'test'}) }}">TEST - Test results</a>
-    <a href="{{ path('sync_result', {'env': 'test'}) }}">TEST- Sync results</a>
+<div class="d-flex justify-content-center gap-4 mt-4">
+    <a class="btn btn-light {{ ('/test/' ~ environment) in app.request.pathinfo ? 'active' }}" href="{{ path('test_result', {'env': environment}) }}">{{ environment|upper }} - Test results</a>
+    <a class="btn btn-light {{ ('/sync/' ~ environment) in app.request.pathinfo ? 'active' }}" href="{{ path('sync_result', {'env': environment}) }}">{{ environment|upper }} - Sync results</a>
+    <a class="btn btn-light {{ '/test/test' in app.request.pathinfo ? 'active' }}" href="{{ path('test_result', {'env': 'test'}) }}">TEST - Test results</a>
+    <a class="btn btn-light {{ '/sync/test' in app.request.pathinfo ? 'active' }}" href="{{ path('sync_result', {'env': 'test'}) }}">TEST- Sync results</a>
 </div>
