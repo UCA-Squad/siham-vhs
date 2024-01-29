@@ -78,7 +78,7 @@ class SyncInpCommand extends Command
                 'ISIMA' => 'UIQ000000C',
             ];
             $matchCivilite = ['M' => 1, 'MME' => 2];
-            $fields = ['IdAurion','NomPatronymique','NomUsuel','Prenom','DateDeNaissance','Civilite','TelephoneProLong','TelephonePersonnel','MailPersonnel','LoginSigma','MailSigma','BadgeSigma','DateDebut','DateFin','TypePopulation','CodeFormation','EntiteAffectation','SupannCodeINE'];
+            $fields = ['IdAurion','NomPatronymique','NomUsuel','Prenom','DateDeNaissance','Civilite','TelephoneProLong','TelephonePersonnel','MailPersonnel','LoginSigma','MailSigma','BadgeSigma','NumeroPorteMonnaieIZLY','DateDebut','DateFin','TypePopulation','CodeFormation','EntiteAffectation','SupannCodeINE'];
             foreach($rows as $row) {
                 $detailAgent = array_combine($fields, explode(';', $row));
 
