@@ -7,8 +7,8 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Agent
  *
- * @ORM\Table(name="agent", 
- *      uniqueConstraints={@ORM\UniqueConstraint(name="matricule_UNIQUE", columns={"matricule"})}, 
+ * @ORM\Table(name="agent",
+ *      uniqueConstraints={@ORM\UniqueConstraint(name="matricule_UNIQUE", columns={"matricule"})},
  *      indexes={@ORM\Index(columns={"aurion"})}
  * )
  * @ORM\Entity(repositoryClass="App\Repository\AgentRepository")
@@ -463,7 +463,7 @@ class Agent {
      * @ORM\Column(name="dateFinPositionAdministrative", type="date", nullable=true)
      */
     private $dateFinPositionAdministrative;
-    
+
     /**
      * @var string|null
      *
@@ -1069,10 +1069,10 @@ class Agent {
 
     /**
      * Set attributes from response of webservice dossierAgent
-     * @param personalData object response of webservice 
+     * @param personalData object response of webservice
      */
     public function addPersonalData($personalData) {
-        
+
         // Set the data with the same name
         if (isset($personalData->donneesPersonnelles)) {
             foreach($personalData->donneesPersonnelles as $attribute => $value) {
@@ -1088,10 +1088,10 @@ class Agent {
 
         // Interpret phones and emails fields
         $typesNumerosMails = [
-            'TPR' => 'telephonePro', 
-            'PPR' => 'portablePro', 
-            'PPE' => 'portablePerso', 
-            'MPR' => 'mailPro', 
+            'TPR' => 'telephonePro',
+            'PPR' => 'portablePro',
+            'PPE' => 'portablePerso',
+            'MPR' => 'mailPro',
             'MPE' => 'mailPerso',
         ];
         // Reset them before
@@ -1134,7 +1134,7 @@ class Agent {
 
     /**
      * Set attributes from response of webservice dossierAgent
-     * @param administrativeData object response of webservice 
+     * @param administrativeData object response of webservice
      */
     public function addAdministrativeData($administrativeData, $startObservationDate = null, $endObservationDate = null) {
         if (empty($startObservationDate))
@@ -1159,13 +1159,13 @@ class Agent {
                 $when = $dateDebutAffectationsCurrent <= $startObservationDate ? 'current' : ($dateDebutAffectationsCurrent <= $endObservationDate ? 'next' : null);
                 $type = $listeAffectation->codeTypeRattachement;
                 if (!empty($when)) {
-                
+
                     if (!isset($codeUOAffectations[$type][$when]) || !in_array($listeAffectation->codeUOAffectation, $codeUOAffectations[$type][$when])) $codeUOAffectations[$type][$when][] = $listeAffectation->codeUOAffectation;
                     if (!isset($nameAffectations[$type][$when]) || !in_array($listeAffectation->libLongCodeUOAffectation, $nameAffectations[$type][$when])) $nameAffectations[$type][$when][] = $listeAffectation->libLongCodeUOAffectation;
                     if (!isset($quotiteAffectations[$type][$when]) || \array_sum($quotiteAffectations[$type][$when]) < 100) $quotiteAffectations[$type][$when][] = $listeAffectation->quotiteAffectation;
-                    
+
                     $dateDebutAffectations[$type][$when][] = $dateDebutAffectationsCurrent;
-                    
+
                     $codeEmploiAffectation   [$type][$when] = isset($listeAffectation->codeEmploiAffectation)    ? $listeAffectation->codeEmploiAffectation    : null;
                     $libLongEmploiAffectation[$type][$when] = isset($listeAffectation->libLongEmploiAffectation) ? $listeAffectation->libLongEmploiAffectation : null;
                     $codePosteAffectation    [$type][$when] = isset($listeAffectation->codePosteAffectation)     ? $listeAffectation->codePosteAffectation     : null;
@@ -1185,7 +1185,7 @@ class Agent {
         $this->codeUOAffectationsHIE = \implode('|', isset($codeUOAffectations  ['HIE']['current']) ? $codeUOAffectations   ['HIE']['current'] : (isset($codeUOAffectations   ['HIE']['next']) ? $codeUOAffectations   ['HIE']['next'] : []));
         $this->nameAffectationsHIE   = \implode('|', isset($nameAffectations    ['HIE']['current']) ? $nameAffectations     ['HIE']['current'] : (isset($nameAffectations     ['HIE']['next']) ? $nameAffectations     ['HIE']['next'] : []));
         $this->quotiteAffectationsHIE= \implode('|', isset($quotiteAffectations ['HIE']['current']) ? $quotiteAffectations  ['HIE']['current'] : (isset($quotiteAffectations  ['HIE']['next']) ? $quotiteAffectations  ['HIE']['next'] : []));
-        
+
         // Keep the min date and the max date
         $datesDebut = isset($dateDebutAffectations['HIE']['current']) ? $dateDebutAffectations['HIE']['current'] : (isset($dateDebutAffectations['HIE']['next']) ? $dateDebutAffectations['HIE']['next'] : []);
         if (!empty($datesDebut)) {
@@ -1205,7 +1205,7 @@ class Agent {
         } else {
             $this->dateFinAffectationsHIE   = null;
         }
-        
+
         $this->codeEmploiAffectation    = isset($codeEmploiAffectation      ['HIE']['current']) ? $codeEmploiAffectation    ['HIE']['current'] : (isset($codeEmploiAffectation      ['HIE']['next']) ? $codeEmploiAffectation    ['HIE']['next'] : null);
         $this->libLongEmploiAffectation = isset($libLongEmploiAffectation   ['HIE']['current']) ? $libLongEmploiAffectation ['HIE']['current'] : (isset($libLongEmploiAffectation   ['HIE']['next']) ? $libLongEmploiAffectation ['HIE']['next'] : null);
         $this->codePosteAffectation     = isset($codePosteAffectation       ['HIE']['current']) ? $codePosteAffectation     ['HIE']['current'] : (isset($codePosteAffectation       ['HIE']['next']) ? $codePosteAffectation     ['HIE']['next'] : null);
@@ -1358,12 +1358,22 @@ class Agent {
 
     /**
      * Set attributes from response of webservice dossierAgent
-     * @param echelons object response of webservice 
+     * @param echelons object response of webservice
      */
     public function addEchelons($echelons) {
         if (isset($echelons->codeEchelonPrevisionnel)) $this->setCodeProchainEchelon($echelons->codeEchelonPrevisionnel);
         if (isset($echelons->datePrevisionnelleAvancEchelon)) $this->setDateProchainEchelon(new \DateTime(\substr($echelons->datePrevisionnelleAvancEchelon, 0, 10)));
-        if (isset($echelons->indiceMajorePrevisionnel)) $this->setProchainIndiceMajore($echelons->indiceMajorePrevisionnel); 
+        if (isset($echelons->indiceMajorePrevisionnel)) $this->setProchainIndiceMajore($echelons->indiceMajorePrevisionnel);
+    }
+
+    /**
+     * Set attributes from response of webservice dossierAgent
+     * @param echelons array from database
+     */
+    public function addEchelon($echelon) {
+        if (isset($echelon['PROCHAIN_ECHELON']))        $this->setCodeProchainEchelon($echelon['PROCHAIN_ECHELON']);
+        if (isset($echelon['DATE_PROCHAIN_ECHELON']))   $this->setDateProchainEchelon(new \DateTime(\substr($echelon['DATE_PROCHAIN_ECHELON'], 0, 10)));
+        if (isset($echelon['PROHAIN_IND_MAJORE']))      $this->setProchainIndiceMajore($echelon['PROHAIN_IND_MAJORE']);
     }
 
 }

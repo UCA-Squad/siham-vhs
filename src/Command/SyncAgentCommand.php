@@ -320,60 +320,140 @@ class SyncAgentCommand extends Command
                 #region Call SIHAM WS to get echelon
                 if ($agent->getCodePIP() == 'TITU1' && $agent->getCodePositionStatutaire() == 'AC') {
 
-                    $startTempo = microtime(true);
-                    $echelon = $dossierAgentWS->getEchelon($agentSihamId);
-                    // restart WS or exit if X timeout achieved
-                    $duration = microtime(true) - $startTempo;
-                    if ($duration > TIMEOUT_MAX_DURATION) {
+                    // $startTempo = microtime(true);
+                    // // TODO Refactor
+                    // // request database to get the last set echelon
+                    $sqlSihamEchelon = 'SELECT
+                    CASE
+                        WHEN (SELECT NULIGN
+                                FROM HR.ZYGR , HR.ZY00
+                                WHERE HR.ZYGR.NUDOSS = HR.ZY00.NUDOSS
+                                AND MATCLE =:matricule
+                                AND HR.ZYGR.NULIGN = (SELECT MAX (NULIGN) FROM HR.ZYGR WHERE NUDOSS IN (SELECT NUDOSS FROM HR.ZY00 WHERE MATCLE =:matricule)))
+                            = (SELECT NULIGN
+                                FROM HR.ZYGR , HR.ZY00
+                                WHERE HR.ZYGR.NUDOSS = HR.ZY00.NUDOSS
+                                AND MATCLE =:matricule
+                                AND SYSDATE  BETWEEN DATEFF AND DATFIN
+                                AND HR.ZYGR.NULIGN = (SELECT MAX (NULIGN) FROM HR.ZYGR WHERE NUDOSS IN (SELECT NUDOSS FROM HR.ZY00 WHERE MATCLE =:matricule) AND SYSDATE  BETWEEN DATEFF AND DATFIN))
+                        THEN
+                            (SELECT ECHLON  FROM HR.ZYAV, HR.ZY00  WHERE HR.ZYAV.NUDOSS = HR.ZY00.NUDOSS AND HR.ZY00.MATCLE =:matricule
+                               AND NULIGN = (SELECT MAX(NULIGN) FROM HR.ZYAV,HR.ZY00 WHERE HR.ZYAV.NUDOSS = HR.ZY00.NUDOSS AND HR.ZY00.MATCLE =:matricule ))
+                        ELSE
+                            (SELECT ECHELO FROM HR.ZYGR , HR.ZY00 WHERE HR.ZYGR.NUDOSS = HR.ZY00.NUDOSS AND MATCLE =:matricule
+                                AND HR.ZYGR.NULIGN = (SELECT MAX (NULIGN) FROM HR.ZYGR WHERE NUDOSS IN (SELECT NUDOSS FROM HR.ZY00 WHERE MATCLE =:matricule  AND DATEFF> SYSDATE )))
+                    END  AS PROCHAIN_ECHELON,
+                    CASE
+                        WHEN (SELECT NULIGN
+                                FROM HR.ZYGR , HR.ZY00
+                                WHERE HR.ZYGR.NUDOSS = HR.ZY00.NUDOSS
+                                AND MATCLE =:matricule
+                                AND HR.ZYGR.NULIGN = (SELECT MAX (NULIGN) FROM HR.ZYGR WHERE NUDOSS IN (SELECT NUDOSS FROM HR.ZY00 WHERE MATCLE =:matricule)))
+                            = (SELECT NULIGN
+                                FROM HR.ZYGR , HR.ZY00
+                                WHERE HR.ZYGR.NUDOSS = HR.ZY00.NUDOSS
+                                AND MATCLE =:matricule
+                                AND SYSDATE  BETWEEN DATEFF AND DATFIN
+                                AND HR.ZYGR.NULIGN = (SELECT MAX (NULIGN) FROM HR.ZYGR WHERE NUDOSS IN (SELECT NUDOSS FROM HR.ZY00 WHERE MATCLE =:matricule) AND SYSDATE  BETWEEN DATEFF AND DATFIN))
+                        THEN
+                            (SELECT AVCREE  FROM HR.ZYAV, HR.ZY00  WHERE HR.ZYAV.NUDOSS = HR.ZY00.NUDOSS AND HR.ZY00.MATCLE =:matricule
+                               AND NULIGN = (SELECT MAX(NULIGN) FROM HR.ZYAV,HR.ZY00 WHERE HR.ZYAV.NUDOSS = HR.ZY00.NUDOSS AND HR.ZY00.MATCLE =:matricule ))
+                        ELSE
+                            (SELECT DATEFF FROM HR.ZYGR , HR.ZY00 WHERE HR.ZYGR.NUDOSS = HR.ZY00.NUDOSS AND MATCLE =:matricule
+                                AND HR.ZYGR.NULIGN = (SELECT MAX (NULIGN) FROM HR.ZYGR WHERE NUDOSS IN (SELECT NUDOSS FROM HR.ZY00 WHERE MATCLE =:matricule  AND DATEFF> SYSDATE )))
+                    END  AS DATE_PROCHAIN_ECHELON,
+                    CASE
+                        WHEN (SELECT NULIGN
+                                FROM HR.ZYGR , HR.ZY00
+                                WHERE HR.ZYGR.NUDOSS = HR.ZY00.NUDOSS
+                                AND MATCLE =:matricule
+                                AND HR.ZYGR.NULIGN = (SELECT MAX (NULIGN) FROM HR.ZYGR WHERE NUDOSS IN (SELECT NUDOSS FROM HR.ZY00 WHERE MATCLE =:matricule)))
+                            = (SELECT NULIGN
+                                FROM HR.ZYGR , HR.ZY00
+                                WHERE HR.ZYGR.NUDOSS = HR.ZY00.NUDOSS
+                                AND MATCLE =:matricule
+                                AND SYSDATE  BETWEEN DATEFF AND DATFIN
+                                AND HR.ZYGR.NULIGN = (SELECT MAX (NULIGN) FROM HR.ZYGR WHERE NUDOSS IN (SELECT NUDOSS FROM HR.ZY00 WHERE MATCLE =:matricule) AND SYSDATE  BETWEEN DATEFF AND DATFIN))
+                        THEN
+                            (SELECT INDMAJ  FROM HR.ZYAV, HR.ZY00  WHERE HR.ZYAV.NUDOSS = HR.ZY00.NUDOSS AND HR.ZY00.MATCLE =:matricule
+                               AND NULIGN = (SELECT MAX(NULIGN) FROM HR.ZYAV,HR.ZY00 WHERE HR.ZYAV.NUDOSS = HR.ZY00.NUDOSS AND HR.ZY00.MATCLE =:matricule ))
+                        ELSE
+                            (SELECT INDMAJ FROM HR.ZYGS , HR.ZY00 WHERE HR.ZYGS.NUDOSS = HR.ZY00.NUDOSS AND MATCLE =:matricule
+                                AND HR.ZYGS.NULIGN = (SELECT MAX (NULIGN) FROM HR.ZYGS WHERE NUDOSS IN (SELECT NUDOSS FROM HR.ZY00 WHERE MATCLE =:matricule  AND DATEFF> SYSDATE )))
+                    END  AS PROHAIN_IND_MAJORE
+                    FROM DUAL';
+                    $stmtSihamEchelon = $connSiham->prepare($sqlSihamEchelon);
+                    $stmtSihamEchelon->bindValue('matricule', $agent->getMatricule());
+                    $stmtSihamEchelon->execute();
+                    $resSihamEchelon = $stmtSihamEchelon->fetch();
+                    if (!empty($resSihamEchelon)) {
+                        $agent->addEchelon($resSihamEchelon);
                         if ($loggerMode === 'file') {
-                            $this->logger->warning('Duration exceeded by ' . TIMEOUT_MAX_DURATION . 's', ['ws' => 'DossierAgentWebService', 'method' => 'recupProchainEchelon', 'cause' => 'timeout', 'duration' => number_format($duration, 3) . 's']);
-                        } else {
-                            $io->warning('Duration ' . number_format($duration, 3) . 's exceeded by ' . TIMEOUT_MAX_DURATION . 's for recupProchainEchelon');
+                            $this->logger->info('- receive echelon' . \str_repeat('&nbsp;', 12), ['duration' => number_format(microtime(true) - $startTempo, 3) . 's']);
                         }
-                        if ($timeoutCounter > TIMEOUT_MAX_COUNTER) {
-                            if ($this->restartWS()) {
-                                if ($loggerMode === 'file') {
-                                    $this->logger->warning('WS restarted', ['ws' => 'DossierAgentWebService', 'method' => 'recupProchainEchelon', 'cause' => $timeoutCounter . ' timeout achieved']);
-                                } else {
-                                    $io->warning('WS restarted , ' . $timeoutCounter . ' timeout achieved');
-                                }
-                                $emailSIContent.= 'Le WS <b>DossierAgentWebService</b> a été redémarré car ' . $timeoutCounter . ' timeout jusqu\'à <b>recupProchainEchelon</b> pour l\'agent ' . $agentSihamId . ' (réinitialisation du compteur à 1).<br>';
-                                $timeoutCounter = 1;
-                            } else {
-                                if ($loggerMode === 'file') {
-                                    $this->logger->error('Sync agent interrupt', ['cause' => $timeoutCounter . ' timeout achieved']);
-                                } else {
-                                    $io->error('Sync agent interrupt, ' . $timeoutCounter . ' timeout achieved');
-                                }
-                                $listUnprocessedAgents = \array_diff($listAgents, $listProcessedAgents);
-                                $emailSIContent.= 'La synchronisation des agents a été arrêté après <b>' . $timeoutCounter . '</b> tentatives de pause de <b>' . TIMEOUT_PAUSE_DURATION . 's</b> suite a des <i>timeout</i> ou des temps de récupération dépassant les <b>' . TIMEOUT_MAX_DURATION . 's</b>';
-                                $emailRHContent.= 'La synchronisation des agents s\'est arrêtée suite a des temps de réponse trop long des webservices.<br>';
-                                $emailRHContent.= '<b>' . count($listUnprocessedAgents) . '</b>/' . count($listAgents) . ' matricules n\'ont pas été traités:<br>';
-                                $emailRHContent.= \implode('<br>', $listUnprocessedAgents) . '<br>';
-                                if (!empty($emailSIContent)) $this->sendSIEmail($emailSIContent);
-                                if (!empty($emailRHContent)) $this->sendRHEmail($emailRHContent);
-                                return 0;
-                            }
-                        }
-                        $this->logger->info('Have a break for ' . TIMEOUT_PAUSE_DURATION . 's ...', ['cause' => $timeoutCounter . ' attempts achieved']);
-                        \sleep(TIMEOUT_PAUSE_DURATION);
-                        $timeoutCounter++;
                     } else {
-                        // set data if returned
-                        if (isset($echelon->return)) {
-                            $agent->addEchelons($echelon->return);
-                            if ($loggerMode === 'file') {
-                                $this->logger->info('- receive echelon' . \str_repeat('&nbsp;', 12), ['duration' => number_format(microtime(true) - $startTempo, 3) . 's']);
-                            }
+                        if ($loggerMode === 'file') {
+                            $this->logger->info('- no echelon' . \str_repeat('&nbsp;', 8), ['ws' => 'no', 'db' => 'SIHAM']);
                         } else {
-                            if ($loggerMode === 'file') {
-                                $this->logger->warning('- no echelon' . \str_repeat('&nbsp;', 8), ['ws' => 'DossierAgentWebService', 'method' => 'recupProchainEchelon', 'cause' => 'empty response']);
-                            } else {
-                                $io->warning('No echelon for ' . $agentSihamId);
-                            }
-                            // $emailSIContent.= 'recupProchainEchelon vide pour l\'agent ' . $agentSihamId . '.<br>';
+                            $io->warning('No echelon for ' . $agentSihamId);
                         }
                     }
+
+                    // REPLACE BY DATABASE CONNEXION ABOVE
+                    // THE WEBSERVICE RETURN WRONG VALUE
+                    // $echelon = $dossierAgentWS->getEchelon($agentSihamId);
+                    // // restart WS or exit if X timeout achieved
+                    // $duration = microtime(true) - $startTempo;
+                    // if ($duration > TIMEOUT_MAX_DURATION) {
+                    //     if ($loggerMode === 'file') {
+                    //         $this->logger->warning('Duration exceeded by ' . TIMEOUT_MAX_DURATION . 's', ['ws' => 'DossierAgentWebService', 'method' => 'recupProchainEchelon', 'cause' => 'timeout', 'duration' => number_format($duration, 3) . 's']);
+                    //     } else {
+                    //         $io->warning('Duration ' . number_format($duration, 3) . 's exceeded by ' . TIMEOUT_MAX_DURATION . 's for recupProchainEchelon');
+                    //     }
+                    //     if ($timeoutCounter > TIMEOUT_MAX_COUNTER) {
+                    //         if ($this->restartWS()) {
+                    //             if ($loggerMode === 'file') {
+                    //                 $this->logger->warning('WS restarted', ['ws' => 'DossierAgentWebService', 'method' => 'recupProchainEchelon', 'cause' => $timeoutCounter . ' timeout achieved']);
+                    //             } else {
+                    //                 $io->warning('WS restarted , ' . $timeoutCounter . ' timeout achieved');
+                    //             }
+                    //             $emailSIContent.= 'Le WS <b>DossierAgentWebService</b> a été redémarré car ' . $timeoutCounter . ' timeout jusqu\'à <b>recupProchainEchelon</b> pour l\'agent ' . $agentSihamId . ' (réinitialisation du compteur à 1).<br>';
+                    //             $timeoutCounter = 1;
+                    //         } else {
+                    //             if ($loggerMode === 'file') {
+                    //                 $this->logger->error('Sync agent interrupt', ['cause' => $timeoutCounter . ' timeout achieved']);
+                    //             } else {
+                    //                 $io->error('Sync agent interrupt, ' . $timeoutCounter . ' timeout achieved');
+                    //             }
+                    //             $listUnprocessedAgents = \array_diff($listAgents, $listProcessedAgents);
+                    //             $emailSIContent.= 'La synchronisation des agents a été arrêté après <b>' . $timeoutCounter . '</b> tentatives de pause de <b>' . TIMEOUT_PAUSE_DURATION . 's</b> suite a des <i>timeout</i> ou des temps de récupération dépassant les <b>' . TIMEOUT_MAX_DURATION . 's</b>';
+                    //             $emailRHContent.= 'La synchronisation des agents s\'est arrêtée suite a des temps de réponse trop long des webservices.<br>';
+                    //             $emailRHContent.= '<b>' . count($listUnprocessedAgents) . '</b>/' . count($listAgents) . ' matricules n\'ont pas été traités:<br>';
+                    //             $emailRHContent.= \implode('<br>', $listUnprocessedAgents) . '<br>';
+                    //             if (!empty($emailSIContent)) $this->sendSIEmail($emailSIContent);
+                    //             if (!empty($emailRHContent)) $this->sendRHEmail($emailRHContent);
+                    //             return 0;
+                    //         }
+                    //     }
+                    //     $this->logger->info('Have a break for ' . TIMEOUT_PAUSE_DURATION . 's ...', ['cause' => $timeoutCounter . ' attempts achieved']);
+                    //     \sleep(TIMEOUT_PAUSE_DURATION);
+                    //     $timeoutCounter++;
+                    // } else {
+                    //     // set data if returned
+                    //     if (isset($echelon->return)) {
+                    //         $agent->addEchelons($echelon->return);
+                    //         if ($loggerMode === 'file') {
+                    //             $this->logger->info('- receive echelon' . \str_repeat('&nbsp;', 12), ['duration' => number_format(microtime(true) - $startTempo, 3) . 's']);
+                    //         }
+                    //     } else {
+                    //         if ($loggerMode === 'file') {
+                    //             $this->logger->warning('- no echelon' . \str_repeat('&nbsp;', 8), ['ws' => 'DossierAgentWebService', 'method' => 'recupProchainEchelon', 'cause' => 'empty response']);
+                    //         } else {
+                    //             $io->warning('No echelon for ' . $agentSihamId);
+                    //         }
+                    //         // $emailSIContent.= 'recupProchainEchelon vide pour l\'agent ' . $agentSihamId . '.<br>';
+                    //     }
+                    // }
                 }
                 #endregion
 
