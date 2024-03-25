@@ -44,3 +44,6 @@ services:
         arguments:
             $logger: '@monolog.logger.sync_inp'
             $project_dir: '%kernel.project_dir%'
+    App\Controller\ApiController:
+        arguments:
+            $logger: '@monolog.logger.api'

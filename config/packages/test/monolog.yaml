@@ -1,7 +1,7 @@
 monolog:
     # Add new channel to log the synch commands
-    channels: ['sync_agent', 'sync_geisha', 'sync_structure', 'sync_ldap', 'sync_inp']
-    
+    channels: ['sync_agent', 'sync_geisha', 'sync_structure', 'sync_ldap', 'sync_inp', 'api']
+
     handlers:
         # Define handler to log in a different file
         sync_agent:
@@ -36,11 +36,16 @@ monolog:
             level: debug
             max_files: 6
             channels: ["sync_inp"]
+        api:
+            type: stream
+            path: "%kernel.logs_dir%/%kernel.environment%.api.log"
+            level: debug
+            channels: ["api"]
         main:
             type: stream
             path: "%kernel.logs_dir%/%kernel.environment%.log"
             level: debug
-            channels: ["!event", '!sync_agent', '!sync_geisha', '!sync_structure', '!sync_ldap', '!sync_inp']
+            channels: ["!event", '!sync_agent', '!sync_geisha', '!sync_structure', '!sync_ldap', '!sync_inp', '!api']
         # uncomment to get logging in your browser
         # you may have to allow bigger header sizes in your Web server configuration
         #firephp:
