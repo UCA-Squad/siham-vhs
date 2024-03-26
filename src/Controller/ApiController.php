@@ -79,7 +79,7 @@ class ApiController extends AbstractController
         if ($success != 1)
             return new JsonResponse(['message' => 'SIHAM webservice does\'nt work'], Response::HTTP_INTERNAL_SERVER_ERROR);
 
-        $agent->setMailPerso($mobile);
+        $agent->setPortablePerso($mobile);
         $em->flush();
 
         $this->apiLogger->info('Updated agent ' . $agent->getMatricule(), ['username' => $agent->getUsername(), 'mobile' => $mobile]);
